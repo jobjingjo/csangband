@@ -1,0 +1,1048 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using CSAngband.Object;
+
+namespace CSAngband.Monster {
+	class Monster_Make {
+		/*
+		 * There is a 1/50 (2%) chance of inflating the requested monster level
+		 * during the creation of a monsters (see "get_mon_num()" in "monster.c").
+		 * Lower values yield harder monsters more often.
+		 */
+		public const int  NASTY_MON  =  25;        /* 1/chance of inflated monster level */
+		public const int MON_OOD_MAX = 10;     /* maximum out-of-depth amount */
+
+		/**
+		 * Calculate hp for a monster. This function assumes that the Rand_normal
+		 * function has limits of +/- 4x std_dev. If that changes, this function
+		 * will become inaccurate.
+		 *
+		 * \param r_ptr is the race of the monster in question.
+		 * \param hp_aspect is the hp calc we want (min, max, avg, random).
+		 */
+		public static int mon_hp(Monster_Race r_ptr, aspect hp_aspect)
+		{
+				int std_dev = (((r_ptr.avg_hp * 10) / 8) + 5) / 10;
+
+				if (r_ptr.avg_hp > 1) std_dev++;
+
+				switch (hp_aspect) {
+					case aspect.MINIMISE:
+						return (r_ptr.avg_hp - (4 * std_dev));
+					case aspect.MAXIMISE:
+					case aspect.EXTREMIFY:
+						return (r_ptr.avg_hp + (4 * std_dev));
+					case aspect.AVERAGE:
+						return r_ptr.avg_hp;
+					default:
+						return Random.Rand_normal(r_ptr.avg_hp, std_dev);
+				}
+		}
+
+		/*
+		 * Attempt to allocate a random monster in the dungeon.
+		 *
+		 * Place the monster at least "dis" distance from the player.
+		 *
+		 * Use "slp" to choose the initial "sleep" status
+		 *
+		 * Use "depth" for the monster level
+		 */
+		public static bool pick_and_place_distant_monster(Cave c, Loc loc, int dis, bool slp, int depth)
+		{
+			int py = loc.y;
+			int px = loc.x;
+
+			int y = 0, x = 0;
+			int	attempts_left = 10000;
+
+			Misc.assert(c != null);
+
+			/* Find a legal, distant, unoccupied, space */
+			while (--attempts_left != 0)
+			{
+				/* Pick a location */
+				y = Random.randint0(c.height);
+				x = Random.randint0(c.width);
+
+				/* Require "naked" floor grid */
+				if (!Cave.cave_isempty(c, y, x)) continue;
+
+				/* Accept far away grids */
+				if (Cave.distance(y, x, py, px) > dis) break;
+			}
+
+			if (attempts_left == 0)
+			{
+				if (Option.cheat_xtra.value || Option.cheat_hear.value)
+				{
+					Utilities.msg("Warning! Could not allocate a new monster.");
+				}
+
+				return false;
+			}
+
+			/* Attempt to place the monster, allow groups */
+			if (pick_and_place_monster(c, y, x, depth, slp, true, Object.Origin.DROP)) return (true);
+
+			/* Nope */
+			return (false);
+		}
+
+		/*
+		 * Pick a monster race, make a new monster of that race, then place
+		 * it in the dungeon.
+		 */
+		public static bool pick_and_place_monster(Cave c, int y, int x, int depth, bool slp, bool grp, Object.Origin origin)
+		{
+			int r_idx;
+
+			/* Pick a monster race */
+			r_idx = get_mon_num(depth);
+
+			/* Handle failure */
+			if (r_idx == 0) return (false);
+
+			/* Attempt to place the monster */
+			return (place_new_monster(c, y, x, r_idx, slp, grp, origin));
+		}
+
+		/*
+		 * Choose a monster race that seems "appropriate" to the given level
+		 *
+		 * This function uses the "prob2" field of the "monster allocation table",
+		 * and various local information, to calculate the "prob3" field of the
+		 * same table, which is then used to choose an "appropriate" monster, in
+		 * a relatively efficient manner.
+		 *
+		 * Note that "town" monsters will *only* be created in the town, and
+		 * "normal" monsters will *never* be created in the town, unless the
+		 * "level" is "modified", for example, by polymorph or summoning.
+		 *
+		 * There is a small chance (1/50) of "boosting" the given depth by
+		 * a small amount (up to four levels), except in the town.
+		 *
+		 * It is (slightly) more likely to acquire a monster of the given level
+		 * than one of a lower level.  This is done by choosing several monsters
+		 * appropriate to the given level and keeping the "hardest" one.
+		 *
+		 * Note that if no monsters are "appropriate", then this function will
+		 * fail, and return zero, but this should *almost* never happen.
+		 */
+		public static short get_mon_num(int level)
+		{
+			int i, j, p;
+
+			int r_idx;
+
+			long value, total;
+
+			Monster_Race r_ptr;
+
+			Init.alloc_entry[] table = Init.alloc_race_table;
+
+			/* Occasionally produce a nastier monster in the dungeon */
+			if (level > 0 && Random.one_in_(NASTY_MON))
+				level += Math.Min(level / 4 + 2, MON_OOD_MAX);
+
+			/* Reset total */
+			total = 0L;
+
+			/* Process probabilities */
+			for (i = 0; i < Init.alloc_race_size; i++)
+			{
+				/* Monsters are sorted by depth */
+				if (table[i].level > level) break;
+
+				/* Default */
+				table[i].prob3 = 0;
+
+				/* Hack -- No town monsters in dungeon */
+				if ((level > 0) && (table[i].level <= 0)) continue;
+
+				/* Get the "r_idx" of the chosen monster */
+				r_idx = table[i].index;
+
+				/* Get the actual race */
+				r_ptr = Misc.r_info[r_idx];
+
+				/* Hack -- "unique" monsters must be "unique" */
+				if (r_ptr.flags.has(Monster_Flag.UNIQUE.value) &&
+					r_ptr.cur_num >= r_ptr.max_num)
+				{
+					continue;
+				}
+
+				/* Depth Monsters never appear out of depth */
+				if (r_ptr.flags.has(Monster_Flag.FORCE_DEPTH.value) && r_ptr.level > Misc.p_ptr.depth)
+				{
+					continue;
+				}
+
+				/* Accept */
+				table[i].prob3 = table[i].prob2;
+
+				/* Total */
+				total += table[i].prob3;
+			}
+
+			/* No legal monsters */
+			if (total <= 0) return (0);
+
+
+			/* Pick a monster */
+			value = Random.randint0((int)total);
+
+			/* Find the monster */
+			for (i = 0; i < Init.alloc_race_size; i++)
+			{
+				/* Found the entry */
+				if (value < table[i].prob3) break;
+
+				/* Decrement */
+				value = value - table[i].prob3;
+			}
+
+
+			/* Power boost */
+			p = Random.randint0(100);
+
+			/* Try for a "harder" monster once (50%) or twice (10%) */
+			if (p < 60)
+			{
+				/* Save old */
+				j = i;
+
+				/* Pick a monster */
+				value = Random.randint0((int)total);
+
+				/* Find the monster */
+				for (i = 0; i < Init.alloc_race_size; i++)
+				{
+					/* Found the entry */
+					if (value < table[i].prob3) break;
+
+					/* Decrement */
+					value = value - table[i].prob3;
+				}
+
+				/* Keep the "best" one */
+				if (table[i].level < table[j].level) i = j;
+			}
+
+			/* Try for a "harder" monster twice (10%) */
+			if (p < 10)
+			{
+				/* Save old */
+				j = i;
+
+				/* Pick a monster */
+				value = Random.randint0((int)total);
+
+				/* Find the monster */
+				for (i = 0; i < Init.alloc_race_size; i++)
+				{
+					/* Found the entry */
+					if (value < table[i].prob3) break;
+
+					/* Decrement */
+					value = value - table[i].prob3;
+				}
+
+				/* Keep the "best" one */
+				if (table[i].level < table[j].level) i = j;
+			}
+
+
+			/* Result */
+			return (table[i].index);
+		}
+
+		/*
+		 * Attempt to place a monster of the given race at the given location.
+		 *
+		 * To give the player a sporting chance, any monster that appears in
+		 * line-of-sight and is extremely dangerous can be marked as
+		 * "FORCE_SLEEP", which will cause them to be placed with low energy,
+		 * which often (but not always) lets the player move before they do.
+		 *
+		 * This routine refuses to place out-of-depth "FORCE_DEPTH" monsters.
+		 *
+		 * XXX XXX XXX Use special "here" and "dead" flags for unique monsters,
+		 * remove old "cur_num" and "max_num" fields.
+		 *
+		 * XXX XXX XXX Actually, do something similar for artifacts, to simplify
+		 * the "preserve" mode, and to make the "what artifacts" flag more useful.
+		 *
+		 * This is the only function which may place a monster in the dungeon,
+		 * except for the savefile loading code.
+		 */
+		static bool place_new_monster_one(int y, int x, int r_idx, bool slp, byte origin)
+		{
+			int i;
+
+			Monster_Race r_ptr;
+			Monster n_ptr;
+			//Monster monster_type_body;
+
+			string name;
+
+			/* Paranoia */
+			if (!Cave.in_bounds(y, x)) return (false);
+
+			/* Require empty space */
+			if (!Cave.cave_empty_bold(y, x)) return (false);
+
+			/* No creation on glyph of warding */
+			if (Cave.cave.feat[y][x] == Cave.FEAT_GLYPH) return (false);
+
+			/* Paranoia */
+			if (r_idx == 0) return (false);
+
+			/* Race */
+			r_ptr = Misc.r_info[r_idx];
+			if (r_ptr == null) return (false);
+
+			/* Paranoia */
+			if (r_ptr.Name == null) return (false);
+
+			name = r_ptr.Name;
+
+			/* "unique" monsters must be "unique" */
+			if (r_ptr.flags.has(Monster_Flag.UNIQUE.value) && r_ptr.cur_num >= r_ptr.max_num)
+				return (false);
+
+			/* Depth monsters may NOT be created out of depth */
+			if (r_ptr.flags.has(Monster_Flag.FORCE_DEPTH.value) && Misc.p_ptr.depth < r_ptr.level)
+				return (false);
+
+			/* Add to level feeling */
+			Cave.cave.mon_rating += (uint)(r_ptr.power / 20);
+
+			/* Check out-of-depth-ness */
+			if (r_ptr.level > Misc.p_ptr.depth) {
+				if (r_ptr.flags.has(Monster_Flag.UNIQUE.value)) { /* OOD unique */
+					if (Option.cheat_hear.value)
+						Utilities.msg("Deep Unique (%s).", name);
+				} else { /* Normal monsters but OOD */
+					if (Option.cheat_hear.value)
+						Utilities.msg("Deep Monster (%s).", name);
+				}
+				/* Boost rating by power per 10 levels OOD */
+				Cave.cave.mon_rating += (uint)((r_ptr.level - Misc.p_ptr.depth) * r_ptr.power / 200);
+			}
+			/* Note uniques for cheaters */
+			else if (r_ptr.flags.has(Monster_Flag.UNIQUE.value) && Option.cheat_hear.value)
+				Utilities.msg("Unique (%s).", name);
+
+			/* Get local monster */
+			n_ptr = new Monster();//&monster_type_body;
+
+			/* Clean out the monster */
+			n_ptr.WIPE();
+			//(void)WIPE(n_ptr, monster_type);
+
+			/* Save the race */
+			n_ptr.r_idx = (short)r_idx;
+
+			/* Enforce sleeping if needed */
+			if (slp && r_ptr.sleep != 0) {
+				int val = r_ptr.sleep;
+				n_ptr.m_timed[(int)Misc.MON_TMD.SLEEP] = (short)((val * 2) + Random.randint1(val * 10));
+			}
+
+			/* Uniques get a fixed amount of HP */
+			if (r_ptr.flags.has(Monster_Flag.UNIQUE.value))
+				n_ptr.maxhp = (short)r_ptr.avg_hp;
+			else {
+				n_ptr.maxhp = (short)mon_hp(r_ptr, aspect.RANDOMISE);
+				n_ptr.maxhp = (short)Math.Max((int)n_ptr.maxhp, 1);
+			}
+
+			/* And start out fully healthy */
+			n_ptr.hp = n_ptr.maxhp;
+
+			/* Extract the monster base speed */
+			n_ptr.mspeed = r_ptr.speed;
+
+			/* Hack -- small racial variety */
+			if (!r_ptr.flags.has(Monster_Flag.UNIQUE.value)) {
+				/* Allow some small variation per monster */
+				i = Misc.extract_energy[r_ptr.speed] / 10;
+				if (i != 0) n_ptr.mspeed += (byte)Random.rand_spread(0, i);
+			}
+
+			/* Give a random starting energy */
+			n_ptr.energy = (byte)Random.randint0(50);
+
+			/* Force monster to wait for player */
+			if (r_ptr.flags.has(Monster_Flag.FORCE_SLEEP.value))
+				n_ptr.mflag |= (Monster_Flag.MFLAG_NICE);
+
+			/* Radiate light? */
+			if (r_ptr.flags.has(Monster_Flag.HAS_LIGHT.value))
+				Misc.p_ptr.update |= Misc.PU_UPDATE_VIEW;
+	
+			/* Is this obviously a monster? (Mimics etc. aren't) */
+			if (r_ptr.flags.has(Monster_Flag.UNAWARE.value)) 
+				n_ptr.unaware = true;
+			else
+				n_ptr.unaware = false;
+
+			/* Set the color if necessary */
+			if (r_ptr.flags.has(Monster_Flag.ATTR_RAND.value))
+				n_ptr.attr = (ConsoleColor)Random.randint1(Enum.GetValues(typeof(ConsoleColor)).Length - 1);
+
+			/* Place the monster in the dungeon */
+			if (place_monster(y, x, n_ptr, origin) == 0)
+				return (false);
+
+			/* Success */
+			return (true);
+		}
+
+		/**
+		 * Place a copy of a monster in the dungeon XXX XXX
+		 */
+		public static short place_monster(int y, int x, Monster n_ptr, byte origin)
+		{
+			short m_idx;
+
+			Monster_Race r_ptr;
+
+			/* Paranoia XXX XXX */
+			if (Cave.cave.m_idx[y][x] != 0) return 0;
+
+			/* Get a new record */
+			m_idx = mon_pop();
+
+			if (m_idx == 0) return 0;
+			n_ptr.midx = m_idx;
+
+			/* Make a new monster */
+			Cave.cave.m_idx[y][x] = m_idx;
+
+			/* Get the new monster */
+			//m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+
+			/* Copy the monster XXX */
+			//m_ptr.COPY(n_ptr);
+
+			//Nick: Set the new monster... Much better than the above two steps...
+			Cave.cave_monster_set(Cave.cave, m_idx, n_ptr);
+
+			/* Location */
+			n_ptr.fy = (byte)y;
+			n_ptr.fx = (byte)x;
+
+			/* Update the monster */
+			Monster.update_mon(m_idx, true);
+
+			/* Get the new race */
+			r_ptr = Misc.r_info[n_ptr.r_idx];
+
+			/* Hack -- Count the number of "reproducers" */
+			if (r_ptr.flags.has(Monster_Flag.MULTIPLY.value)) Misc.num_repro++;
+
+			/* Count racial occurances */
+			r_ptr.cur_num++;
+
+			/* Create the monster's drop, if any */
+			if(origin != 0) {
+				mon_create_drop(m_idx, origin);
+			}
+
+			/* Make mimics start mimicking */
+			if (origin != 0 && r_ptr.mimic_kinds != null) {
+				throw new NotImplementedException();
+				//object_type *i_ptr;
+				//object_type object_type_body;
+				//object_kind *kind = r_ptr.mimic_kinds.kind;
+				//struct monster_mimic *mimic_kind;
+				//int i = 1;
+		
+				///* Pick a random object kind to mimic */
+				//for (mimic_kind = r_ptr.mimic_kinds; mimic_kind; mimic_kind = mimic_kind.next, i++) {
+				//    if (one_in_(i)) kind = mimic_kind.kind;
+				//}
+
+				//i_ptr = &object_type_body;
+
+				//if (kind.tval == TV_GOLD) {
+				//    make_gold(i_ptr, p_ptr.depth, kind.sval);
+				//} else {
+				//    object_prep(i_ptr, kind, r_ptr.level, RANDOMISE);
+				//    apply_magic(i_ptr, r_ptr.level, true, false, false);
+				//    i_ptr.number = 1;
+				//}
+
+				//i_ptr.mimicking_m_idx = m_idx;
+				//m_ptr.mimicked_o_idx = floor_carry(cave, y, x, i_ptr);
+			}
+
+			/* Result */
+			return m_idx;
+		}
+
+		/**
+		 * Create a specific monster's drop, including any specified drops.
+		 *
+		 * Returns true if anything is created, false if nothing is.
+		 */
+		static bool mon_create_drop(int m_idx, byte origin)
+		{
+			Monster_Drop drop;
+
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			bool great = (r_ptr.flags.has(Monster_Flag.DROP_GREAT.value)) ? true : false;
+			bool good = (r_ptr.flags.has(Monster_Flag.DROP_GOOD.value) ? true : false) || great;
+			bool any = false;
+			bool gold_ok = (!r_ptr.flags.has(Monster_Flag.ONLY_ITEM.value));
+			bool item_ok = (!r_ptr.flags.has(Monster_Flag.ONLY_GOLD.value));
+
+			int number = 0, level, j;
+			int force_coin = get_coin_type(r_ptr);
+
+			Object.Object i_ptr;
+			//object_type object_type_body;
+
+			/* Determine how much we can drop */
+			if (r_ptr.flags.has(Monster_Flag.DROP_20.value) && Random.randint0(100) < 20) number++;
+			if (r_ptr.flags.has(Monster_Flag.DROP_40.value) && Random.randint0(100) < 40) number++;
+			if (r_ptr.flags.has(Monster_Flag.DROP_60.value) && Random.randint0(100) < 60) number++;
+			if (r_ptr.flags.has(Monster_Flag.DROP_4.value)) number += Random.rand_range(2, 6);
+			if (r_ptr.flags.has(Monster_Flag.DROP_3.value)) number += Random.rand_range(2, 4);
+			if (r_ptr.flags.has(Monster_Flag.DROP_2.value)) number += Random.rand_range(1, 3);
+			if (r_ptr.flags.has(Monster_Flag.DROP_1.value)) number++;
+
+			/* Take the best of average of monster level and current depth,
+			   and monster level - to reward fighting OOD monsters */
+			level = Math.Max((r_ptr.level + Misc.p_ptr.depth) / 2, r_ptr.level);
+
+			/* Specified drops */
+			for (drop = r_ptr.drops; drop != null; drop = drop.Next) {
+				if (Random.randint0(100) >= drop.percent_chance)
+					continue;
+
+				//i_ptr = &object_type_body;
+				i_ptr = new Object.Object();
+				if (drop.artifact != null) {
+					throw new NotImplementedException();
+					//object_prep(i_ptr, objkind_get(drop.artifact.tval,
+					//    drop.artifact.sval), level, RANDOMISE);
+					//i_ptr.artifact = drop.artifact;
+					//copy_artifact_data(i_ptr, i_ptr.artifact);
+					//i_ptr.artifact.created = 1;
+				} else {
+					i_ptr.prep(drop.kind, level, aspect.RANDOMISE);
+					i_ptr.apply_magic(level, true, good, great);
+				}
+
+				i_ptr.origin = (Object.Origin)origin;
+				i_ptr.origin_depth = (byte)Misc.p_ptr.depth;
+				i_ptr.origin_xtra = m_ptr.r_idx;
+				i_ptr.number = (byte)(Random.randint0((int)(drop.max - drop.min)) + drop.min);
+				if (m_ptr.carry(i_ptr) != 0)
+					any = true;
+			}
+
+			/* Make some objects */
+			for (j = 0; j < number; j++) {
+				//i_ptr = &object_type_body;
+				//object_wipe(i_ptr);
+
+				throw new NotImplementedException();
+				//i_ptr = new Object.Object();
+
+				//if (gold_ok && (!item_ok || (Random.randint0(100) < 50))) {
+				//    make_gold(i_ptr, level, force_coin);
+				//} else {
+				//    if (!make_object(Cave.cave, i_ptr, level, good, great, null)) continue;
+				//}
+
+				//i_ptr.origin = origin;
+				//i_ptr.origin_depth = p_ptr.depth;
+				//i_ptr.origin_xtra = m_ptr.r_idx;
+				//if (monster_carry(m_ptr, i_ptr))
+				//    any = true;
+			}
+
+			return any;
+		}
+
+		/**
+		 * Return the coin type of a monster race, based on the monster being
+		 * killed.
+		 */
+		static int get_coin_type(Monster_Race r_ptr)
+		{
+			string name = r_ptr.Name;
+
+			if (!r_ptr.flags.has(Monster_Flag.METAL.value)) return (int)SVal.sval_gold.SV_GOLD_ANY;
+
+			/* Look for textual clues */
+			if (name.Contains("copper "))	return (int)SVal.sval_gold.SV_COPPER;
+			if (name.Contains("silver "))	return (int)SVal.sval_gold.SV_SILVER;
+			if (name.Contains("gold "))		return (int)SVal.sval_gold.SV_GOLD;
+			if (name.Contains("mithril "))	return (int)SVal.sval_gold.SV_MITHRIL;
+			if (name.Contains("adamantite "))	return (int)SVal.sval_gold.SV_ADAMANTITE;
+
+			/* Assume nothing */
+			return (int)SVal.sval_gold.SV_GOLD_ANY;
+		}
+
+		/*
+		 * Get and return the index of a "free" monster.
+		 *
+		 * This routine should almost never fail, but it *can* happen.
+		 */
+		static short mon_pop()
+		{
+			int i;
+
+
+			/* Normal allocation */
+			if (Cave.cave_monster_max(Cave.cave) < Misc.z_info.m_max)
+			{
+				/* Get the next hole */
+				i = Cave.cave_monster_max(Cave.cave);
+
+				/* Expand the array */
+				Cave.cave.mon_max++;
+
+				/* Count monsters */
+				Cave.cave.mon_cnt++;
+
+				/* Return the index */
+				return ((short)i);
+			}
+
+
+			/* Recycle dead monsters */
+			for (i = 1; i < Cave.cave_monster_max(Cave.cave); i++)
+			{
+				Monster m_ptr;
+
+				/* Get the monster */
+				m_ptr = Cave.cave_monster(Cave.cave, i);
+
+				/* Skip live monsters */
+				if (m_ptr.r_idx != 0) continue;
+
+				/* Count monsters */
+				Cave.cave.mon_cnt++;
+
+				/* Use this monster */
+				return ((short)i);
+			}
+
+
+			/* Warn the player (except during dungeon creation) */
+			if (Player.Player.character_dungeon) Utilities.msg("Too many monsters!");
+
+			/* Try not to crash */
+			return (0);
+		}
+
+		/*
+		 * Attempt to place a monster of the given race at the given location
+		 *
+		 * Note that certain monsters are now marked as requiring "friends".
+		 * These monsters, if successfully placed, and if the "grp" parameter
+		 * is true, will be surrounded by a "group" of identical monsters.
+		 *
+		 * Note that certain monsters are now marked as requiring an "escort",
+		 * which is a collection of monsters with similar "race" but lower level.
+		 *
+		 * Some monsters induce a fake "group" flag on their escorts.
+		 *
+		 * Note the "bizarre" use of non-recursion to prevent annoying output
+		 * when running a code profiler.
+		 *
+		 * Note the use of the new "monster allocation table" code to restrict
+		 * the "get_mon_num()" function to "legal" escort types.
+		 */
+		public static bool place_new_monster(Cave c, int y, int x, int r_idx, bool slp, bool grp, Object.Origin origin)
+		{
+			//int i;
+
+			Monster_Race r_ptr = Misc.r_info[r_idx];
+
+			Misc.assert(c != null);
+
+			/* Place one monster, or fail */
+			if (!place_new_monster_one(y, x, r_idx, slp, (byte)origin)) return (false);
+
+			/* Require the "group" flag */
+			if (!grp) return (true);
+
+			/* Friends for certain monsters */
+			if (r_ptr.flags.has(Monster_Flag.FRIEND.value)) {
+				throw new NotImplementedException();
+				//int total = group_size_2(r_idx);
+		
+				///* Attempt to place a group */
+				//(void)place_new_monster_group(c, y, x, r_idx, slp, total, origin);
+			}
+
+			/* Friends for certain monsters */
+			if (r_ptr.flags.has(Monster_Flag.FRIENDS.value)) {
+				throw new NotImplementedException();
+				//int total = group_size_1(r_idx);
+		
+				///* Attempt to place a group */
+				//(void)place_new_monster_group(c, y, x, r_idx, slp, total, origin);
+			}
+
+			/* Escorts for certain monsters */
+			if (r_ptr.flags.has(Monster_Flag.ESCORT.value))
+			{
+				throw new NotImplementedException();
+				///* Try to place several "escorts" */
+				//for (i = 0; i < 50; i++)
+				//{
+				//    int nx, ny, z, d = 3;
+
+				//    /* Pick a location */
+				//    scatter(&ny, &nx, y, x, d, 0);
+
+				//    /* Require empty grids */
+				//    if (!cave_empty_bold(ny, nx)) continue;
+
+				//    /* Set the escort index */
+				//    place_monster_idx = r_idx;
+
+				//    /* Set the escort hook */
+				//    get_mon_num_hook = place_monster_okay;
+
+				//    /* Prepare allocation table */
+				//    get_mon_num_prep();
+
+				//    /* Pick a random race */
+				//    z = get_mon_num(r_ptr.level);
+
+				//    /* Remove restriction */
+				//    get_mon_num_hook = null;
+
+				//    /* Prepare allocation table */
+				//    get_mon_num_prep();
+
+				//    /* Handle failure */
+				//    if (!z) break;
+
+				//    /* Place a single escort */
+				//    (void)place_new_monster_one(ny, nx, z, slp, origin);
+
+				//    /* Place a "group" of escorts if needed */
+				//    if (rf_has(r_info[z].flags, RF_FRIEND)) {
+				//        int total = group_size_2(r_idx);
+				
+				//        /* Attempt to place a group */
+				//        (void)place_new_monster_group(c, y, x, r_idx, slp, total, origin);
+				//    }
+			
+				//    if (rf_has(r_info[z].flags, RF_FRIENDS) || rf_has(r_ptr.flags, RF_ESCORTS)) {
+				//        int total = group_size_1(r_idx);
+				
+				//        /* Place a group of monsters */
+				//        (void)place_new_monster_group(c, ny, nx, z, slp, total, origin);
+				//    }
+				//}
+			}
+
+			/* Success */
+			return (true);
+		}
+
+		/*
+		 * Delete/Remove all the monsters when the player leaves the level
+		 *
+		 * This is an efficient method of simulating multiple calls to the
+		 * "delete_monster()" function, with no visual effects.
+		 */
+		public static void wipe_mon_list(Cave c, Player.Player p)
+		{
+			int i;
+
+			/* Delete all the monsters */
+			for (i = Cave.cave_monster_max(Cave.cave) - 1; i >= 1; i--)
+			{
+				Monster m_ptr = Cave.cave_monster(Cave.cave, i);
+
+				Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+				/* Skip dead monsters */
+				if (m_ptr.r_idx == 0) continue;
+
+				/* Hack -- Reduce the racial counter */
+				r_ptr.cur_num--;
+
+				/* Monster is gone */
+				c.m_idx[m_ptr.fy][m_ptr.fx] = 0;
+
+				/* Wipe the Monster */
+				m_ptr.WIPE();
+			}
+
+			/* Reset "cave.mon_max" */
+			Cave.cave.mon_max = 1;
+
+			/* Reset "mon_cnt" */
+			Cave.cave.mon_cnt = 0;
+
+			/* Hack -- reset "reproducer" count */
+			Misc.num_repro = 0;
+
+			/* Hack -- no more target */
+			Target.set_monster(0);
+
+			/* Hack -- no more tracking */
+			Cave.health_track(p, 0);
+		}
+
+		// XXX Nick: I think there is a better place to put this
+		public static void player_place(Cave c, Player.Player p, int y, int x)
+		{
+			Misc.assert(c.m_idx[y][x] == 0);
+
+			/* Save player location */
+			p.py = (short)y;
+			p.px = (short)x;
+
+			/* Mark cave grid */
+			c.m_idx[y][x] = -1;
+		}
+
+		/*
+		 * Move an object from index i1 to index i2 in the object list
+		 */
+		public static void compact_monsters_aux(int i1, int i2)
+		{
+			int y, x;
+
+			Monster m_ptr;
+
+			short this_o_idx, next_o_idx = 0;
+
+
+			/* Do nothing */
+			if (i1 == i2) return;
+
+
+			/* Old monster */
+			m_ptr = Cave.cave_monster(Cave.cave, i1);
+
+			/* Location */
+			y = m_ptr.fy;
+			x = m_ptr.fx;
+
+			/* Update the cave */
+			Cave.cave.m_idx[y][x] = (short)i2;
+	
+			/* Update midx */
+			m_ptr.midx = i2;
+
+			/* Repair objects being carried by monster */
+			for (this_o_idx = m_ptr.hold_o_idx; this_o_idx != 0; this_o_idx = next_o_idx)
+			{
+				Object.Object o_ptr;
+
+				/* Get the object */
+				o_ptr = Object.Object.byid(this_o_idx);
+
+				/* Get the next object */
+				next_o_idx = o_ptr.next_o_idx;
+
+				/* Reset monster pointer */
+				o_ptr.held_m_idx = (short)i2;
+			}
+	
+			/* Move mimicked objects */
+			if (m_ptr.mimicked_o_idx > 0) {
+
+				Object.Object o_ptr;
+
+				/* Get the object */
+				o_ptr = Object.Object.byid(m_ptr.mimicked_o_idx);
+
+				/* Reset monster pointer */
+				o_ptr.mimicking_m_idx = (short)i2;
+			}
+
+			/* Hack -- Update the target */
+			if (Target.get_monster() == i1) Target.set_monster(i2);
+
+			/* Hack -- Update the health bar */
+			if (Misc.p_ptr.health_who == i1) Misc.p_ptr.health_who = (short)i2;
+
+			/* Hack -- move monster */
+			Cave.cave_monster_set(Cave.cave, i2, Cave.cave_monster(Cave.cave, i1));
+
+			/* Hack -- wipe hole */
+			Cave.cave_monster(Cave.cave, i1).WIPE();
+			//(void)WIPE(cave_monster(cave, i1), monster_type);
+		}
+
+		/*
+		 * Delete a monster by index.
+		 *
+		 * When a monster is deleted, all of its objects are deleted.
+		 */
+		public static void delete_monster_idx(int i)
+		{
+			int x, y;
+
+			Monster m_ptr = Cave.cave_monster(Cave.cave, i);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			short this_o_idx, next_o_idx = 0;
+
+			/* Get location */
+			y = m_ptr.fy;
+			x = m_ptr.fx;
+
+			/* Hack -- Reduce the racial counter */
+			r_ptr.cur_num--;
+
+			/* Hack -- count the number of "reproducers" */
+			if (r_ptr.flags.has(Monster_Flag.MULTIPLY.value)) Misc.num_repro--;
+
+			/* Hack -- remove target monster */
+			if (Target.get_monster() == i) Target.set_monster(0);
+
+			/* Hack -- remove tracked monster */
+			if (Misc.p_ptr.health_who == i) Cave.health_track(Misc.p_ptr, 0);
+
+			/* Monster is gone */
+			Cave.cave.m_idx[y][x] = 0;
+
+			/* Delete objects */
+			for (this_o_idx = m_ptr.hold_o_idx; this_o_idx != 0; this_o_idx = next_o_idx)
+			{
+				Object.Object o_ptr;
+
+				/* Get the object */
+				o_ptr = Object.Object.byid(this_o_idx);
+
+				/* Get the next object */
+				next_o_idx = o_ptr.next_o_idx;
+
+				/* Preserve unseen artifacts (we assume they were created as this
+				 * monster's drop) - this will cause unintended behaviour in preserve
+				 * off mode if monsters can pick up artifacts */
+				if (o_ptr.artifact != null && !o_ptr.was_sensed())
+					o_ptr.artifact.created = false;
+
+				/* Clear held_m_idx now to avoid wasting time in delete_object_idx */
+				o_ptr.held_m_idx = 0;
+
+				/* Delete the object */
+				Object.Object.delete_object_idx(this_o_idx);
+			}
+
+			/* Delete mimicked objects */
+			if (m_ptr.mimicked_o_idx > 0)
+				Object.Object.delete_object_idx(m_ptr.mimicked_o_idx);
+
+			/* Wipe the Monster */
+			m_ptr.WIPE();
+			//(void)WIPE(m_ptr, monster_type);
+
+			/* Count monsters */
+			Cave.cave.mon_cnt--;
+
+			/* Visual update */
+			Cave.cave_light_spot(Cave.cave, y, x);
+		}
+
+		/*
+		 * Compact and Reorder the monster list
+		 *
+		 * This function can be very dangerous, use with caution!
+		 *
+		 * When actually "compacting" monsters, we base the saving throw
+		 * on a combination of monster level, distance from player, and
+		 * current "desperation".
+		 *
+		 * After "compacting" (if needed), we "reorder" the monsters into a more
+		 * compact order, and we reset the allocation info, and the "live" array.
+		 */
+		public static void compact_monsters(int size)
+		{
+			int i, num, cnt;
+
+			int cur_lev, cur_dis, chance;
+
+
+			/* Message (only if compacting) */
+			if (size != 0) Utilities.msg("Compacting monsters...");
+
+
+			/* Compact at least 'size' objects */
+			for (num = 0, cnt = 1; num < size; cnt++)
+			{
+				/* Get more vicious each iteration */
+				cur_lev = 5 * cnt;
+
+				/* Get closer each iteration */
+				cur_dis = 5 * (20 - cnt);
+
+				/* Check all the monsters */
+				for (i = 1; i < Cave.cave_monster_max(Cave.cave); i++)
+				{
+					Monster m_ptr = Cave.cave_monster(Cave.cave, i);
+
+					Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+					/* Paranoia -- skip "dead" monsters */
+					if (m_ptr.r_idx == 0) continue;
+
+					/* Hack -- High level monsters start out "immune" */
+					if (r_ptr.level > cur_lev) continue;
+
+					/* Ignore nearby monsters */
+					if ((cur_dis > 0) && (m_ptr.cdis < cur_dis)) continue;
+
+					/* Saving throw chance */
+					chance = 90;
+
+					/* Only compact "Quest" Monsters in emergencies */
+					if (r_ptr.flags.has(Monster_Flag.QUESTOR.value) && (cnt < 1000)) chance = 100;
+
+					/* Try not to compact Unique Monsters */
+					if (r_ptr.flags.has(Monster_Flag.UNIQUE.value)) chance = 99;
+
+					/* All monsters get a saving throw */
+					if (Random.randint0(100) < chance) continue;
+
+					/* Delete the monster */
+					delete_monster_idx(i);
+
+					/* Count the monster */
+					num++;
+				}
+			}
+
+
+			/* Excise dead monsters (backwards!) */
+			for (i = Cave.cave_monster_max(Cave.cave) - 1; i >= 1; i--)
+			{
+				/* Get the i'th monster */
+				Monster m_ptr = Cave.cave_monster(Cave.cave, i);
+
+				/* Skip real monsters */
+				if (m_ptr.r_idx != 0) continue;
+
+				/* Move last monster into open hole */
+				compact_monsters_aux(Cave.cave_monster_max(Cave.cave) - 1, i);
+
+				/* Compress "cave.mon_max" */
+				Cave.cave.mon_max--;
+			}
+		}
+	}
+}
