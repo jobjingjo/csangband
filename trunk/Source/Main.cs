@@ -502,11 +502,18 @@ namespace CSAngband {
 		 * the correct character on this system.
 		 */
 		static char Term_xchar_xxx(char c) {
-			//TODO: Make sure this is right. I imagine it would be.
 			/* The xxx port uses the Latin-1 standard */
-			/*if(c >= 127) {
-				c += (char)9472;
-			}*/
+
+			if(c == '\a') { 
+				//TODO: Figure out how to change this properly
+				c = (char)183;
+			}
+
+			if(c == 127) {
+				//TODO: Figure out why town walls are 127, and change them to this
+				c = (char)9608;
+			}
+
 			return (c);
 		}
 
@@ -561,16 +568,7 @@ namespace CSAngband {
 
 			//bool found = false;
 			for(int i = 0; i < cp.Length; i++) {
-				if(cp[i] == '\a') { //TODO: Figure out blank space is this...
-					//This should eliminate all "alert" characters...
-					cp[i] = (char)183;
-					//found = true;
-				}
-
-				if(cp[i] == 127) {
-					//TODO: Figure out why town walls are 127, and change them to this
-					cp[i] = (char)9608;
-				}
+				cp[i] = Term_xchar_xxx(cp[i]);
 			}
 
 			//if(found) {

@@ -3,3 +3,8 @@ C:\Projects\CSAngband\bin\Debug\CSAngband.exe
 C:\Projects\CSAngband\bin\Debug\CSAngband.pdb
 C:\Projects\CSAngband\obj\x86\Debug\CSAngband.exe
 C:\Projects\CSAngband\obj\x86\Debug\CSAngband.pdb
+C:\Projects\CSAngband_GCODE\obj\x86\Debug\CSAngband.exe
+C:\Projects\CSAngband_GCODE\obj\x86\Debug\CSAngband.pdb
+C:\Projects\CSAngband_GCODE\bin\Debug\CSAngband.exe
+C:\Projects\CSAngband_GCODE\bin\Debug\CSAngband.pdb
+C:\Projects\CSAngband_GCODE\obj\x86\Debug\ResolveAssemblyReference.cache
