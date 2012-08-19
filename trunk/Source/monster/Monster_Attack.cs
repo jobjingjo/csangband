@@ -48,7 +48,7 @@ namespace CSAngband.Monster {
 
 
 			// Not allowed to attack
-			if (Race.flags.has(Monster_Flag.NEVER_BLOW.value)) return false;
+			if (r_ptr.flags.has(Monster_Flag.NEVER_BLOW.value)) return false;
 
 			// Total armor
 			int ac = p.state.ac + p.state.to_a;
