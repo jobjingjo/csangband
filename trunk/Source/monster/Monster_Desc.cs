@@ -11,7 +11,7 @@ namespace CSAngband.Monster {
 		/*
 		 * Bit flags for the "monster_desc" function
 		 */
-		enum Desc{
+		public enum Desc{
 			OBJE	=	0x01	/* Objective (or Reflexive) */,
 			POSS	=	0x02	/* Possessive (or Reflexive) */,
 			IND1	=	0x04	/* Indefinites for hidden monsters */,
@@ -69,14 +69,14 @@ namespace CSAngband.Monster {
 		 *   0x22 -. Possessive, genderized if visable ("his") or "its"
 		 *   0x23 -. Reflexive, genderized if visable ("himself") or "itself"
 		 */
-		string monster_desc(Desc in_mode)
+		public string monster_desc(Desc in_mode)
 		{
 			string res = "ERROR IN MONSTER_DESC";
 			int mode = (int)in_mode;
 
-			//monster_race *r_ptr = &r_info[m_ptr.r_idx];
+			Monster_Race r_ptr = Misc.r_info[r_idx];
 
-			string name = Race.Name;
+			string name = r_ptr.Name;
 
 			/* Can we "see" it (forced, or not hidden + visible) */
 			bool seen = (((mode & (0x80)) != 0) || (((mode & (0x40)) == 0) && ml));
@@ -92,8 +92,8 @@ namespace CSAngband.Monster {
 				int kind = 0x00;
 
 				/* Extract the gender (if applicable) */
-				if (Race.flags.has(Monster_Flag.FEMALE.value)) kind = 0x20;
-				else if (Race.flags.has(Monster_Flag.MALE.value)) kind = 0x10;
+				if (r_ptr.flags.has(Monster_Flag.FEMALE.value)) kind = 0x20;
+				else if (r_ptr.flags.has(Monster_Flag.MALE.value)) kind = 0x10;
 
 				/* Ignore the gender (if desired) */
 				if (!pron) kind = 0x00;
@@ -142,8 +142,8 @@ namespace CSAngband.Monster {
 			else if ((mode & 0x02) != 0 && (mode & 0x01) != 0)
 			{
 				/* The monster is visible, so use its gender */
-				if (Race.flags.has(Monster_Flag.FEMALE.value)) res = "herself";
-				else if (Race.flags.has(Monster_Flag.MALE.value)) res = "himself";
+				if (r_ptr.flags.has(Monster_Flag.FEMALE.value)) res = "herself";
+				else if (r_ptr.flags.has(Monster_Flag.MALE.value)) res = "himself";
 				else res = "itself";
 			}
 
@@ -152,7 +152,7 @@ namespace CSAngband.Monster {
 			else
 			{
 				/* It could be a Unique */
-				if (Race.flags.has(Monster_Flag.UNIQUE.value))
+				if (r_ptr.flags.has(Monster_Flag.UNIQUE.value))
 				{
 					res = name;
 				}

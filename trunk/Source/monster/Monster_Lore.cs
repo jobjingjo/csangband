@@ -13,7 +13,7 @@ namespace CSAngband.Monster {
 	 */
 	class Monster_Lore {
 		public Int16 sights;			/* Count sightings of this monster */
-		Int16 deaths;			/* Count deaths from this monster */
+		public Int16 deaths;			/* Count deaths from this monster */
 
 		public Int16 pkills;			/* Count monsters killed in this life */
 		public Int16 tkills;			/* Count monsters killed in all lives */
@@ -27,7 +27,7 @@ namespace CSAngband.Monster {
 		byte cast_innate;		/* Max number of innate spells seen */
 		byte cast_spell;		/* Max number of other spells seen */
 
-		byte[] blows = new byte[Monster_Blow.MONSTER_BLOW_MAX]; /* Number of times each blow type was seen */
+		public byte[] blows = new byte[Monster_Blow.MONSTER_BLOW_MAX]; /* Number of times each blow type was seen */
 
 		public Bitflag flags = new Bitflag(Monster_Flag.SIZE); /* Observed racial flags - a 1 indicates
 								 * the flag (or lack thereof) is known to
