@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0BE26190-833D-46A0-A02B-CDECFBAFACA9}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CSAngband</RootNamespace>
+    <AssemblyName>CSAngband</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>CSAngband.Main_CS</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Attack.cs" />
+    <Compile Include="Source\Basic.cs" />
+    <Compile Include="Source\Bitflag.cs" />
+    <Compile Include="Source\Button.cs" />
+    <Compile Include="Source\Cave.cs" />
+    <Compile Include="Source\Command.cs" />
+    <Compile Include="Source\Command_List.cs" />
+    <Compile Include="Source\Config.cs" />
+    <Compile Include="Source\Data_Panel.cs" />
+    <Compile Include="Source\Do_Command2.cs" />
+    <Compile Include="Source\Do_Command_Knowledge.cs" />
+    <Compile Include="Source\Do_Command3.cs" />
+    <Compile Include="Source\Do_Command4.cs" />
+    <Compile Include="Source\Do_CommandMisc.cs" />
+    <Compile Include="Source\Do_Command_UI.cs" />
+    <Compile Include="Source\Dungeon.cs" />
+    <Compile Include="Source\Effect.cs" />
+    <Compile Include="Source\Feature.cs" />
+    <Compile Include="Source\Files.cs" />
+    <Compile Include="Source\File_Parser.cs" />
+    <Compile Include="Source\Floor.cs" />
+    <Compile Include="Source\Game_Command.cs" />
+    <Compile Include="Source\Game_Event.cs" />
+    <Compile Include="Source\Generate.cs" />
+    <Compile Include="Source\GF.cs" />
+    <Compile Include="Source\Grid_Data.cs" />
+    <Compile Include="Source\Grouper.cs" />
+    <Compile Include="Source\GUID.cs" />
+    <Compile Include="Source\Hint.cs" />
+    <Compile Include="Source\History.cs" />
+    <Compile Include="Source\Init.cs" />
+    <Compile Include="Source\Init2.cs" />
+    <Compile Include="Source\Keymap.cs" />
+    <Compile Include="Source\Loc.cs" />
+    <Compile Include="Source\Main.cs" />
+    <Compile Include="Source\Map.cs" />
+    <Compile Include="Source\Maxima.cs" />
+    <Compile Include="Source\Menu_Action.cs" />
+    <Compile Include="Source\Menu_Type.cs" />
+    <Compile Include="Source\Message.cs" />
+    <Compile Include="Source\Misc.cs" />
+    <Compile Include="Source\Monster\Eval.cs" />
+    <Compile Include="Source\Monster\Monster.cs" />
+    <Compile Include="Source\Monster\Monster_Attack.cs" />
+    <Compile Include="Source\Monster\Monster_Base.cs" />
+    <Compile Include="Source\Monster\Monster_Blow.cs" />
+    <Compile Include="Source\Monster\Monster_Desc.cs" />
+    <Compile Include="Source\Monster\Monster_Drop.cs" />
+    <Compile Include="Source\Monster\Monster_Flag.cs" />
+    <Compile Include="Source\Monster\Monster_Lore.cs" />
+    <Compile Include="Source\Monster\Monster_Make.cs" />
+    <Compile Include="Source\Monster\Monster_Mimic.cs" />
+    <Compile Include="Source\Monster\Monster_Pain.cs" />
+    <Compile Include="Source\Monster\Monster_Race.cs" />
+    <Compile Include="Source\Monster\Monster_Spell_Effect_Flag.cs" />
+    <Compile Include="Source\Monster\Monster_Spell_Flag.cs" />
+    <Compile Include="Source\Monster\Monster_Timed.cs" />
+    <Compile Include="Source\Monster\Monster_Utilities.cs" />
+    <Compile Include="Source\Object\Artifact.cs" />
+    <Compile Include="Source\Object\Ego_Item.cs" />
+    <Compile Include="Source\Object\Flavor.cs" />
+    <Compile Include="Source\Object\Identify.cs" />
+    <Compile Include="Source\Object\Object.cs" />
+    <Compile Include="Source\Object\Object_Base.cs" />
+    <Compile Include="Source\Object\Object_Desc.cs" />
+    <Compile Include="Source\Object\Object_Flag.cs" />
+    <Compile Include="Source\Object\Object_Kind.cs" />
+    <Compile Include="Source\Object\Object_Make.cs" />
+    <Compile Include="Source\Object\Object_Power.cs" />
+    <Compile Include="Source\Object\Object_Utilities.cs" />
+    <Compile Include="Source\Object\Origin.cs" />
+    <Compile Include="Source\Object\Randart.cs" />
+    <Compile Include="Source\Object\Slay.cs" />
+    <Compile Include="Source\Object\SVal.cs" />
+    <Compile Include="Source\Object\TVal.cs" />
+    <Compile Include="Source\Option.cs" />
+    <Compile Include="Source\Parser.cs" />
+    <Compile Include="Source\Parser_State.cs" />
+    <Compile Include="Source\Pathfind.cs" />
+    <Compile Include="Source\Pit_Profile.cs" />
+    <Compile Include="Source\Birther.cs" />
+    <Compile Include="Source\Player\Calcs.cs" />
+    <Compile Include="Source\Player\Magic_Type.cs" />
+    <Compile Include="Source\Monster\Monster_Message.cs" />
+    <Compile Include="Source\Player\Player_Magic.cs" />
+    <Compile Include="Source\Player\Player_Other.cs" />
+    <Compile Include="Source\Player\Player_State.cs" />
+    <Compile Include="Source\Player\Stat_Tables.cs" />
+    <Compile Include="Source\Player\Timed.cs" />
+    <Compile Include="Source\Prefs.cs" />
+    <Compile Include="Source\Quark.cs" />
+    <Compile Include="Source\Quest.cs" />
+    <Compile Include="Source\Region.cs" />
+    <Compile Include="Source\Savefile.cs" />
+    <Compile Include="Source\Sidebar.cs" />
+    <Compile Include="Source\Signals.cs" />
+    <Compile Include="Source\Skill_Enum.cs" />
+    <Compile Include="Source\Spell.cs" />
+    <Compile Include="Source\Squelch.cs" />
+    <Compile Include="Source\Statusline.cs" />
+    <Compile Include="Source\Store.cs" />
+    <Compile Include="Source\Target.cs" />
+    <Compile Include="Source\Term_Data.cs" />
+    <Compile Include="Source\Term_Win.cs" />
+    <Compile Include="Source\Tests\artifact\Randname_Test.cs" />
+    <Compile Include="Source\Tests\command\Lookup_Test.cs" />
+    <Compile Include="Source\Command_Info.cs" />
+    <Compile Include="Source\Tests\monster\MonsterAttack_Test.cs" />
+    <Compile Include="Source\Tests\monster\Monster_Test.cs" />
+    <Compile Include="Source\Tests\object\ObjectAttack_Test.cs" />
+    <Compile Include="Source\Tests\parse\A_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\C_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\E_Info_test.cs" />
+    <Compile Include="Source\Tests\parse\Flavor_Test.cs" />
+    <Compile Include="Source\Tests\parse\F_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\H_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\K_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\Names_Test.cs" />
+    <Compile Include="Source\Tests\parse\Owner_Test.cs" />
+    <Compile Include="Source\Tests\parse\Parser_Test.cs" />
+    <Compile Include="Source\Tests\parse\ParseStore_Test.cs" />
+    <Compile Include="Source\Tests\parse\P_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\R_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\S_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\V_Info_Test.cs" />
+    <Compile Include="Source\Tests\parse\Z_Info_Test.cs" />
+    <Compile Include="Source\Tests\pathfind\Pathfind_Test.cs" />
+    <Compile Include="Source\Tests\player\Birth_Test.cs" />
+    <Compile Include="Source\Tests\player\History_Test.cs" />
+    <Compile Include="Source\Tests\store\Store_Test.cs" />
+    <Compile Include="Source\Tests\UnitTest_Utils.cs" />
+    <Compile Include="Source\Tests\UnitTest.cs" />
+    <Compile Include="Source\Tests\UnitTest_Data.cs" />
+    <Compile Include="Source\Tests\z-quark\Quark_Test.cs" />
+    <Compile Include="Source\Tests\z-textblock\Textblock_Test.cs" />
+    <Compile Include="Source\Textblock.cs" />
+    <Compile Include="Source\TextUI.cs" />
+    <Compile Include="Source\Timed_Effect_Enum.cs" />
+    <Compile Include="Source\Player\History_Chart.cs" />
+    <Compile Include="Source\Player\History_Entry.cs" />
+    <Compile Include="Source\Player\Player.cs" />
+    <Compile Include="Source\Player\Player_Class.cs" />
+    <Compile Include="Source\Player\Player_Race.cs" />
+    <Compile Include="Source\Player\Player_Sex.cs" />
+    <Compile Include="Source\Player\Start_Item.cs" />
+    <Compile Include="Source\Random.cs" />
+    <Compile Include="Source\RandomName.cs" />
+    <Compile Include="Source\stats\Info_Entry.cs" />
+    <Compile Include="Source\Stat_Enum.cs" />
+    <Compile Include="Source\Term.cs" />
+    <Compile Include="Source\Tests\player\Player_Test.cs" />
+    <Compile Include="Source\Tests\Suite.cs" />
+    <Compile Include="Source\Tests\Test.cs" />
+    <Compile Include="Source\Tests\trivial\Trivial_Test.cs" />
+    <Compile Include="Source\Tests\UnitTest_Main.cs" />
+    <Compile Include="Source\Type_Union.cs" />
+    <Compile Include="Source\UIBirth.cs" />
+    <Compile Include="Source\UIEvent.cs" />
+    <Compile Include="Source\Utilities.cs" />
+    <Compile Include="Source\Vault.cs" />
+    <Compile Include="Source\Xtra2.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\angband.man" />
+    <None Include="Source\Tests\README" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Source\angband.h" />
+    <Content Include="Source\attack.c" />
+    <Content Include="Source\birth.c" />
+    <Content Include="Source\birth.h" />
+    <Content Include="Source\buildid.c" />
+    <Content Include="Source\buildid.h" />
+    <Content Include="Source\cmd-obj.c" />
+    <Content Include="Source\cmd0.c" />
+    <Content Include="Source\cmd1.c" />
+    <Content Include="Source\cmd2.c" />
+    <Content Include="Source\cmds.h" />
+    <Content Include="Source\death.c" />
+    <Content Include="Source\debug.c" />
+    <Content Include="Source\debug.h" />
+    <Content Include="Source\defines.h" />
+    <Content Include="Source\dungeon.c" />
+    <Content Include="Source\effects.c" />
+    <Content Include="Source\effects.h" />
+    <Content Include="Source\externs.h" />
+    <Content Include="Source\files.c" />
+    <Content Include="Source\files.h" />
+    <Content Include="Source\game-cmd.c" />
+    <Content Include="Source\game-cmd.h" />
+    <Content Include="Source\generate.h" />
+    <Content Include="Source\h-basic.h" />
+    <Content Include="Source\history.c" />
+    <Content Include="Source\init.h" />
+    <Content Include="Source\init2.c" />
+    <Content Include="Source\load.c" />
+    <Content Include="Source\main-crb.c" />
+    <Content Include="Source\main-gcu.c" />
+    <Content Include="Source\main-nds.c" />
+    <Content Include="Source\main-sdl.c" />
+    <Content Include="Source\main-stats.c" />
+    <Content Include="Source\main-test.c" />
+    <Content Include="Source\main-win.c" />
+    <Content Include="Source\main-x11.c" />
+    <Content Include="Source\main.c" />
+    <Content Include="Source\main.h" />
+    <Content Include="Source\Monster\constants.h" />
+    <Content Include="Source\Monster\melee2.c" />
+    <Content Include="Source\Monster\mon-lore.c" />
+    <Content Include="Source\Monster\mon-lore.h" />
+    <Content Include="Source\Monster\mon-make.c" />
+    <Content Include="Source\Monster\mon-make.h" />
+    <Content Include="Source\Monster\mon-msg.c" />
+    <Content Include="Source\Monster\mon-timed.c" />
+    <Content Include="Source\Monster\mon-timed.h" />
+    <Content Include="Source\Monster\mon-util.c" />
+    <Content Include="Source\Monster\mon-util.h" />
+    <Content Include="Source\Monster\monster.h" />
+    <Content Include="Source\Object\identify.c" />
+    <Content Include="Source\Object\obj-info.c" />
+    <Content Include="Source\Object\obj-make.c" />
+    <Content Include="Source\Object\obj-power.c" />
+    <Content Include="Source\Object\obj-ui.c" />
+    <Content Include="Source\Object\obj-util.c" />
+    <Content Include="Source\Object\object.h" />
+    <Content Include="Source\Object\pval.c" />
+    <Content Include="Source\Object\pval.h" />
+    <Content Include="Source\Object\randart.c" />
+    <Content Include="Source\Object\slays.c" />
+    <Content Include="Source\parser.c" />
+    <Content Include="Source\parser.h" />
+    <Content Include="Source\pathfind.c" />
+    <Content Include="Source\pathfind.h" />
+    <Content Include="Source\Player\calcs.c" />
+    <Content Include="Source\Player\player.h" />
+    <Content Include="Source\Player\spell.c" />
+    <Content Include="Source\Player\timed.c" />
+    <Content Include="Source\prefs.c" />
+    <Content Include="Source\prefs.h" />
+    <Content Include="Source\save.c" />
+    <Content Include="Source\savefile.c" />
+    <Content Include="Source\savefile.h" />
+    <Content Include="Source\score.c" />
+    <Content Include="Source\signals.c" />
+    <Content Include="Source\snd-sdl.c" />
+    <Content Include="Source\spells.h" />
+    <Content Include="Source\spells1.c" />
+    <Content Include="Source\spells2.c" />
+    <Content Include="Source\stats\db.c" />
+    <Content Include="Source\stats\db.h" />
+    <Content Include="Source\store.c" />
+    <Content Include="Source\tables.c" />
+    <Content Include="Source\target.c" />
+    <Content Include="Source\target.h" />
+    <Content Include="Source\textui.h" />
+    <Content Include="Source\trap.c" />
+    <Content Include="Source\trap.h" />
+    <Content Include="Source\types.h" />
+    <Content Include="Source\ui-knowledge.c" />
+    <Content Include="Source\ui-menu.c" />
+    <Content Include="Source\ui-menu.h" />
+    <Content Include="Source\ui-options.c" />
+    <Content Include="Source\ui-spell.c" />
+    <Content Include="Source\ui.c" />
+    <Content Include="Source\ui.h" />
+    <Content Include="Source\util.c" />
+    <Content Include="Source\variable.c" />
+    <Content Include="Source\wiz-spoil.c" />
+    <Content Include="Source\wiz-stats.c" />
+    <Content Include="Source\wizard.c" />
+    <Content Include="Source\wizard.h" />
+    <Content Include="Source\x-char.c" />
+    <Content Include="Source\x-char.h" />
+    <Content Include="Source\x-spell.c" />
+    <Content Include="Source\xtra2.c" />
+    <Content Include="Source\xtra3.c" />
+    <Content Include="Source\z-debug.h" />
+    <Content Include="Source\z-file.c" />
+    <Content Include="Source\z-file.h" />
+    <Content Include="Source\z-form.c" />
+    <Content Include="Source\z-form.h" />
+    <Content Include="Source\z-queue.c" />
+    <Content Include="Source\z-queue.h" />
+    <Content Include="Source\z-rand.c" />
+    <Content Include="Source\z-type.c" />
+    <Content Include="Source\z-type.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
