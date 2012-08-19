@@ -408,30 +408,6 @@ static bool store_will_buy(struct store *store, const object_type *o_ptr)
 	return (true);
 }
 
-
-/* Get the current store or null if there isn't one */
-static struct store *current_store(void)
-{
-	int n = STORE_NONE;
-
-	/* If we're displaying store knowledge whilst not in a store,
-	 * override the value returned
-	 */
-	if (store_knowledge != STORE_NONE)
-		n = store_knowledge;
-
-	else if ((cave.feat[p_ptr.py][p_ptr.px] >= FEAT_SHOP_HEAD) &&
-			(cave.feat[p_ptr.py][p_ptr.px] <= FEAT_SHOP_TAIL))
-		n = cave.feat[p_ptr.py][p_ptr.px] - FEAT_SHOP_HEAD;
-
-	if (n != STORE_NONE)
-		return &stores[n];
-	else
-		return null;
-}
-
-
-
 /*** Basics: pricing, generation, etc. ***/
 
 /*

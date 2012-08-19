@@ -778,27 +778,6 @@ static int monster_critical(int dice, int sides, int dam)
 	return (1 + max);
 }
 
-/*
- * Determine if a monster attack against the player succeeds.
- */
-bool check_hit(struct player *p, int power, int level)
-{
-	int chance, ac;
-
-	/* Calculate the "attack quality" */
-	chance = (power + (level * 3));
-
-	/* Total armor */
-	ac = p.state.ac + p.state.to_a;
-
-	/* if the monster checks vs ac, the player learns ac bonuses */
-	/* XXX Eddie should you only learn +ac on miss, -ac on hit?  who knows */
-	object_notice_on_defend(p);
-
-	/* Check if the player was hit */
-	return test_hit(chance, ac, true);
-}
-
 
 #define MAX_DESC_INSULT 8
 

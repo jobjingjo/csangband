@@ -2712,11 +2712,11 @@ namespace CSAngband {
 		 * Enter a store, and interact with it.
 		 */
 		public static void store(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			///* Take note of the store number from the terrain feature */
-			//struct store *store = current_store();
-			//menu_type menu;
+			/* Take note of the store number from the terrain feature */
+			Store store = Store.current_store();
+			Menu_Type menu;
 
+			throw new NotImplementedException();
 			///* Verify that there is a store */
 			//if (!store) {
 			//    msg("You see no store here.");

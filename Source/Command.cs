@@ -213,8 +213,7 @@ namespace CSAngband {
 					//mon_clear_timed(m_idx, MON_TMD_SLEEP, MON_TMD_FLG_NOMESSAGE, false);
 
 			    } else {
-					throw new NotImplementedException();
-			        //py_attack(y, x);
+			        Attack.py_attack(y, x);
 			    }
 			}
 
