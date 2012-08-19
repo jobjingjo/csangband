@@ -516,7 +516,32 @@ namespace CSAngband {
 		 */
 		public bool test_all(params int[] values)
 		{
-			throw new NotImplementedException();
+
+			int flag_offset;
+			int flag_binary;
+			bool delta = true;
+
+			/* Process each flag in the va-args */
+			for (int i = 0; i < values.Length; i++)
+			{
+				int f = values[i];
+			    flag_offset = FLAG_OFFSET(f);
+			    flag_binary = FLAG_BINARY(f);
+
+			    Misc.assert(flag_offset < size);
+
+			    /* !flag_has() */
+			    if ((data[flag_offset] & flag_binary) == 0)
+			    {
+			        delta = false;
+			        break;
+			    }
+			}
+	
+			return delta;
+
+
+
 			//size_t flag_offset;
 			//int flag_binary;
 			//int f;

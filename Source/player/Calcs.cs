@@ -1463,5 +1463,14 @@ namespace CSAngband.Player {
 				//flush_all_monster_messages();
 			}
 		}
+
+		/*
+		 * Handle "p_ptr.update" and "p_ptr.redraw"
+		 */
+		public void handle_stuff()
+		{
+			if (update != 0) update_stuff();
+			if (redraw != 0) redraw_stuff();
+		}
 	}
 }

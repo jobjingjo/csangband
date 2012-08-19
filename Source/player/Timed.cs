@@ -30,199 +30,198 @@ namespace CSAngband.Player {
 		//formerly player_set_food
 		public bool set_food(int v)
 		{
-			throw new NotImplementedException();
-			//int old_aux, new_aux;
+			int old_aux, new_aux;
 
-			//bool notice = false;
+			bool notice = false;
 
-			///* Hack -- Force good values */
-			//v = MIN(v, PY_FOOD_UPPER);
-			//v = MAX(v, 0);
+			/* Hack -- Force good values */
+			v = Math.Min(v, Misc.PY_FOOD_UPPER);
+			v = Math.Max(v, 0);
 
-			///* Fainting / Starving */
-			//if (p.food < PY_FOOD_FAINT)
-			//{
-			//    old_aux = 0;
-			//}
+			/* Fainting / Starving */
+			if (food < Misc.PY_FOOD_FAINT)
+			{
+			    old_aux = 0;
+			}
 
-			///* Weak */
-			//else if (p.food < PY_FOOD_WEAK)
-			//{
-			//    old_aux = 1;
-			//}
+			/* Weak */
+			else if (food < Misc.PY_FOOD_WEAK)
+			{
+			    old_aux = 1;
+			}
 
-			///* Hungry */
-			//else if (p.food < PY_FOOD_ALERT)
-			//{
-			//    old_aux = 2;
-			//}
+			/* Hungry */
+			else if (food < Misc.PY_FOOD_ALERT)
+			{
+			    old_aux = 2;
+			}
 
-			///* Normal */
-			//else if (p.food < PY_FOOD_FULL)
-			//{
-			//    old_aux = 3;
-			//}
+			/* Normal */
+			else if (food < Misc.PY_FOOD_FULL)
+			{
+			    old_aux = 3;
+			}
 
-			///* Full */
-			//else if (p.food < PY_FOOD_MAX)
-			//{
-			//    old_aux = 4;
-			//}
+			/* Full */
+			else if (food < Misc.PY_FOOD_MAX)
+			{
+			    old_aux = 4;
+			}
 
-			///* Gorged */
-			//else
-			//{
-			//    old_aux = 5;
-			//}
+			/* Gorged */
+			else
+			{
+			    old_aux = 5;
+			}
 
-			///* Fainting / Starving */
-			//if (v < PY_FOOD_FAINT)
-			//{
-			//    new_aux = 0;
-			//}
+			/* Fainting / Starving */
+			if (v < Misc.PY_FOOD_FAINT)
+			{
+			    new_aux = 0;
+			}
 
-			///* Weak */
-			//else if (v < PY_FOOD_WEAK)
-			//{
-			//    new_aux = 1;
-			//}
+			/* Weak */
+			else if (v < Misc.PY_FOOD_WEAK)
+			{
+			    new_aux = 1;
+			}
 
-			///* Hungry */
-			//else if (v < PY_FOOD_ALERT)
-			//{
-			//    new_aux = 2;
-			//}
+			/* Hungry */
+			else if (v < Misc.PY_FOOD_ALERT)
+			{
+			    new_aux = 2;
+			}
 
-			///* Normal */
-			//else if (v < PY_FOOD_FULL)
-			//{
-			//    new_aux = 3;
-			//}
+			/* Normal */
+			else if (v < Misc.PY_FOOD_FULL)
+			{
+			    new_aux = 3;
+			}
 
-			///* Full */
-			//else if (v < PY_FOOD_MAX)
-			//{
-			//    new_aux = 4;
-			//}
+			/* Full */
+			else if (v < Misc.PY_FOOD_MAX)
+			{
+			    new_aux = 4;
+			}
 
-			///* Gorged */
-			//else
-			//{
-			//    new_aux = 5;
-			//}
+			/* Gorged */
+			else
+			{
+			    new_aux = 5;
+			}
 
-			///* Food increase */
-			//if (new_aux > old_aux)
-			//{
-			//    /* Describe the state */
-			//    switch (new_aux)
-			//    {
-			//        /* Weak */
-			//        case 1:
-			//        {
-			//            msg("You are still weak.");
-			//            break;
-			//        }
+			/* Food increase */
+			if (new_aux > old_aux)
+			{
+			    /* Describe the state */
+			    switch (new_aux)
+			    {
+			        /* Weak */
+			        case 1:
+			        {
+			            Utilities.msg("You are still weak.");
+			            break;
+			        }
 
-			//        /* Hungry */
-			//        case 2:
-			//        {
-			//            msg("You are still hungry.");
-			//            break;
-			//        }
+			        /* Hungry */
+			        case 2:
+			        {
+			            Utilities.msg("You are still hungry.");
+			            break;
+			        }
 
-			//        /* Normal */
-			//        case 3:
-			//        {
-			//            msg("You are no longer hungry.");
-			//            break;
-			//        }
+			        /* Normal */
+			        case 3:
+			        {
+			            Utilities.msg("You are no longer hungry.");
+			            break;
+			        }
 
-			//        /* Full */
-			//        case 4:
-			//        {
-			//            msg("You are full!");
-			//            break;
-			//        }
+			        /* Full */
+			        case 4:
+			        {
+			            Utilities.msg("You are full!");
+			            break;
+			        }
 
-			//        /* Bloated */
-			//        case 5:
-			//        {
-			//            msg("You have gorged yourself!");
-			//            break;
-			//        }
-			//    }
+			        /* Bloated */
+			        case 5:
+			        {
+			            Utilities.msg("You have gorged yourself!");
+			            break;
+			        }
+			    }
 
-			//    /* Change */
-			//    notice = true;
-			//}
+			    /* Change */
+			    notice = true;
+			}
 
-			///* Food decrease */
-			//else if (new_aux < old_aux)
-			//{
-			//    /* Describe the state */
-			//    switch (new_aux)
-			//    {
-			//        /* Fainting / Starving */
-			//        case 0:
-			//        {
-			//            msgt(MSG_NOTICE, "You are getting faint from hunger!");
-			//            break;
-			//        }
+			/* Food decrease */
+			else if (new_aux < old_aux)
+			{
+			    /* Describe the state */
+			    switch (new_aux)
+			    {
+			        /* Fainting / Starving */
+			        case 0:
+			        {
+			            Utilities.msgt(Message_Type.MSG_NOTICE, "You are getting faint from hunger!");
+			            break;
+			        }
 
-			//        /* Weak */
-			//        case 1:
-			//        {
-			//            msgt(MSG_NOTICE, "You are getting weak from hunger!");
-			//            break;
-			//        }
+			        /* Weak */
+			        case 1:
+			        {
+			            Utilities.msgt(Message_Type.MSG_NOTICE, "You are getting weak from hunger!");
+			            break;
+			        }
 
-			//        /* Hungry */
-			//        case 2:
-			//        {
-			//            msgt(MSG_HUNGRY, "You are getting hungry.");
-			//            break;
-			//        }
+			        /* Hungry */
+			        case 2:
+			        {
+			            Utilities.msgt(Message_Type.MSG_HUNGRY, "You are getting hungry.");
+			            break;
+			        }
 
-			//        /* Normal */
-			//        case 3:
-			//        {
-			//            msgt(MSG_NOTICE, "You are no longer full.");
-			//            break;
-			//        }
+			        /* Normal */
+			        case 3:
+			        {
+			            Utilities.msgt(Message_Type.MSG_NOTICE, "You are no longer full.");
+			            break;
+			        }
 
-			//        /* Full */
-			//        case 4:
-			//        {
-			//            msgt(MSG_NOTICE, "You are no longer gorged.");
-			//            break;
-			//        }
-			//    }
+			        /* Full */
+			        case 4:
+			        {
+			            Utilities.msgt(Message_Type.MSG_NOTICE, "You are no longer gorged.");
+			            break;
+			        }
+			    }
 
-			//    /* Change */
-			//    notice = true;
-			//}
+			    /* Change */
+			    notice = true;
+			}
 
-			///* Use the value */
-			//p.food = v;
+			/* Use the value */
+			food = (short)v;
 
-			///* Nothing to notice */
-			//if (!notice) return (false);
+			/* Nothing to notice */
+			if (!notice) return (false);
 
-			///* Disturb */
-			//if (OPT(disturb_state)) disturb(p_ptr, 0, 0);
+			/* Disturb */
+			if (Option.disturb_state.value) Cave.disturb(Misc.p_ptr, 0, 0);
 
-			///* Recalculate bonuses */
-			//p.update |= (PU_BONUS);
+			/* Recalculate bonuses */
+			update |= (Misc.PU_BONUS);
 
-			///* Redraw hunger */
-			//p.redraw |= (PR_STATUS);
+			/* Redraw hunger */
+			redraw |= (Misc.PR_STATUS);
 
-			///* Handle stuff */
-			//handle_stuff(p_ptr);
+			/* Handle stuff */
+			Misc.p_ptr.handle_stuff();
 
-			///* Result */
-			//return (true);
+			/* Result */
+			return (true);
 		}
 
 		/**

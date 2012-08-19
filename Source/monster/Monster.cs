@@ -942,302 +942,457 @@ namespace CSAngband.Monster {
 		 */
 		static bool get_moves(Cave c, int m_idx, int[] mm)
 		{
-			throw new NotImplementedException();
-			//int py = p_ptr.py;
-			//int px = p_ptr.px;
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
 
-			//monster_type *m_ptr = cave_monster(cave, m_idx);
-			//monster_race *r_ptr = &r_info[m_ptr.r_idx];
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
 
-			//int y, ay, x, ax;
+			int y, ay, x, ax;
 
-			//int move_val = 0;
+			int move_val = 0;
 
-			//int y2 = py;
-			//int x2 = px;
+			int y2 = py;
+			int x2 = px;
 
-			//bool done = false;
+			bool done = false;
 
-			///* Flow towards the player */
-			//get_moves_aux(c, m_idx, &y2, &x2);
+			/* Flow towards the player */
+			get_moves_aux(c, m_idx, ref y2, ref x2);
 
-			///* Extract the "pseudo-direction" */
-			//y = m_ptr.fy - y2;
-			//x = m_ptr.fx - x2;
-
+			/* Extract the "pseudo-direction" */
+			y = m_ptr.fy - y2;
+			x = m_ptr.fx - x2;
 
 
-			///* Normal animal packs try to get the player out of corridors. */
-			//if (OPT(birth_ai_packs) &&
-			//    rf_has(r_ptr.flags, RF_FRIENDS) && rf_has(r_ptr.flags, RF_ANIMAL) &&
-			//    !flags_test(r_ptr.flags, RF_SIZE, RF_PASS_WALL, RF_KILL_WALL, FLAG_END))
-			//{
-			//    int i, open = 0;
 
-			//    /* Count empty grids next to player */
-			//    for (i = 0; i < 8; i++)
-			//    {
-			//        /* Check grid around the player for room interior (room walls count)
-			//           or other empty space */
-			//        if ((cave.feat[py + ddy_ddd[i]][px + ddx_ddd[i]] <= FEAT_MORE) ||
-			//            (cave.info[py + ddy_ddd[i]][px + ddx_ddd[i]] & (CAVE_ROOM)))
-			//        {
-			//            /* One more open grid */
-			//            open++;
-			//        }
-			//    }
+			/* Normal animal packs try to get the player out of corridors. */
+			if (Option.birth_ai_packs.value && r_ptr.flags.has(Monster_Flag.FRIENDS.value) && 
+				r_ptr.flags.has(Monster_Flag.ANIMAL.value) &&
+				!r_ptr.flags.test(Monster_Flag.PASS_WALL.value, Monster_Flag.KILL_WALL.value))
+			{
+				throw new NotImplementedException();
+				//int i, open = 0;
 
-			//    /* Not in an empty space and strong player */
-			//    if ((open < 7) && (p_ptr.chp > p_ptr.mhp / 2))
-			//    {
-			//        /* Find hiding place */
-			//        if (find_hiding(m_idx, &y, &x)) done = true;
-			//    }
-			//}
+				///* Count empty grids next to player */
+				//for (i = 0; i < 8; i++)
+				//{
+				//    /* Check grid around the player for room interior (room walls count)
+				//       or other empty space */
+				//    if ((cave.feat[py + ddy_ddd[i]][px + ddx_ddd[i]] <= FEAT_MORE) ||
+				//        (cave.info[py + ddy_ddd[i]][px + ddx_ddd[i]] & (CAVE_ROOM)))
+				//    {
+				//        /* One more open grid */
+				//        open++;
+				//    }
+				//}
 
-
-			///* Apply fear */
-			//if (!done && mon_will_run(m_idx))
-			//{
-			//    /* Try to find safe place */
-			//    if (!(OPT(birth_ai_smart) && find_safety(c, m_idx, &y, &x)))
-			//    {
-			//        /* This is not a very "smart" method XXX XXX */
-			//        y = (-y);
-			//        x = (-x);
-			//    }
-
-			//    else
-			//    {
-			//        /* Adjust movement */
-			//        get_fear_moves_aux(c, m_idx, &y, &x);
-			//    }
-
-			//    done = true;
-			//}
+				///* Not in an empty space and strong player */
+				//if ((open < 7) && (p_ptr.chp > p_ptr.mhp / 2))
+				//{
+				//    /* Find hiding place */
+				//    if (find_hiding(m_idx, &y, &x)) done = true;
+				//}
+			}
 
 
-			///* Monster groups try to surround the player */
-			//if (!done && OPT(birth_ai_packs) && rf_has(r_ptr.flags, RF_FRIENDS))
-			//{
-			//    int i;
+			/* Apply fear */
+			if (!done && mon_will_run(m_idx))
+			{
+				throw new NotImplementedException();
+				///* Try to find safe place */
+				//if (!(OPT(birth_ai_smart) && find_safety(c, m_idx, &y, &x)))
+				//{
+				//    /* This is not a very "smart" method XXX XXX */
+				//    y = (-y);
+				//    x = (-x);
+				//}
 
-			//    /* If we are not already adjacent */
-			//    if (m_ptr.cdis > 1)
-			//    {
-			//        /* Find an empty square near the player to fill */
-			//        int tmp = randint0(8);
-			//        for (i = 0; i < 8; i++)
-			//        {
-			//            /* Pick squares near player (pseudo-randomly) */
-			//            y2 = py + ddy_ddd[(tmp + i) & 7];
-			//            x2 = px + ddx_ddd[(tmp + i) & 7];
+				//else
+				//{
+				//    /* Adjust movement */
+				//    get_fear_moves_aux(c, m_idx, &y, &x);
+				//}
+
+				//done = true;
+			}
+
+
+			/* Monster groups try to surround the player */
+			if (!done && Option.birth_ai_packs.value && r_ptr.flags.has(Monster_Flag.FRIENDS.value))
+			{
+				throw new NotImplementedException();
+				//int i;
+
+				///* If we are not already adjacent */
+				//if (m_ptr.cdis > 1)
+				//{
+				//    /* Find an empty square near the player to fill */
+				//    int tmp = randint0(8);
+				//    for (i = 0; i < 8; i++)
+				//    {
+				//        /* Pick squares near player (pseudo-randomly) */
+				//        y2 = py + ddy_ddd[(tmp + i) & 7];
+				//        x2 = px + ddx_ddd[(tmp + i) & 7];
 				
-			//            /* Ignore filled grids */
-			//            if (!cave_empty_bold(y2, x2)) continue;
+				//        /* Ignore filled grids */
+				//        if (!cave_empty_bold(y2, x2)) continue;
 				
-			//            /* Try to fill this hole */
-			//            break;
-			//        }
-			//    }
-			//    /* Extract the new "pseudo-direction" */
-			//    y = m_ptr.fy - y2;
-			//    x = m_ptr.fx - x2;
-			//}
+				//        /* Try to fill this hole */
+				//        break;
+				//    }
+				//}
+				///* Extract the new "pseudo-direction" */
+				//y = m_ptr.fy - y2;
+				//x = m_ptr.fx - x2;
+			}
 
 
-			///* Check for no move */
-			//if (!x && !y) return (false);
+			/* Check for no move */
+			if (x == 0 && y == 0) return (false);
 
-			///* Extract the "absolute distances" */
-			//ax = ABS(x);
-			//ay = ABS(y);
+			/* Extract the "absolute distances" */
+			ax = Math.Abs(x);
+			ay = Math.Abs(y);
 
-			///* Do something weird */
-			//if (y < 0) move_val += 8;
-			//if (x > 0) move_val += 4;
+			/* Do something weird */
+			if (y < 0) move_val += 8;
+			if (x > 0) move_val += 4;
 
-			///* Prevent the diamond maneuvre */
-			//if (ay > (ax << 1))
-			//{
-			//    move_val++;
-			//    move_val++;
-			//}
-			//else if (ax > (ay << 1))
-			//{
-			//    move_val++;
-			//}
+			/* Prevent the diamond maneuvre */
+			if (ay > (ax << 1))
+			{
+			    move_val++;
+			    move_val++;
+			}
+			else if (ax > (ay << 1))
+			{
+			    move_val++;
+			}
 
-			///* Analyze */
-			//switch (move_val)
-			//{
-			//    case 0:
-			//    {
-			//        mm[0] = 9;
-			//        if (ay > ax)
-			//        {
-			//            mm[1] = 8;
-			//            mm[2] = 6;
-			//            mm[3] = 7;
-			//            mm[4] = 3;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 6;
-			//            mm[2] = 8;
-			//            mm[3] = 3;
-			//            mm[4] = 7;
-			//        }
-			//        break;
-			//    }
+			/* Analyze */
+			switch (move_val)
+			{
+			    case 0:
+			    {
+			        mm[0] = 9;
+			        if (ay > ax)
+			        {
+			            mm[1] = 8;
+			            mm[2] = 6;
+			            mm[3] = 7;
+			            mm[4] = 3;
+			        }
+			        else
+			        {
+			            mm[1] = 6;
+			            mm[2] = 8;
+			            mm[3] = 3;
+			            mm[4] = 7;
+			        }
+			        break;
+			    }
 
-			//    case 1:
-			//    case 9:
-			//    {
-			//        mm[0] = 6;
-			//        if (y < 0)
-			//        {
-			//            mm[1] = 3;
-			//            mm[2] = 9;
-			//            mm[3] = 2;
-			//            mm[4] = 8;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 9;
-			//            mm[2] = 3;
-			//            mm[3] = 8;
-			//            mm[4] = 2;
-			//        }
-			//        break;
-			//    }
+			    case 1:
+			    case 9:
+			    {
+			        mm[0] = 6;
+			        if (y < 0)
+			        {
+			            mm[1] = 3;
+			            mm[2] = 9;
+			            mm[3] = 2;
+			            mm[4] = 8;
+			        }
+			        else
+			        {
+			            mm[1] = 9;
+			            mm[2] = 3;
+			            mm[3] = 8;
+			            mm[4] = 2;
+			        }
+			        break;
+			    }
 
-			//    case 2:
-			//    case 6:
-			//    {
-			//        mm[0] = 8;
-			//        if (x < 0)
-			//        {
-			//            mm[1] = 9;
-			//            mm[2] = 7;
-			//            mm[3] = 6;
-			//            mm[4] = 4;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 7;
-			//            mm[2] = 9;
-			//            mm[3] = 4;
-			//            mm[4] = 6;
-			//        }
-			//        break;
-			//    }
+			    case 2:
+			    case 6:
+			    {
+			        mm[0] = 8;
+			        if (x < 0)
+			        {
+			            mm[1] = 9;
+			            mm[2] = 7;
+			            mm[3] = 6;
+			            mm[4] = 4;
+			        }
+			        else
+			        {
+			            mm[1] = 7;
+			            mm[2] = 9;
+			            mm[3] = 4;
+			            mm[4] = 6;
+			        }
+			        break;
+			    }
 
-			//    case 4:
-			//    {
-			//        mm[0] = 7;
-			//        if (ay > ax)
-			//        {
-			//            mm[1] = 8;
-			//            mm[2] = 4;
-			//            mm[3] = 9;
-			//            mm[4] = 1;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 4;
-			//            mm[2] = 8;
-			//            mm[3] = 1;
-			//            mm[4] = 9;
-			//        }
-			//        break;
-			//    }
+			    case 4:
+			    {
+			        mm[0] = 7;
+			        if (ay > ax)
+			        {
+			            mm[1] = 8;
+			            mm[2] = 4;
+			            mm[3] = 9;
+			            mm[4] = 1;
+			        }
+			        else
+			        {
+			            mm[1] = 4;
+			            mm[2] = 8;
+			            mm[3] = 1;
+			            mm[4] = 9;
+			        }
+			        break;
+			    }
 
-			//    case 5:
-			//    case 13:
-			//    {
-			//        mm[0] = 4;
-			//        if (y < 0)
-			//        {
-			//            mm[1] = 1;
-			//            mm[2] = 7;
-			//            mm[3] = 2;
-			//            mm[4] = 8;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 7;
-			//            mm[2] = 1;
-			//            mm[3] = 8;
-			//            mm[4] = 2;
-			//        }
-			//        break;
-			//    }
+			    case 5:
+			    case 13:
+			    {
+			        mm[0] = 4;
+			        if (y < 0)
+			        {
+			            mm[1] = 1;
+			            mm[2] = 7;
+			            mm[3] = 2;
+			            mm[4] = 8;
+			        }
+			        else
+			        {
+			            mm[1] = 7;
+			            mm[2] = 1;
+			            mm[3] = 8;
+			            mm[4] = 2;
+			        }
+			        break;
+			    }
 
-			//    case 8:
-			//    {
-			//        mm[0] = 3;
-			//        if (ay > ax)
-			//        {
-			//            mm[1] = 2;
-			//            mm[2] = 6;
-			//            mm[3] = 1;
-			//            mm[4] = 9;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 6;
-			//            mm[2] = 2;
-			//            mm[3] = 9;
-			//            mm[4] = 1;
-			//        }
-			//        break;
-			//    }
+			    case 8:
+			    {
+			        mm[0] = 3;
+			        if (ay > ax)
+			        {
+			            mm[1] = 2;
+			            mm[2] = 6;
+			            mm[3] = 1;
+			            mm[4] = 9;
+			        }
+			        else
+			        {
+			            mm[1] = 6;
+			            mm[2] = 2;
+			            mm[3] = 9;
+			            mm[4] = 1;
+			        }
+			        break;
+			    }
 
-			//    case 10:
-			//    case 14:
-			//    {
-			//        mm[0] = 2;
-			//        if (x < 0)
-			//        {
-			//            mm[1] = 3;
-			//            mm[2] = 1;
-			//            mm[3] = 6;
-			//            mm[4] = 4;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 1;
-			//            mm[2] = 3;
-			//            mm[3] = 4;
-			//            mm[4] = 6;
-			//        }
-			//        break;
-			//    }
+			    case 10:
+			    case 14:
+			    {
+			        mm[0] = 2;
+			        if (x < 0)
+			        {
+			            mm[1] = 3;
+			            mm[2] = 1;
+			            mm[3] = 6;
+			            mm[4] = 4;
+			        }
+			        else
+			        {
+			            mm[1] = 1;
+			            mm[2] = 3;
+			            mm[3] = 4;
+			            mm[4] = 6;
+			        }
+			        break;
+			    }
 
-			//    default: /* case 12: */
-			//    {
-			//        mm[0] = 1;
-			//        if (ay > ax)
-			//        {
-			//            mm[1] = 2;
-			//            mm[2] = 4;
-			//            mm[3] = 3;
-			//            mm[4] = 7;
-			//        }
-			//        else
-			//        {
-			//            mm[1] = 4;
-			//            mm[2] = 2;
-			//            mm[3] = 7;
-			//            mm[4] = 3;
-			//        }
-			//        break;
-			//    }
-			//}
+			    default: /* case 12: */
+			    {
+			        mm[0] = 1;
+			        if (ay > ax)
+			        {
+			            mm[1] = 2;
+			            mm[2] = 4;
+			            mm[3] = 3;
+			            mm[4] = 7;
+			        }
+			        else
+			        {
+			            mm[1] = 4;
+			            mm[2] = 2;
+			            mm[3] = 7;
+			            mm[4] = 3;
+			        }
+			        break;
+			    }
+			}
 
-			///* Want to move */
-			//return (true);
+			/* Want to move */
+			return (true);
+		}
+
+		/*
+		 * Returns whether a given monster will try to run from the player.
+		 *
+		 * Monsters will attempt to avoid very powerful players.  See below.
+		 *
+		 * Because this function is called so often, little details are important
+		 * for efficiency.  Like not using "mod" or "div" when possible.  And
+		 * attempting to check the conditions in an optimal order.  Note that
+		 * "(x << 2) == (x * 4)" if "x" has enough bits to hold the result.
+		 *
+		 * Note that this function is responsible for about one to five percent
+		 * of the processor use in normal conditions...
+		 */
+		static bool mon_will_run(int m_idx)
+		{
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			ushort p_lev, m_lev;
+			ushort p_chp, p_mhp;
+			ushort m_chp, m_mhp;
+			uint p_val, m_val;
+
+			/* Keep monsters from running too far away */
+			if (m_ptr.cdis > Misc.MAX_SIGHT + 5) return (false);
+
+			/* All "afraid" monsters will run away */
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] != 0) return (true);
+
+			/* Nearby monsters will not become terrified */
+			if (m_ptr.cdis <= 5) return (false);
+
+			/* Examine player power (level) */
+			p_lev = (ushort)Misc.p_ptr.lev;
+
+			/* Examine monster power (level plus morale) */
+			m_lev = (ushort)(r_ptr.level + (m_idx & 0x08) + 25);
+
+			/* Optimize extreme cases below */
+			if (m_lev > p_lev + 4) return (false);
+			if (m_lev + 4 <= p_lev) return (true);
+
+			/* Examine player health */
+			p_chp = (ushort)Misc.p_ptr.chp;
+			p_mhp = (ushort)Misc.p_ptr.mhp;
+
+			/* Examine monster health */
+			m_chp = (ushort)m_ptr.hp;
+			m_mhp = (ushort)m_ptr.maxhp;
+
+			/* Prepare to optimize the calculation */
+			p_val = (ushort)((p_lev * p_mhp) + (p_chp << 2));	/* div p_mhp */
+			m_val = (ushort)((m_lev * m_mhp) + (m_chp << 2));	/* div m_mhp */
+
+			/* Strong players scare strong monsters */
+			if (p_val * m_mhp > m_val * p_mhp) return (true);
+
+			/* Assume no terror */
+			return (false);
+		}
+
+		/*
+		 * Choose the "best" direction for "flowing"
+		 *
+		 * Note that ghosts and rock-eaters are never allowed to "flow",
+		 * since they should move directly towards the player.
+		 *
+		 * Prefer "non-diagonal" directions, but twiddle them a little
+		 * to angle slightly towards the player's actual location.
+		 *
+		 * Allow very perceptive monsters to track old "spoor" left by
+		 * previous locations occupied by the player.  This will tend
+		 * to have monsters end up either near the player or on a grid
+		 * recently occupied by the player (and left via "teleport").
+		 *
+		 * Note that if "smell" is turned on, all monsters get vicious.
+		 *
+		 * Also note that teleporting away from a location will cause
+		 * the monsters who were chasing you to converge on that location
+		 * as long as you are still near enough to "annoy" them without
+		 * being close enough to chase directly.  I have no idea what will
+		 * happen if you combine "smell" with low "aaf" values.
+		 */
+		static bool get_moves_aux(Cave c, int m_idx, ref int yp, ref int xp)
+		{
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
+
+			int i, y, x, y1, x1;
+
+			int when = 0;
+			int cost = 999;
+
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			/* Monster can go through rocks */
+			if (r_ptr.flags.test(Monster_Flag.PASS_WALL.value, Monster_Flag.KILL_WALL.value)) return (false);
+
+			/* Monster location */
+			y1 = m_ptr.fy;
+			x1 = m_ptr.fx;
+
+			/* The player is not currently near the monster grid */
+			if (c.when[y1][x1] < c.when[py][px])
+			{
+				/* The player has never been near the monster grid */
+				if (c.when[y1][x1] == 0) return (false);
+
+				/* The monster is not allowed to track the player */
+				if (!Option.birth_ai_smell.value) return (false);
+			}
+
+			/* Monster is too far away to notice the player */
+			if (c.cost[y1][x1] > Misc.MONSTER_FLOW_DEPTH) return (false);
+			if (c.cost[y1][x1] > r_ptr.aaf) return (false);
+
+			/* Hack -- Player can see us, run towards him */
+			if (Cave.player_has_los_bold(y1, x1)) return (false);
+
+			/* Check nearby grids, diagonals first */
+			for (i = 7; i >= 0; i--)
+			{
+				/* Get the location */
+				y = y1 + Misc.ddy_ddd[i];
+				x = x1 + Misc.ddx_ddd[i];
+
+				/* Ignore illegal locations */
+				if (c.when[y][x] == 0) continue;
+
+				/* Ignore ancient locations */
+				if (c.when[y][x] < when) continue;
+
+				/* Ignore distant locations */
+				if (c.cost[y][x] > cost) continue;
+
+				/* Save the cost and time */
+				when = c.when[y][x];
+				cost = c.cost[y][x];
+
+				/* Hack -- Save the "twiddled" location */
+				yp = py + 16 * Misc.ddy_ddd[i];
+				xp = px + 16 * Misc.ddx_ddd[i];
+			}
+
+			/* No legal move (?) */
+			if (when == 0) return (false);
+
+			/* Success */
+			return (true);
 		}
 
 		/*
@@ -1282,72 +1437,77 @@ namespace CSAngband.Monster {
 		 */
 		static bool make_attack_spell(int m_idx)
 		{
-			throw new NotImplementedException();
-			//int chance, thrown_spell, rlev, failrate;
+			int chance, thrown_spell, rlev, failrate;
 
-			//bitflag f[RSF_SIZE];
+			Bitflag f = new Bitflag(Monster_Spell_Flag.SIZE);
 
-			//monster_type *m_ptr = cave_monster(cave, m_idx);
-			//monster_race *r_ptr = &r_info[m_ptr.r_idx];
-			//monster_lore *l_ptr = &l_list[m_ptr.r_idx];
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+			Monster_Lore l_ptr = Misc.l_list[m_ptr.r_idx];
 
 			//char m_name[80], m_poss[80], ddesc[80];
+			string m_name, m_poss, ddesc;
 
-			///* Player position */
-			//int px = p_ptr.px;
-			//int py = p_ptr.py;
+			/* Player position */
+			int px = Misc.p_ptr.px;
+			int py = Misc.p_ptr.py;
 
-			///* Extract the blind-ness */
-			//bool blind = (p_ptr.timed[TMD_BLIND] ? true : false);
+			/* Extract the blind-ness */
+			bool blind = (Misc.p_ptr.timed[(int)Timed_Effect.BLIND] != 0 ? true : false);
 
-			///* Extract the "see-able-ness" */
-			//bool seen = (!blind && m_ptr.ml);
+			/* Extract the "see-able-ness" */
+			bool seen = (!blind && m_ptr.ml);
 
-			///* Assume "normal" target */
-			//bool normal = true;
+			/* Assume "normal" target */
+			bool normal = true;
 
-			///* Handle "leaving" */
-			//if (p_ptr.leaving) return false;
+			/* Handle "leaving" */
+			if (Misc.p_ptr.leaving) return false;
 
-			///* Cannot cast spells when confused */
-			//if (m_ptr.m_timed[MON_TMD_CONF]) return (false);
+			/* Cannot cast spells when confused */
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.CONF] != 0) return (false);
 
-			///* Cannot cast spells when nice */
-			//if (m_ptr.mflag & MFLAG_NICE) return false;
+			/* Cannot cast spells when nice */
+			if ((m_ptr.mflag & Monster_Flag.MFLAG_NICE) != 0) return false;
 
-			///* Hack -- Extract the spell probability */
-			//chance = (r_ptr.freq_innate + r_ptr.freq_spell) / 2;
+			/* Hack -- Extract the spell probability */
+			chance = (r_ptr.freq_innate + r_ptr.freq_spell) / 2;
 
-			///* Not allowed to cast spells */
-			//if (!chance) return false;
+			/* Not allowed to cast spells */
+			if (chance == 0) return false;
 
-			///* Only do spells occasionally */
-			//if (randint0(100) >= chance) return false;
+			/* Only do spells occasionally */
+			if (Random.randint0(100) >= chance) return false;
 
-			///* Hack -- require projectable player */
-			//if (normal)
-			//{
-			//    /* Check range */
-			//    if (m_ptr.cdis > MAX_RANGE) return false;
+			/* Hack -- require projectable player */
+			if (normal)
+			{
+			    /* Check range */
+			    if (m_ptr.cdis > Misc.MAX_RANGE) return false;
 
-			//    /* Check path */
-			//    if (!projectable(m_ptr.fy, m_ptr.fx, py, px, PROJECT_NONE))
-			//        return false;
-			//}
+			    /* Check path */
+				throw new NotImplementedException();
+				//if (!projectable(m_ptr.fy, m_ptr.fx, py, px, PROJECT_NONE))
+				//    return false;
+			}
 
-			///* Extract the monster level */
-			//rlev = ((r_ptr.level >= 1) ? r_ptr.level : 1);
+			/* Extract the monster level */
+			rlev = ((r_ptr.level >= 1) ? r_ptr.level : 1);
 
-			///* Extract the racial spell flags */
-			//rsf_copy(f, r_ptr.spell_flags);
+			/* Extract the racial spell flags */
+			f.copy(r_ptr.spell_flags);
 
-			///* Allow "desperate" spells */
-			//if (rf_has(r_ptr.flags, RF_SMART) &&
-			//    m_ptr.hp < m_ptr.maxhp / 10 &&
-			//    randint0(100) < 50)
+			/* Allow "desperate" spells */
+			if (r_ptr.flags.has(Monster_Flag.SMART.value) &&
+			    m_ptr.hp < m_ptr.maxhp / 10 &&
+			    Random.randint0(100) < 50){
+				throw new NotImplementedException();
 
-			//    /* Require intelligent spells */
-			//    set_spells(f, RST_HASTE | RST_ANNOY | RST_ESCAPE | RST_HEAL | RST_TACTIC | RST_SUMMON);
+				///* Require intelligent spells */
+				//set_spells(f, RST_HASTE | RST_ANNOY | RST_ESCAPE | RST_HEAL | RST_TACTIC | RST_SUMMON);
+			}
+
+			throw new NotImplementedException();
 
 			///* Remove the "ineffective" spells */
 			//remove_bad_spells(m_idx, f);

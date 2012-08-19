@@ -1262,41 +1262,40 @@ namespace CSAngband {
 		 */
 		static void regen_monsters()
 		{
-			throw new NotImplementedException();
-			//int i, frac;
+			int i, frac;
 
-			///* Regenerate everyone */
-			//for (i = 1; i < cave_monster_max(cave); i++)
-			//{
-			//    /* Check the i'th monster */
-			//    monster_type *m_ptr = cave_monster(cave, i);
-			//    monster_race *r_ptr = &r_info[m_ptr.r_idx];
+			/* Regenerate everyone */
+			for (i = 1; i < Cave.cave_monster_max(Cave.cave); i++)
+			{
+			    /* Check the i'th monster */
+			    Monster.Monster m_ptr = Cave.cave_monster(Cave.cave, i);
+			    Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
 
-			//    /* Skip dead monsters */
-			//    if (!m_ptr.r_idx) continue;
+			    /* Skip dead monsters */
+			    if (m_ptr.r_idx == 0) continue;
 
-			//    /* Allow regeneration (if needed) */
-			//    if (m_ptr.hp < m_ptr.maxhp)
-			//    {
-			//        /* Hack -- Base regeneration */
-			//        frac = m_ptr.maxhp / 100;
+			    /* Allow regeneration (if needed) */
+			    if (m_ptr.hp < m_ptr.maxhp)
+			    {
+			        /* Hack -- Base regeneration */
+			        frac = m_ptr.maxhp / 100;
 
-			//        /* Hack -- Minimal regeneration rate */
-			//        if (!frac) frac = 1;
+			        /* Hack -- Minimal regeneration rate */
+			        if (frac == 0) frac = 1;
 
-			//        /* Hack -- Some monsters regenerate quickly */
-			//        if (rf_has(r_ptr.flags, RF_REGENERATE)) frac *= 2;
+			        /* Hack -- Some monsters regenerate quickly */
+			        if (r_ptr.flags.has(Monster_Flag.REGENERATE.value)) frac *= 2;
 
-			//        /* Hack -- Regenerate */
-			//        m_ptr.hp += frac;
+			        /* Hack -- Regenerate */
+			        m_ptr.hp += (short)frac;
 
-			//        /* Do not over-regenerate */
-			//        if (m_ptr.hp > m_ptr.maxhp) m_ptr.hp = m_ptr.maxhp;
+			        /* Do not over-regenerate */
+			        if (m_ptr.hp > m_ptr.maxhp) m_ptr.hp = m_ptr.maxhp;
 
-			//        /* Redraw (later) if needed */
-			//        if (p_ptr.health_who == i) p_ptr.redraw |= (PR_HEALTH);
-			//    }
-			//}
+			        /* Redraw (later) if needed */
+			        if (Misc.p_ptr.health_who == i) Misc.p_ptr.redraw |= (Misc.PR_HEALTH);
+			    }
+			}
 		}
 
 		/*

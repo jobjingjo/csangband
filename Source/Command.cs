@@ -306,8 +306,7 @@ namespace CSAngband {
 				/* Searching */
 				if(Misc.p_ptr.searching != 0 || (Misc.p_ptr.state.skills[(int)Skill.SEARCH_FREQUENCY] >= 50) ||
 						Random.one_in_(50 - Misc.p_ptr.state.skills[(int)Skill.SEARCH_FREQUENCY])) {
-					throw new NotImplementedException();
-					//search(false);
+					search(false);
 				}
 
 				/* Handle "store doors" */
@@ -423,6 +422,126 @@ namespace CSAngband {
 			//}
 
 			//return objs_picked_up;
+		}
+
+		/*
+		 * Search for hidden things.  Returns true if a search was attempted, returns
+		 * false when the player has a 0% chance of finding anything.  Prints messages
+		 * for negative confirmation when verbose mode is requested.
+		 */
+		public static bool search(bool verbose)
+		{
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
+
+			int y, x, chance;
+
+			bool found = false;
+
+			Object.Object o_ptr;
+
+
+			/* Start with base search ability */
+			chance = Misc.p_ptr.state.skills[(int)Skill.SEARCH];
+
+			/* Penalize various conditions */
+			if (Misc.p_ptr.timed[(int)Timed_Effect.BLIND] != 0 || Cave.no_light()) chance = chance / 10;
+			if (Misc.p_ptr.timed[(int)Timed_Effect.CONFUSED] != 0 || Misc.p_ptr.timed[(int)Timed_Effect.IMAGE] != 0) chance = chance / 10;
+
+			/* Prevent fruitless searches */
+			if (chance <= 0)
+			{
+				if (verbose)
+				{
+					Utilities.msg("You can't make out your surroundings well enough to search.");
+
+					/* Cancel repeat */
+					Cave.disturb(Misc.p_ptr, 0, 0);
+				}
+
+				return false;
+			}
+
+			/* Search the nearby grids, which are always in bounds */
+			for (y = (py - 1); y <= (py + 1); y++)
+			{
+				for (x = (px - 1); x <= (px + 1); x++)
+				{
+					/* Sometimes, notice things */
+					if (Random.randint0(100) < chance)
+					{
+						/* Invisible trap */
+						if (Cave.cave.feat[y][x] == Cave.FEAT_INVIS)
+						{
+							found = true;
+							throw new NotImplementedException();
+							///* Pick a trap */
+							//pick_trap(y, x);
+
+							///* Message */
+							//Utilities.msg("You have found a trap.");
+
+							///* Disturb */
+							//Cave.disturb(Misc.p_ptr, 0, 0);
+						}
+
+						/* Secret door */
+						if (Cave.cave.feat[y][x] == Cave.FEAT_SECRET)
+						{
+							found = true;
+
+							/* Message */
+							Utilities.msg("You have found a secret door.");
+
+							throw new NotImplementedException();
+							///* Pick a door */
+							//place_closed_door(cave, y, x);
+
+							///* Disturb */
+							//disturb(p_ptr, 0, 0);
+						}
+
+						/* Scan all objects in the grid */
+						for (o_ptr = Object.Object.get_first_object(y, x); o_ptr != null; o_ptr = Object.Object.get_next_object(o_ptr))
+						{
+							throw new NotImplementedException();
+							///* Skip non-chests */
+							//if (o_ptr.tval != TV_CHEST) continue;
+
+							///* Skip disarmed chests */
+							//if (o_ptr.pval[DEFAULT_PVAL] <= 0) continue;
+
+							///* Skip non-trapped chests */
+							//if (!chest_traps[o_ptr.pval[DEFAULT_PVAL]]) continue;
+
+							///* Identify once */
+							//if (!object_is_known(o_ptr))
+							//{
+							//    found = true;
+
+							//    /* Message */
+							//    msg("You have discovered a trap on the chest!");
+
+							//    /* Know the trap */
+							//    object_notice_everything(o_ptr);
+
+							//    /* Notice it */
+							//    disturb(p_ptr, 0, 0);
+							//}
+						}
+					}
+				}
+			}
+
+			if (verbose && !found)
+			{
+				if (chance >= 100)
+					Utilities.msg("There are no secrets here.");
+				else
+					Utilities.msg("You found nothing.");
+			}
+
+			return true;
 		}
 
 	}
