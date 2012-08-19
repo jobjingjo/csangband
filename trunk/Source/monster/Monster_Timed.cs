@@ -257,20 +257,19 @@ namespace CSAngband.Monster {
 		 */
 		static bool mon_clear_timed(int m_idx, int ef_idx, ushort flag, bool id)
 		{
-			throw new NotImplementedException();
-			//monster_type *m_ptr;
+			Monster m_ptr;
 
-			//assert(ef_idx >= 0 && ef_idx < MON_TMD_MAX);
+			Misc.assert(ef_idx >= 0 && ef_idx < (int)Misc.MON_TMD.MAX);
 
-			//assert(m_idx > 0);
-			//m_ptr = cave_monster(cave, m_idx);
+			Misc.assert(m_idx > 0);
+			m_ptr = Cave.cave_monster(Cave.cave, m_idx);
 
-			//if (!m_ptr.m_timed[ef_idx]) return false;
+			if (m_ptr.m_timed[ef_idx] == 0) return false;
 
-			///* Clearing never fails */
-			//flag |= MON_TMD_FLG_NOFAIL;
+			/* Clearing never fails */
+			flag |= Misc.MON_TMD_FLG_NOFAIL;
 
-			//return mon_set_timed(m_ptr, ef_idx, 0, flag, id);
+			return mon_set_timed(m_ptr, ef_idx, 0, flag, id);
 		}
 	}
 }

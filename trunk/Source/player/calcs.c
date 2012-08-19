@@ -42,12 +42,3 @@ int weight_remaining(void)
 	return (i);
 }
 
-/*
- * Handle "p_ptr.update" and "p_ptr.redraw"
- */
-void handle_stuff(struct player *p)
-{
-	if (p.update) update_stuff(p);
-	if (p.redraw) redraw_stuff(p);
-}
-
