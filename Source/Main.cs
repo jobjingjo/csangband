@@ -562,18 +562,9 @@ namespace CSAngband {
 			//    }
 			//}
 
-			//if(!found) {
-			//    return 1;
-			//}
-
-			//bool found = false;
 			for(int i = 0; i < cp.Length; i++) {
 				cp[i] = Term_xchar_xxx(cp[i]);
 			}
-
-			//if(found) {
-			//    return 1;
-			//}
 
 			Console.SetCursorPosition(x, y);
 			Console.ForegroundColor = a;

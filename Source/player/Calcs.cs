@@ -300,7 +300,7 @@ namespace CSAngband.Player {
 			    if (instance.new_spells > 0)
 			    {
 			        /* Message */
-			        Utilities.msg("You can learn %d more %s%s.",
+			        Utilities.msg("You can learn {0} more {1}{2}.",
 			                   instance.new_spells, p,
 			                   (instance.new_spells != 1) ? "s" : "");
 			    }

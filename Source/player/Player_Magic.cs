@@ -5,6 +5,11 @@ using System.Text;
 
 namespace CSAngband.Player {
 	class Player_Magic {
+		public Player_Magic() {
+			for(int i = 0; i < info.Length; i++) {
+				info[i] = new Magic_Type();
+			}
+		}
 		/*
 		 * Information about the player's "magic"
 		 *
