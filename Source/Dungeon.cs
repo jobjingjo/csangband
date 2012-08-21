@@ -238,103 +238,104 @@ namespace CSAngband {
 				/* Process the level */
 				dungeon(Cave.cave);
 
-				///* Notice stuff */
-				//if (Player.Player.instance.notice) notice_stuff(Player.Player.instance);
+				/* Notice stuff */
+				if (Player.Player.instance.notice != 0) Misc.p_ptr.notice_stuff();
 
-				///* Update stuff */
-				//if (Player.Player.instance.update) update_stuff(Player.Player.instance);
+				/* Update stuff */
+				if (Player.Player.instance.update != 0) Misc.p_ptr.update_stuff();
 
-				///* Redraw stuff */
-				//if (Player.Player.instance.redraw) redraw_stuff(Player.Player.instance);
-
-
-				///* Cancel the target */
-				//target_set_monster(0);
-
-				///* Cancel the health bar */
-				//health_track(Player.Player.instance, 0);
+				/* Redraw stuff */
+				if (Player.Player.instance.redraw != 0) Misc.p_ptr.redraw_stuff();
 
 
-				///* Forget the view */
-				//forget_view();
+				/* Cancel the target */
+				Target.set_monster(0);
+
+				/* Cancel the health bar */
+				Cave.health_track(Player.Player.instance, 0);
 
 
-				///* Handle "quit and save" */
-				//if (!Player.Player.instance.playing && !Player.Player.instance.is_dead) break;
+				/* Forget the view */
+				Cave.forget_view();
 
 
-				///* XXX XXX XXX */
-				//message_flush();
+				/* Handle "quit and save" */
+				if (!Player.Player.instance.playing && !Player.Player.instance.is_dead) break;
 
-				///* Accidental Death */
-				//if (Player.Player.instance.playing && Player.Player.instance.is_dead) {
-				//    /* XXX-elly: this does not belong here. Refactor or
-				//     * remove. Very similar to do_cmd_wiz_cure_all(). */
-				//    if ((Player.Player.instance.wizard || OPT(cheat_live)) && !get_check("Die? ")) {
-				//        /* Mark social class, reset age, if needed */
-				//        if (Player.Player.instance.sc) Player.Player.instance.sc = Player.Player.instance.age = 0;
 
-				//        /* Increase age */
-				//        Player.Player.instance.age++;
+				/* XXX XXX XXX */
+				Utilities.message_flush();
 
-				//        /* Mark savefile */
-				//        Player.Player.instance.noscore |= NOSCORE_WIZARD;
+				/* Accidental Death */
+				if (Player.Player.instance.playing && Player.Player.instance.is_dead) {
+					throw new NotImplementedException();
+					///* XXX-elly: this does not belong here. Refactor or
+					// * remove. Very similar to do_cmd_wiz_cure_all(). */
+					//if ((Player.Player.instance.wizard || OPT(cheat_live)) && !get_check("Die? ")) {
+					//    /* Mark social class, reset age, if needed */
+					//    if (Player.Player.instance.sc) Player.Player.instance.sc = Player.Player.instance.age = 0;
 
-				//        /* Message */
-				//        msg("You invoke wizard mode and cheat death.");
-				//        message_flush();
+					//    /* Increase age */
+					//    Player.Player.instance.age++;
 
-				//        /* Cheat death */
-				//        Player.Player.instance.is_dead = false;
+					//    /* Mark savefile */
+					//    Player.Player.instance.noscore |= NOSCORE_WIZARD;
 
-				//        /* Restore hit points */
-				//        Player.Player.instance.chp = Player.Player.instance.mhp;
-				//        Player.Player.instance.chp_frac = 0;
+					//    /* Message */
+					//    msg("You invoke wizard mode and cheat death.");
+					//    message_flush();
 
-				//        /* Restore spell points */
-				//        Player.Player.instance.csp = Player.Player.instance.msp;
-				//        Player.Player.instance.csp_frac = 0;
+					//    /* Cheat death */
+					//    Player.Player.instance.is_dead = false;
 
-				//        /* Hack -- Healing */
-				//        Player.Player.instance.clear_timed(Timed_Effect.BLIND, true);
-				//        Player.Player.instance.clear_timed(Timed_Effect.CONFUSED, true);
-				//        Player.Player.instance.clear_timed(Timed_Effect.POISONED, true);
-				//        Player.Player.instance.clear_timed(Timed_Effect.AFRAID, true);
-				//        Player.Player.instance.clear_timed(Timed_Effect.PARALYZED, true);
-				//        Player.Player.instance.clear_timed(Timed_Effect.IMAGE, true);
-				//        Player.Player.instance.clear_timed(Timed_Effect.STUN, true);
-				//        Player.Player.instance.clear_timed(Timed_Effect.CUT, true);
+					//    /* Restore hit points */
+					//    Player.Player.instance.chp = Player.Player.instance.mhp;
+					//    Player.Player.instance.chp_frac = 0;
 
-				//        /* Hack -- Prevent starvation */
-				//        Player.Player.instance.set_food(Player.Player.instance, PY_FOOD_MAX - 1);
+					//    /* Restore spell points */
+					//    Player.Player.instance.csp = Player.Player.instance.msp;
+					//    Player.Player.instance.csp_frac = 0;
 
-				//        /* Hack -- cancel recall */
-				//        if (Player.Player.instance.word_recall)
-				//        {
-				//            /* Message */
-				//            msg("A tension leaves the air around you...");
-				//            message_flush();
+					//    /* Hack -- Healing */
+					//    Player.Player.instance.clear_timed(Timed_Effect.BLIND, true);
+					//    Player.Player.instance.clear_timed(Timed_Effect.CONFUSED, true);
+					//    Player.Player.instance.clear_timed(Timed_Effect.POISONED, true);
+					//    Player.Player.instance.clear_timed(Timed_Effect.AFRAID, true);
+					//    Player.Player.instance.clear_timed(Timed_Effect.PARALYZED, true);
+					//    Player.Player.instance.clear_timed(Timed_Effect.IMAGE, true);
+					//    Player.Player.instance.clear_timed(Timed_Effect.STUN, true);
+					//    Player.Player.instance.clear_timed(Timed_Effect.CUT, true);
 
-				//            /* Hack -- Prevent recall */
-				//            Player.Player.instance.word_recall = 0;
-				//        }
+					//    /* Hack -- Prevent starvation */
+					//    Player.Player.instance.set_food(Player.Player.instance, PY_FOOD_MAX - 1);
 
-				//        /* Note cause of death XXX XXX XXX */
-				//        my_strcpy(Player.Player.instance.died_from, "Cheating death", sizeof(Player.Player.instance.died_from));
+					//    /* Hack -- cancel recall */
+					//    if (Player.Player.instance.word_recall)
+					//    {
+					//        /* Message */
+					//        msg("A tension leaves the air around you...");
+					//        message_flush();
 
-				//        /* New depth */
-				//        Player.Player.instance.depth = 0;
+					//        /* Hack -- Prevent recall */
+					//        Player.Player.instance.word_recall = 0;
+					//    }
 
-				//        /* Leaving */
-				//        Player.Player.instance.leaving = true;
-				//    }
-				//}
+					//    /* Note cause of death XXX XXX XXX */
+					//    my_strcpy(Player.Player.instance.died_from, "Cheating death", sizeof(Player.Player.instance.died_from));
 
-				///* Handle "death" */
-				//if (Player.Player.instance.is_dead) break;
+					//    /* New depth */
+					//    Player.Player.instance.depth = 0;
 
-				///* Make a new level */
-				//cave_generate(cave, Player.Player.instance);
+					//    /* Leaving */
+					//    Player.Player.instance.leaving = true;
+					//}
+				}
+
+				/* Handle "death" */
+				if (Player.Player.instance.is_dead) break;
+
+				/* Make a new level */
+				Cave.cave_generate(Cave.cave, Player.Player.instance);
 			}
 
 			throw new NotImplementedException();
@@ -1720,6 +1721,61 @@ namespace CSAngband {
 
 			///* Single, non-artifact items */
 			//else msg("Your %s has recharged.", o_name);
+		}
+
+		/*
+		 * Change dungeon level - e.g. by going up stairs or with WoR.
+		 */
+		public static void dungeon_change_level(int dlev)
+		{
+			/* New depth */
+			Misc.p_ptr.depth = (short)dlev;
+
+			/* If we're returning to town, update the store contents
+			   according to how long we've been away */
+			if (dlev == 0 && Misc.daycount != 0)
+			{
+			    if (Option.cheat_xtra.value) Utilities.msg("Updating Shops...");
+			    while (Misc.daycount-- != 0)
+			    {
+			        int n;
+
+			        /* Maintain each shop (except home) */
+			        for (n = 0; n < (int)STORE.MAX_STORES; n++)
+			        {
+			            /* Skip the home */
+			            if (n == (int)STORE.HOME) continue;
+
+			            /* Maintain */
+						Misc.stores[n].store_maint();
+			        }
+
+			        /* Sometimes, shuffle the shop-keepers */
+			        if (Random.one_in_(Store.SHUFFLE))
+			        {
+			            /* Message */
+			            if (Option.cheat_xtra.value) Utilities.msg("Shuffling a Shopkeeper...");
+
+			            /* Pick a random shop (except home) */
+			            while (true)
+			            {
+			                n = Random.randint0((int)STORE.MAX_STORES);
+			                if (n != (int)STORE.HOME) break;
+			            }
+
+			            /* Shuffle it */
+						Misc.stores[n].store_shuffle();
+			        }
+			    }
+			    Misc.daycount = 0;
+			    if (Option.cheat_xtra.value) Utilities.msg("Done.");
+			}
+
+			/* Leaving */
+			Misc.p_ptr.leaving = true;
+
+			/* Save the game when we arrive on the new level. */
+			Misc.p_ptr.autosave = true;
 		}
 	}
 }

@@ -34,61 +34,6 @@
 #include "spells.h"
 #include "target.h"
 
-/*
- * Change dungeon level - e.g. by going up stairs or with WoR.
- */
-void dungeon_change_level(int dlev)
-{
-	/* New depth */
-	p_ptr.depth = dlev;
-
-	/* If we're returning to town, update the store contents
-	   according to how long we've been away */
-	if (!dlev && daycount)
-	{
-		if (OPT(cheat_xtra)) msg("Updating Shops...");
-		while (daycount--)
-		{
-			int n;
-
-			/* Maintain each shop (except home) */
-			for (n = 0; n < MAX_STORES; n++)
-			{
-				/* Skip the home */
-				if (n == STORE_HOME) continue;
-
-				/* Maintain */
-				store_maint(&stores[n]);
-			}
-
-			/* Sometimes, shuffle the shop-keepers */
-			if (one_in_(STORE_SHUFFLE))
-			{
-				/* Message */
-				if (OPT(cheat_xtra)) msg("Shuffling a Shopkeeper...");
-
-				/* Pick a random shop (except home) */
-				while (1)
-				{
-					n = randint0(MAX_STORES);
-					if (n != STORE_HOME) break;
-				}
-
-				/* Shuffle it */
-				store_shuffle(&stores[n]);
-			}
-		}
-		daycount = 0;
-		if (OPT(cheat_xtra)) msg("Done.");
-	}
-
-	/* Leaving */
-	p_ptr.leaving = true;
-
-	/* Save the game when we arrive on the new level. */
-	p_ptr.autosave = true;
-}
-
 
 static void play_ambient_sound(void)
 {

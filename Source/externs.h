@@ -76,7 +76,6 @@ int coords_to_dir(int y, int x);
 void death_screen(void);
 
 /* dungeon.c */
-extern void dungeon_change_level(int dlev);
 extern int value_check_aux1(const object_type *o_ptr);
 extern void idle_update(void);
 
