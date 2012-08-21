@@ -152,7 +152,7 @@ namespace CSAngband {
 		/* Item selector type (everything required for get_item()) */
 		class item_selector_type
 		{
-			public item_selector_type(Command_Code a, string b, string c, filter_func d, int e) {
+			public item_selector_type(Command_Code a, string b, string c, Misc.item_tester_hook_func d, int e) {
 				command = a;
 				prompt = b;
 				noop = c;
@@ -164,8 +164,9 @@ namespace CSAngband {
 			public string prompt;
 			public string noop;
 
-			public delegate bool filter_func(Object.Object o_ptr);
-			public filter_func filter;
+			//This delegate is now renamed and in Misc
+			//public delegate bool filter_func(Object.Object o_ptr);
+			public Misc.item_tester_hook_func filter;
 			public int mode;
 		};
 
@@ -560,14 +561,13 @@ namespace CSAngband {
 
 					if (!cmd.arg_present[0])
 					{
-						int item;
+						int item = 0;
 
-						throw new NotImplementedException();
-						//item_tester_hook = itms.filter;
-						//if (!get_item(&item, itms.prompt, itms.noop, cmd.command, itms.mode))
-						//    return;
+						Misc.item_tester_hook = itms.filter;
+						if (!Object.Object.get_item(ref item, itms.prompt, itms.noop, cmd.command, itms.mode))
+						    return;
 
-						//cmd_set_arg_item(cmd, 0, item);
+						cmd.set_arg_item(0, item);
 					}
 				}
 
@@ -870,6 +870,19 @@ namespace CSAngband {
 			Misc.p_ptr.redraw |= (Misc.PR_STATE);
 		}
 
+
+		public void set_arg_item(int n, int item)
+		{
+			throw new NotImplementedException();
+			//int idx = cmd_idx(cmd.command);
+
+			//assert(n <= CMD_MAX_ARGS);
+			//assert(game_cmds[idx].arg_type[n] & arg_ITEM);
+
+			//cmd.arg[n].item = item;
+			//cmd.arg_type[n] = arg_ITEM;
+			//cmd.arg_present[n] = true;
+		}
 
 	}
 }
