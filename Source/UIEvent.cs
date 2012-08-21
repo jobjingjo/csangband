@@ -175,8 +175,8 @@ namespace CSAngband {
 		/**
 		 * Given a control character X, turn it into its uppercase ASCII equivalent.
 		 */
-		public static keycode_t UN_KTRL(keycode_t X){
-			return (X + 64);
+		public static char UN_KTRL(keycode_t X){
+			return (char)(X + 64);
 		}
 
 		/* Analogous to isdigit() etc in ctypes */
@@ -290,7 +290,7 @@ namespace CSAngband {
 				 * displayed as [Tab] */
 				if ((byte)i < 0x20 && desc == null){
 					mods |= (byte)keycode_t.KC_MOD_CONTROL;
-					i = UN_KTRL(i);
+					i = (keycode_t)UN_KTRL(i);
 				}
 
 				if (mods != 0) {

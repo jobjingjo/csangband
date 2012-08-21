@@ -7,6 +7,13 @@ namespace CSAngband {
 	/* ================== GEOMETRY ====================== */
 	/* Defines a rectangle on the screen that is bound to a Panel or subpanel */
 	class Region {
+		public Region() {
+			col = 0;
+			row = 0;
+			width = 0;
+			page_rows = 0;
+		}
+
 		public Region(int col, int row, int width, int page_rows){
 			this.col = col;
 			this.row = row;

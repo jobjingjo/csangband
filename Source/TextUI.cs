@@ -26,19 +26,17 @@ namespace CSAngband {
 			if (Command.command_menu == null)
 			    Command.command_menu = new Menu_Type(Menu_Type.skin_id.SCROLL, Command.command_menu_iter);
 
-			throw new NotImplementedException();
-			//menu_setpriv(command_menu, N_ELEMENTS(cmds_all) - 1, &chosen_command);
-			//menu_layout(command_menu, &area);
+			Command.command_menu.priv(Command_List.all.Length - 1, chosen_command);
+			Command.command_menu.layout(area);
 
-			///* Set up the screen */
-			//screen_save();
-			//window_make(19, 4, 58, 11);
+			/* Set up the screen */
+			Utilities.screen_save();
+			Utilities.window_make(19, 4, 58, 11);
 
-			//menu_select(command_menu, 0, true);
+			Command.command_menu.select(0, true);
+			Utilities.screen_load();
 
-			//screen_load();
-
-			//return chosen_command.key;
+			return chosen_command.key;
 		}
 
 		/*** Input processing ***/

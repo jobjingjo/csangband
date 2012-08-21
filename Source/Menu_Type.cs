@@ -272,7 +272,7 @@ namespace CSAngband {
 			{
 				if ((flags & (int)menu_type_flags.MN_REL_TAGS) != 0)
 					sel = skin.get_tag(this, pos);
-				else if (selections.Length > 0 && ((flags & (int)menu_type_flags.MN_PVT_TAGS) == 0))
+				else if ((selections != null && selections.Length  > 0) && ((flags & (int)menu_type_flags.MN_PVT_TAGS) == 0))
 					sel = selections[pos];
 				else if (row_funcs.get_tag != null)
 					sel = row_funcs.get_tag(this, oid);
@@ -626,10 +626,9 @@ namespace CSAngband {
 			int oid = cursor;
 			Region loc = active;
 
-			if (reset_screen) {
-				throw new NotImplementedException();
-				/*screen_load();
-				screen_save();*/
+			if (reset_screen) {;
+				Utilities.screen_load();
+				Utilities.screen_save();
 			}
 
 			if (filter_list != null && cursor >= 0)
@@ -679,7 +678,7 @@ namespace CSAngband {
 			            return i + this.top;
 			    }
 			}
-			else if ((this.flags & (int)menu_type_flags.MN_PVT_TAGS) == 0 && this.selections.Length > 0)
+			else if ((this.flags & (int)menu_type_flags.MN_PVT_TAGS) == 0 && (this.selections != null && this.selections.Length > 0))
 			{
 			    for (i = 0; i < selections.Length; i++)
 			    {
@@ -875,8 +874,7 @@ namespace CSAngband {
 
 			notify |= (ui_event_type.EVT_SELECT | ui_event_type.EVT_ESCAPE);
 			if(popup) {
-				throw new NotImplementedException();
-				//screen_save();
+				Utilities.screen_save();
 			}
 
 			/* Stop on first unhandled event */
@@ -891,7 +889,7 @@ namespace CSAngband {
 				if (min.type == ui_event_type.EVT_MOUSE) {
 					handle_mouse(min, out mout);
 				} else if (min.type == ui_event_type.EVT_KBRD) {
-					if (!no_act && cmd_keys.Length > 0 && cmd_keys.IndexOf((char)min.key.code) >= 0 && handle_action(min))
+					if (!no_act && (cmd_keys != null && cmd_keys.Length > 0) && cmd_keys.IndexOf((char)min.key.code) >= 0 && handle_action(min))
 						continue;
 
 					handle_keypress(min, ref mout);
@@ -910,16 +908,14 @@ namespace CSAngband {
 				/* Notify about the outgoing type */
 				if ((notify & mout.type) != (ui_event_type)0) {
 					if(popup) {
-						throw new NotImplementedException();
-						//screen_load();
+						Utilities.screen_load();
 					}
 					return mout;
 				}
 			}
 
 			if(popup) {
-				throw new NotImplementedException();
-				//screen_load();
+				Utilities.screen_load();
 			}
 			return min;
 		}

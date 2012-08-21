@@ -18,18 +18,79 @@ namespace CSAngband {
 
 		static bool cmd_list_action(Menu_Type m, ui_event mevent, int oid)
 		{
-			throw new NotImplementedException();
-			//if (event.type == EVT_SELECT)
-			//    return cmd_menu(&cmds_all[oid], menu_priv(m));
-			//else
-			//    return false;
+			if (mevent.type == ui_event_type.EVT_SELECT)
+			    return cmd_menu(ref Command_List.all[oid], m.menu_data);
+			else
+			    return false;
 		}
+
+		/*
+		 * Display a list of commands.
+		 */
+		static bool cmd_menu(ref Command_List list, object selection_p)
+		{
+			Menu_Type menu;
+			Menu_Type.menu_iter commands_menu = new Menu_Type.menu_iter( null, null, cmd_sub_entry, null, null );
+			Region area = new Region(23, 4, 37, 13);
+
+			ui_event evt;
+			//Command_Info selection = selection_p as Command_Info;
+
+			/* Set up the menu */
+			menu = new Menu_Type(Menu_Type.skin_id.SCROLL, commands_menu);
+			menu.priv(list.list.Length, list.list);
+			menu.layout(area);
+
+			/* Set up the screen */
+			Utilities.screen_save();
+			Utilities.window_make(21, 3, 62, 17);
+
+			/* Select an entry */
+			evt = menu.select(0, true);
+
+			/* Load de screen */
+			Utilities.screen_load();
+
+			if (evt.type == ui_event_type.EVT_SELECT)
+				selection_p = list.list[menu.cursor]; //This was originally selection as above
+
+			return false;
+		}
+
+		/* Display an entry on a command menu */
+		static void cmd_sub_entry(Menu_Type menu, int oid, bool cursor, int row, int col, int width)
+		{
+			ConsoleColor attr = (cursor ? ConsoleColor.Cyan : ConsoleColor.White);
+			Command_Info[] commands = menu.menu_data as Command_Info[];
+
+			//(void)width;
+
+			/* Write the description */
+			Term.putstr(col, row, -1, attr, commands[oid].desc);
+
+			/* Include keypress */
+			Term.addch(attr, ' ');
+			Term.addch(attr, '(');
+
+			/* KTRL()ing a control character does not alter it at all */
+			if (UIEvent.KTRL(commands[oid].key) == commands[oid].key)
+			{
+			    Term.addch(attr, '^');
+			    Term.addch(attr, UIEvent.UN_KTRL((keycode_t)commands[oid].key));
+			}
+			else
+			{
+			    Term.addch(attr, commands[oid].key);
+			}
+
+			Term.addch(attr, ')');
+		}
+
 
 		static void cmd_list_entry(Menu_Type menu, int oid, bool cursor, int row, int col, int width)
 		{
-			throw new NotImplementedException();
-			//byte attr = (cursor ? TERM_L_BLUE : TERM_WHITE);
-			//Term_putstr(col, row, -1, attr, cmds_all[oid].name);
+			ConsoleColor attr = (cursor ? ConsoleColor.Cyan : ConsoleColor.White);
+			Term.putstr(col, row, -1, attr, Command_List.all[oid].name);
 		}
 
 		/* List indexed by char */
