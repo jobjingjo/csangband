@@ -1318,7 +1318,7 @@ namespace CSAngband {
 			    Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
 
 			    if (r_ptr.flags.has(Monster_Flag.ATTR_MULTI.value))
-			        attr = (ConsoleColor)Random.randint1(16 - 1); //BASIC_COLORS - 1, so, size of ConsoleColors...
+			        attr = Utilities.num_to_attr(Random.randint1(16 - 1)); //BASIC_COLORS - 1, so, size of ConsoleColors...
 			    else if (r_ptr.flags.has(Monster_Flag.ATTR_FLICKER.value))
 			        attr = get_flicker(r_ptr.x_attr);
 			    else

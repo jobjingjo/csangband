@@ -19,14 +19,14 @@ namespace CSAngband {
 		 */
 		static char action_menu_choose()
 		{
+			Region area = new Region( 21, 5, 37, 6 );
+
+			Command_Info chosen_command = new Command_Info();
+
+			if (Command.command_menu == null)
+			    Command.command_menu = new Menu_Type(Menu_Type.skin_id.SCROLL, Command.command_menu_iter);
+
 			throw new NotImplementedException();
-			//region area = { 21, 5, 37, 6 };
-
-			//struct cmd_info chosen_command = { 0 };
-
-			//if (!command_menu)
-			//    command_menu = menu_new(MN_SKIN_SCROLL, &command_menu_iter);
-
 			//menu_setpriv(command_menu, N_ELEMENTS(cmds_all) - 1, &chosen_command);
 			//menu_layout(command_menu, &area);
 
@@ -41,7 +41,7 @@ namespace CSAngband {
 			//return chosen_command.key;
 		}
 
-				/*** Input processing ***/
+		/*** Input processing ***/
 
 
 		/**

@@ -19,28 +19,77 @@ namespace CSAngband {
 		 */
 		public static List<keypress> inkey_next = new List<keypress>(); //might be an array/list
 
+		class color_chart_info {
+			public color_chart_info(char a, string b, ConsoleColor c) {
+				sym = a;
+				name = b;
+				color = c;
+			}
+
+			public char sym;
+			public string name;
+			public ConsoleColor color;
+		}
+
+		static color_chart_info[] color_chart = new color_chart_info[] {
+			new color_chart_info('d', "Black", ConsoleColor.Black),
+			new color_chart_info('w', "White", ConsoleColor.White),
+			new color_chart_info('s', "Slate", ConsoleColor.Gray),
+			new color_chart_info('o', "Orange", ConsoleColor.DarkYellow),
+			new color_chart_info('r', "Red", ConsoleColor.Red),
+			new color_chart_info('g', "Green", ConsoleColor.DarkGreen),
+			new color_chart_info('b', "Blue", ConsoleColor.Blue),
+			new color_chart_info('u', "Umber", ConsoleColor.DarkRed),
+			new color_chart_info('D', "Light Dark", ConsoleColor.DarkGray),
+			new color_chart_info('W', "Light Slate", ConsoleColor.White),
+			new color_chart_info('P', "Light Purple", ConsoleColor.Magenta),
+			new color_chart_info('y', "Yellow", ConsoleColor.Yellow),
+			new color_chart_info('R', "Light Red", ConsoleColor.Red),
+			new color_chart_info('G', "Light Green", ConsoleColor.Green),
+			new color_chart_info('B', "Light Blue", ConsoleColor.Cyan),
+			new color_chart_info('U', "Light Umber", ConsoleColor.Red),
+			new color_chart_info('p', "Purple", ConsoleColor.DarkMagenta),
+			new color_chart_info('v', "Violet", ConsoleColor.DarkMagenta),
+			new color_chart_info('t', "Teal", ConsoleColor.DarkCyan),
+			new color_chart_info('m', "Mud", ConsoleColor.DarkYellow),
+			new color_chart_info('Y', "Light Yellow", ConsoleColor.Yellow),
+			new color_chart_info('i', "Magenta-Pink", ConsoleColor.Magenta),
+			new color_chart_info('T', "Light Teal", ConsoleColor.Cyan),
+			new color_chart_info('V', "Light Violet", ConsoleColor.Magenta),
+			new color_chart_info('I', "Light Pink", ConsoleColor.Red),
+			new color_chart_info('M', "Mustard", ConsoleColor.DarkYellow),
+			new color_chart_info('z', "Blue Slate", ConsoleColor.Cyan),
+			new color_chart_info('Z', "Deep Light Blue", ConsoleColor.Cyan)
+		};
+
 		/*
 		 * Converts a string to a terminal color byte.
 		 */
 		public static ConsoleColor color_text_to_attr(string name)
 		{
-			//TODO make sure colors match format of ConsoleColor names
-			foreach(ConsoleColor c in Enum.GetValues(typeof(ConsoleColor))) {
-				string col_name = Enum.GetName(typeof(ConsoleColor), c);
-				if (name.Length > 1){
-					if(name.ToLower() == col_name.ToLower()) {
-						return c;
+			foreach(color_chart_info i in color_chart){
+				if(name.Length == 1) {
+					if(name[0] == i.sym) {
+						return i.color;
 					}
-				} else { //Crap, we gotta figure out what they want...
-					//TODO: Make this a switch/ifelseif statement to select a ConsoleColor...
-					if (name.ToLower()[0] == col_name.ToLower()[0]){
-						return c;
+				} else {
+					if(name == i.name) {
+						return i.color;
 					}
 				}
 			}
 
+			int k;
+			if(Char.IsDigit(name[0]) && int.TryParse(name, out k)) {
+				return color_chart[k].color;
+			}
+
 			/* Default to white */
 			return ConsoleColor.White;
+		}
+
+		public static ConsoleColor num_to_attr(int num) {
+			return color_chart[num].color;
 		}
 
 		/**** Available Functions ****/
