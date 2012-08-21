@@ -1805,12 +1805,11 @@ namespace CSAngband {
 		 */
 		public static void monster_race_track(int r_idx)
 		{
-			throw new NotImplementedException();
-			///* Save this monster ID */
-			//p_ptr.monster_race_idx = r_idx;
+			/* Save this monster ID */
+			Misc.p_ptr.monster_race_idx = (short)r_idx;
 
-			///* Window stuff */
-			//p_ptr.redraw |= (PR_MONSTER);
+			/* Window stuff */
+			Misc.p_ptr.redraw |= (Misc.PR_MONSTER);
 		}
 
 

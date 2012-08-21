@@ -33,9 +33,9 @@ namespace CSAngband.Object {
 		Object_Flag object_flag;			/* Object flag for the slay */
 		Monster_Flag monster_flag;			/* Which monster flag(s) make it vulnerable */
 		Monster_Flag resist_flag;			/* Which monster flag(s) make it resist */
-		int mult;					/* Slay multiplier */
+		public int mult;					/* Slay multiplier */
 		string range_verb;		/* attack verb for ranged hits */
-		string melee_verb; 	/* attack verb for melee hits */
+		public string melee_verb; 	/* attack verb for melee hits */
 		string active_verb; 	/* verb for when the object is active */
 		string desc;			/* description of vulnerable creatures */
 		string brand;			/* name of brand */
@@ -306,7 +306,7 @@ namespace CSAngband.Object {
 		 */
 		//Best_s_ptr was slay**
 		public static void improve_attack_modifier(Object o_ptr, Monster.Monster m_ptr, 
-				Slay[] best_s_ptr, bool real, bool known_only)
+			ref Slay best_s_ptr, bool real, bool known_only)
 		{
 			throw new NotImplementedException();
 			//monster_race *r_ptr = &r_info[m_ptr.r_idx];

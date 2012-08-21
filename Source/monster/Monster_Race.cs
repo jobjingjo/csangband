@@ -82,5 +82,17 @@ namespace CSAngband.Monster {
 		public Monster_Drop drops;
 	
 		public Monster_Mimic mimic_kinds;
+
+		/*
+		 * Some monster types are different.
+		 */
+		public bool monster_is_unusual(){
+			return flags.test(Monster_Flag.DEMON.value, Monster_Flag.UNDEAD.value, Monster_Flag.STUPID.value, 
+				Monster_Flag.NONLIVING.value);
+		}
+
+		public bool monster_is_nonliving(){
+			return flags.test(Monster_Flag.DEMON.value, Monster_Flag.UNDEAD.value, Monster_Flag.NONLIVING.value);
+		}
 	}
 }

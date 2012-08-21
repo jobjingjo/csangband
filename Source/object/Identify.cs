@@ -282,5 +282,115 @@ namespace CSAngband.Object {
 
 			//return false;
 		}
+
+		public void notice_attack_plusses()
+		{
+			throw new NotImplementedException();
+			//assert(o_ptr && o_ptr.kind);
+
+			//if (object_attack_plusses_are_visible(o_ptr))
+			//    return;
+
+			//if (object_add_ident_flags(o_ptr, IDENT_ATTACK))
+			//    object_check_for_ident(o_ptr);
+
+
+			//if (wield_slot(o_ptr) == INVEN_WIELD)
+			//{
+			//    char o_name[80];
+
+			//    object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
+			//    msgt(MSG_PSEUDOID,
+			//            "You know more about the %s you are using.",
+			//            o_name);
+			//}
+			//else if ((o_ptr.to_d || o_ptr.to_h) &&
+			//        !((o_ptr.tval == TV_HARD_ARMOR || o_ptr.tval == TV_SOFT_ARMOR) && (o_ptr.to_h < 0)))
+			//{
+			//    char o_name[80];
+
+			//    object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
+			//    msgt(MSG_PSEUDOID, "Your %s glows.", o_name);
+			//}
+
+			//p_ptr.update |= (PU_BONUS);
+			//event_signal(EVENT_INVENTORY);
+			//event_signal(EVENT_EQUIPMENT);
+		}
+
+		/**
+		 * Notice a given special flag on wielded items.
+		 *
+		 * \param flag is the flag to notice
+		 */
+		public static void wieldeds_notice_flag(Player.Player p, int flag)
+		{
+			throw new NotImplementedException();
+			//int i;
+
+			///* Sanity check */
+			//if (!flag) return;
+
+			///* XXX Eddie need different naming conventions for starting wieldeds at INVEN_WIELD vs INVEN_WIELD+2 */
+			//for (i = INVEN_WIELD; i < ALL_INVEN_TOTAL; i++)
+			//{
+			//    object_type *o_ptr = &p.inventory[i];
+			//    bitflag f[OF_SIZE];
+
+			//    if (!o_ptr.kind) continue;
+
+			//    object_flags(o_ptr, f);
+
+			//    if (of_has(f, flag) && !of_has(o_ptr.known_flags, flag))
+			//    {
+			//        char o_name[80];
+			//        object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
+
+			//        /* Notice the flag */
+			//        object_notice_flag(o_ptr, flag);
+
+			//        /* XXX Eddie should this go before noticing the flag to avoid learning twice? */
+			//        if (EASY_LEARN && object_is_jewelry(o_ptr))
+			//        {
+			//            /* XXX Eddie EASY_LEARN Possible concern: gets =teleportation just from +2 speed */
+			//            object_flavor_aware(o_ptr);
+			//            object_check_for_ident(o_ptr);
+			//        }
+
+			//        /* Message */
+			//        flag_message(flag, o_name);
+			//    }
+			//    else
+			//    {
+			//        /* Notice that flag is absent */
+			//        object_notice_flag(o_ptr, flag);
+			//    }
+
+			//    /* XXX Eddie should not need this, should be done in noticing, but will remove later */
+			//    object_check_for_ident(o_ptr);
+
+			//}
+
+			//return;
+		}
+
+
+		/**
+		 * Notice things which happen on attacking.
+		 */
+		public static void wieldeds_notice_on_attack()
+		/* Does not apply to weapon or bow which should be done separately */
+		{
+			int i;
+
+			for (i = Misc.INVEN_WIELD + 2; i < Misc.INVEN_TOTAL; i++)
+			    if (Misc.p_ptr.inventory[i].kind != null)
+			        Misc.p_ptr.inventory[i].notice_attack_plusses();
+
+			/* XXX Eddie print message? */
+			/* XXX Eddie do we need to do more about ammo? */
+
+			return;
+		}
 	}
 }

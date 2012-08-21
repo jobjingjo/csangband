@@ -1044,5 +1044,370 @@ namespace CSAngband.Monster {
 				Cave.cave.mon_max--;
 			}
 		}
+
+		/**
+		 * Decrease a monster's hit points and handle monster death.
+		 *
+		 * We return true if the monster has been killed (and deleted).
+		 *
+		 * We announce monster death (using an optional "death message"
+		 * if given, and a otherwise a generic killed/destroyed message).
+		 *
+		 * Only "physical attacks" can induce the "You have slain" message.
+		 * Missile and Spell attacks will induce the "dies" message, or
+		 * various "specialized" messages.  Note that "You have destroyed"
+		 * and "is destroyed" are synonyms for "You have slain" and "dies".
+		 *
+		 * Invisible monsters induce a special "You have killed it." message.
+		 *
+		 * Hack -- we "delay" fear messages by passing around a "fear" flag.
+		 *
+		 * Consider decreasing monster experience over time, say, by using
+		 * "(m_exp * m_lev * (m_lev)) / (p_lev * (m_lev + n_killed))" instead
+		 * of simply "(m_exp * m_lev) / (p_lev)", to make the first monster
+		 * worth more than subsequent monsters.  This would also need to
+		 * induce changes in the monster recall code.  XXX XXX XXX
+		 **/
+		public static bool mon_take_hit(int m_idx, int dam, ref bool fear, string note)
+		{
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			Monster_Lore l_ptr = Misc.l_list[m_ptr.r_idx];
+
+			int div, new_exp, new_exp_frac;
+
+
+			/* Redraw (later) if needed */
+			if (Misc.p_ptr.health_who == m_idx) Misc.p_ptr.redraw |= (Misc.PR_HEALTH);
+
+			/* Wake it up */
+			Monster.mon_clear_timed(m_idx, (int)Misc.MON_TMD.SLEEP, Misc.MON_TMD_FLG_NOMESSAGE, false);
+
+			/* Become aware of its presence */
+			if (m_ptr.unaware)
+			    Monster.become_aware(m_idx);
+
+			/* Hurt it */
+			m_ptr.hp -= (short)dam;
+
+			/* It is dead now */
+			if (m_ptr.hp < 0)
+			{
+			    //char m_name[80];
+			    //char buf[80];
+				string m_name;
+				string buf;
+
+			    /* Assume normal death sound */
+			    Message_Type soundfx = Message_Type.MSG_KILL;
+
+			    /* Play a special sound if the monster was unique */
+			    if (r_ptr.flags.has(Monster_Flag.UNIQUE.value))
+			    {
+			        if (r_ptr.Base == Monster.lookup_monster_base("Morgoth"))
+			            soundfx = Message_Type.MSG_KILL_KING;
+			        else
+			            soundfx = Message_Type.MSG_KILL_UNIQUE;
+			    }
+
+			    /* Extract monster name */
+			    m_name = m_ptr.monster_desc(0);
+
+			    /* Death by Missile/Spell attack */
+			    if (note != null)
+			    {
+			        /* Hack -- allow message suppression */
+			        if (note.Length <= 1)
+			        {
+			            /* Be silent */
+			        }
+
+			        else Utilities.msgt(soundfx, "%^s%s", m_name, note);
+			    }
+
+			    /* Death by physical attack -- invisible monster */
+			    else if (!m_ptr.ml)
+			    {
+			        Utilities.msgt(soundfx, "You have killed {0}.", m_name);
+			    }
+
+			    /* Death by Physical attack -- non-living monster */
+			    else if (r_ptr.monster_is_unusual())
+			    {
+			        Utilities.msgt(soundfx, "You have destroyed {0}.", m_name);
+			    }
+
+			    /* Death by Physical attack -- living monster */
+			    else
+			    {
+			        Utilities.msgt(soundfx, "You have slain {0}.", m_name);
+			    }
+
+			    /* Player level */
+			    div = Misc.p_ptr.lev;
+
+			    /* Give some experience for the kill */
+			    new_exp = (int)(((long)r_ptr.mexp * r_ptr.level) / div);
+
+			    /* Handle fractional experience */
+			    new_exp_frac = (int)(((((long)r_ptr.mexp * r_ptr.level) % div) * 0x10000L / div) + Misc.p_ptr.exp_frac);
+
+			    /* Keep track of experience */
+			    if (new_exp_frac >= 0x10000L)
+			    {
+			        new_exp++;
+			        Misc.p_ptr.exp_frac = (ushort)(new_exp_frac - 0x10000L);
+			    }
+			    else
+			    {
+			        Misc.p_ptr.exp_frac = (ushort)new_exp_frac;
+			    }
+
+			    /* When the player kills a Unique, it stays dead */
+			    if (r_ptr.flags.has(Monster_Flag.UNIQUE.value))
+			    {
+			        //char unique_name[80];
+					string unique_name;
+			        r_ptr.max_num = 0;
+
+			        /* This gets the correct name if we slay an invisible unique and don't have See Invisible. */
+			        unique_name = m_ptr.monster_desc(Monster.Desc.SHOW | Monster.Desc.IND2);
+
+			        /* Log the slaying of a unique */
+					buf = "Killed " + unique_name;
+			        //strnfmt(buf, sizeof(buf), "Killed %s", unique_name);
+			        History.add(buf, History.SLAY_UNIQUE, null);
+			    }
+
+			    /* Gain experience */
+			    Misc.p_ptr.exp_gain(new_exp);
+
+			    /* Generate treasure */
+			    monster_death(m_idx, false);
+
+			    /* Recall even invisible uniques or winners */
+			    if (m_ptr.ml || r_ptr.flags.has(Monster_Flag.UNIQUE.value))
+			    {
+			        /* Count kills this life */
+			        if (l_ptr.pkills < short.MaxValue) l_ptr.pkills++;
+
+			        /* Count kills in all lives */
+			        if (l_ptr.tkills < short.MaxValue) l_ptr.tkills++;
+
+			        /* Hack -- Auto-recall */
+			        Cave.monster_race_track(m_ptr.r_idx);
+			    }
+
+			    /* Delete the monster */
+			    delete_monster_idx(m_idx);
+
+			    /* Not afraid */
+			    fear = false;
+
+			    /* Monster is dead */
+			    return (true);
+			}
+
+
+			/* Mega-Hack -- Pain cancels fear */
+			if (!fear && m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] != 0 && (dam > 0))
+			{
+			    int tmp = Random.randint1(dam);
+
+			    /* Cure a little fear */
+			    if (tmp < m_ptr.m_timed[(int)Misc.MON_TMD.FEAR])
+			        /* Reduce fear */
+			        Monster.mon_dec_timed(m_idx, (int)Misc.MON_TMD.FEAR, tmp, Misc.MON_TMD_FLG_NOMESSAGE, false);
+
+			    /* Cure all the fear */
+			    else
+			    {
+			        /* Cure fear */
+			        Monster.mon_clear_timed(m_idx, (int)Misc.MON_TMD.FEAR, Misc.MON_TMD_FLG_NOMESSAGE, false);
+
+			        /* No more fear */
+			        fear = false;
+			    }
+			}
+
+			/* Sometimes a monster gets scared by damage */
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] == 0 && !r_ptr.flags.has(Monster_Flag.NO_FEAR.value) && dam > 0)
+			{
+			    int percentage;
+
+			    /* Percentage of fully healthy */
+			    percentage = (int)((100L * m_ptr.hp) / m_ptr.maxhp);
+
+			    /*
+			     * Run (sometimes) if at 10% or less of max hit points,
+			     * or (usually) when hit for half its current hit points
+			     */
+			    if ((Random.randint1(10) >= percentage) ||
+			        ((dam >= m_ptr.hp) && (Random.randint0(100) < 80)))
+			    {
+			        int timer = Random.randint1(10) + (((dam >= m_ptr.hp) && (percentage > 7)) ?
+			                   20 : ((11 - percentage) * 5));
+
+			        /* Hack -- note fear */
+			        fear = true;
+
+			        Monster.mon_inc_timed(m_idx, (int)Misc.MON_TMD.FEAR, timer, Misc.MON_TMD_FLG_NOMESSAGE | Misc.MON_TMD_FLG_NOFAIL, false);
+			    }
+			}
+
+
+			/* Not dead yet */
+			return (false);
+		}
+
+		/**
+		 * Handle the "death" of a monster.
+		 *
+		 * Disperse treasures carried by the monster centered at the monster location.
+		 * Note that objects dropped may disappear in crowded rooms.
+		 *
+		 * Check for "Quest" completion when a quest monster is killed.
+		 *
+		 * Note that only the player can induce "monster_death()" on Uniques.
+		 * Thus (for now) all Quest monsters should be Uniques.
+		 */
+		public static void monster_death(int m_idx, bool stats)
+		{
+			int i, y, x;
+			int dump_item = 0;
+			int dump_gold = 0;
+			int total = 0;
+			short this_o_idx, next_o_idx = 0;
+
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			bool visible = (m_ptr.ml || r_ptr.flags.has(Monster_Flag.UNIQUE.value));
+
+			Object.Object i_ptr;
+			//object_type object_type_body;
+
+			/* Get the location */
+			y = m_ptr.fy;
+			x = m_ptr.fx;
+	
+			/* Delete any mimicked objects */
+			if (m_ptr.mimicked_o_idx > 0)
+			    Object.Object.delete_object_idx(m_ptr.mimicked_o_idx);
+
+			/* Drop objects being carried */
+			for (this_o_idx = m_ptr.hold_o_idx; this_o_idx != 0; this_o_idx = next_o_idx) {
+			    Object.Object o_ptr;
+
+			    /* Get the object */
+			    o_ptr = Object.Object.byid(this_o_idx);
+
+			    /* Line up the next object */
+			    next_o_idx = o_ptr.next_o_idx;
+
+			    /* Paranoia */
+			    o_ptr.held_m_idx = 0;
+
+			    /* Get local object, copy it and delete the original */
+			    //i_ptr = &object_type_body;
+			    //object_copy(i_ptr, o_ptr);
+				i_ptr = o_ptr.copy();
+			    Object.Object.delete_object_idx(this_o_idx);
+
+			    /* Count it and drop it - refactor once origin is a bitflag */
+			    if (!stats) {
+			        if ((i_ptr.tval == TVal.TV_GOLD) && (i_ptr.origin != Origin.STOLEN))
+			            dump_gold++;
+			        else if ((i_ptr.tval != TVal.TV_GOLD) && ((i_ptr.origin == Origin.DROP)
+			                || (i_ptr.origin == Origin.DROP_PIT)
+			                || (i_ptr.origin == Origin.DROP_VAULT)
+			                || (i_ptr.origin == Origin.DROP_SUMMON)
+			                || (i_ptr.origin == Origin.DROP_SPECIAL)
+			                || (i_ptr.origin == Origin.DROP_BREED)
+			                || (i_ptr.origin == Origin.DROP_POLY)
+			                || (i_ptr.origin == Origin.DROP_WIZARD)))
+			            dump_item++;
+			    }
+
+			    /* Change origin if monster is invisible, unless we're in stats mode */
+			    if (!visible && !stats)
+			        i_ptr.origin = Origin.DROP_UNKNOWN;
+
+			    Object.Object.drop_near(Cave.cave, i_ptr, 0, y, x, true);
+			}
+
+			/* Forget objects */
+			m_ptr.hold_o_idx = 0;
+
+			/* Take note of any dropped treasure */
+			if (visible && (dump_item != 0 || dump_gold != 0))
+			    Monster_Lore.lore_treasure(m_idx, dump_item, dump_gold);
+
+			/* Update monster list window */
+			Misc.p_ptr.redraw |= Misc.PR_MONLIST;
+
+			/* Only process "Quest Monsters" */
+			if (!r_ptr.flags.has(Monster_Flag.QUESTOR.value)) return;
+
+			/* Mark quests as complete */
+			for (i = 0; i < Misc.MAX_Q_IDX; i++)	{
+			    /* Note completed quests */
+			    if (Misc.q_list[i].level == r_ptr.level) Misc.q_list[i].level = 0;
+
+			    /* Count incomplete quests */
+			    if (Misc.q_list[i].level != 0) total++;
+			}
+
+			/* Build magical stairs */
+			build_quest_stairs(y, x);
+
+			/* Nothing left, game over... */
+			if (total == 0) {
+			    Misc.p_ptr.total_winner = 1;//true
+			    Misc.p_ptr.redraw |= (Misc.PR_TITLE);
+			    Utilities.msg("*** CONGRATULATIONS ***");
+			    Utilities.msg("You have won the game!");
+			    Utilities.msg("You may retire (commit suicide) when you are ready.");
+			}
+		}
+
+		/*
+		 * Create magical stairs after finishing a quest monster.
+		 */
+		static void build_quest_stairs(int y, int x)
+		{
+			throw new NotImplementedException();
+			//int ny, nx;
+
+
+			///* Stagger around */
+			//while (!cave_valid_bold(y, x))
+			//{
+			//    int d = 1;
+
+			//    /* Pick a location */
+			//    scatter(&ny, &nx, y, x, d, 0);
+
+			//    /* Stagger */
+			//    y = ny; x = nx;
+			//}
+
+			///* Destroy any objects */
+			//delete_object(y, x);
+
+			///* Explain the staircase */
+			//msg("A magical staircase appears...");
+
+			///* Create stairs down */
+			//cave_set_feat(cave, y, x, FEAT_MORE);
+
+			///* Update the visuals */
+			//p_ptr.update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+
+			///* Fully update the flow */
+			//p_ptr.update |= (PU_FORGET_FLOW | PU_UPDATE_FLOW);
+		}
 	}
 }

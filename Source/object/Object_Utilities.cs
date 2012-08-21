@@ -775,5 +775,221 @@ namespace CSAngband.Object {
 			///* Assume okay */
 			//return (true);
 		}
+
+		/*
+		 * Let an object fall to the ground at or near a location.
+		 *
+		 * The initial location is assumed to be "in_bounds_fully()".
+		 *
+		 * This function takes a parameter "chance".  This is the percentage
+		 * chance that the item will "disappear" instead of drop.  If the object
+		 * has been thrown, then this is the chance of disappearance on contact.
+		 *
+		 * This function will produce a description of a drop event under the player
+		 * when "verbose" is true.
+		 *
+		 * We check several locations to see if we can find a location at which
+		 * the object can combine, stack, or be placed.  Artifacts will try very
+		 * hard to be placed, including "teleporting" to a useful grid if needed.
+		 */
+		public static void drop_near(Cave c, Object j_ptr, int chance, int y, int x, bool verbose)
+		{
+			throw new NotImplementedException();
+			//int i, k, n, d, s;
+
+			//int bs, bn;
+			//int by, bx;
+			//int dy, dx;
+			//int ty, tx;
+
+			//object_type *o_ptr;
+
+			//char o_name[80];
+
+			//bool flag = false;
+
+			//bool plural = false;
+
+
+			///* Extract plural */
+			//if (j_ptr.number != 1) plural = true;
+
+			///* Describe object */
+			//object_desc(o_name, sizeof(o_name), j_ptr, ODESC_BASE);
+
+
+			///* Handle normal "breakage" */
+			//if (!j_ptr.artifact && (randint0(100) < chance))
+			//{
+			//    /* Message */
+			//    msg("The %s break%s.", o_name, PLURAL(plural));
+
+			//    /* Failure */
+			//    return;
+			//}
+
+
+			///* Score */
+			//bs = -1;
+
+			///* Picker */
+			//bn = 0;
+
+			///* Default */
+			//by = y;
+			//bx = x;
+
+			///* Scan local grids */
+			//for (dy = -3; dy <= 3; dy++)
+			//{
+			//    /* Scan local grids */
+			//    for (dx = -3; dx <= 3; dx++)
+			//    {
+			//        bool comb = false;
+
+			//        /* Calculate actual distance */
+			//        d = (dy * dy) + (dx * dx);
+
+			//        /* Ignore distant grids */
+			//        if (d > 10) continue;
+
+			//        /* Location */
+			//        ty = y + dy;
+			//        tx = x + dx;
+
+			//        /* Skip illegal grids */
+			//        if (!in_bounds_fully(ty, tx)) continue;
+
+			//        /* Require line of sight */
+			//        if (!los(y, x, ty, tx)) continue;
+
+			//        /* Require floor space */
+			//        if (cave.feat[ty][tx] != FEAT_FLOOR) continue;
+
+			//        /* No objects */
+			//        k = 0;
+			//        n = 0;
+
+			//        /* Scan objects in that grid */
+			//        for (o_ptr = get_first_object(ty, tx); o_ptr;
+			//                o_ptr = get_next_object(o_ptr))
+			//        {
+			//            /* Check for possible combination */
+			//            if (object_similar(o_ptr, j_ptr, OSTACK_FLOOR))
+			//                comb = true;
+
+			//            /* Count objects */
+			//            if (!squelch_item_ok(o_ptr))
+			//                k++;
+			//            else
+			//                n++;
+			//        }
+
+			//        /* Add new object */
+			//        if (!comb) k++;
+
+			//        /* Option -- disallow stacking */
+			//        if (OPT(birth_no_stacking) && (k > 1)) continue;
+			
+			//        /* Paranoia? */
+			//        if ((k + n) > MAX_FLOOR_STACK &&
+			//                !floor_get_idx_oldest_squelched(ty, tx)) continue;
+
+			//        /* Calculate score */
+			//        s = 1000 - (d + k * 5);
+
+			//        /* Skip bad values */
+			//        if (s < bs) continue;
+
+			//        /* New best value */
+			//        if (s > bs) bn = 0;
+
+			//        /* Apply the randomizer to equivalent values */
+			//        if ((++bn >= 2) && (randint0(bn) != 0)) continue;
+
+			//        /* Keep score */
+			//        bs = s;
+
+			//        /* Track it */
+			//        by = ty;
+			//        bx = tx;
+
+			//        /* Okay */
+			//        flag = true;
+			//    }
+			//}
+
+
+			///* Handle lack of space */
+			//if (!flag && !j_ptr.artifact)
+			//{
+			//    /* Message */
+			//    msg("The %s disappear%s.", o_name, PLURAL(plural));
+
+			//    /* Debug */
+			//    if (p_ptr.wizard) msg("Breakage (no floor space).");
+
+			//    /* Failure */
+			//    return;
+			//}
+
+
+			///* Find a grid */
+			//for (i = 0; !flag; i++)
+			//{
+			//    /* Bounce around */
+			//    if (i < 1000)
+			//    {
+			//        ty = rand_spread(by, 1);
+			//        tx = rand_spread(bx, 1);
+			//    }
+
+			//    /* Random locations */
+			//    else
+			//    {
+			//        ty = randint0(c.height);
+			//        tx = randint0(c.width);
+			//    }
+
+			//    /* Require floor space */
+			//    if (cave.feat[ty][tx] != FEAT_FLOOR) continue;
+
+			//    /* Bounce to that location */
+			//    by = ty;
+			//    bx = tx;
+
+			//    /* Require floor space */
+			//    if (!cave_clean_bold(by, bx)) continue;
+
+			//    /* Okay */
+			//    flag = true;
+			//}
+
+
+			///* Give it to the floor */
+			//if (!floor_carry(c, by, bx, j_ptr))
+			//{
+			//    /* Message */
+			//    msg("The %s disappear%s.", o_name, PLURAL(plural));
+
+			//    /* Debug */
+			//    if (p_ptr.wizard) msg("Breakage (too many objects).");
+
+			//    if (j_ptr.artifact) j_ptr.artifact.created = false;
+
+			//    /* Failure */
+			//    return;
+			//}
+
+
+			///* Sound */
+			//sound(MSG_DROP);
+
+			///* Message when an object falls under the player */
+			//if (verbose && (cave.m_idx[by][bx] < 0) && !squelch_item_ok(j_ptr))
+			//{
+			//    msg("You feel something roll beneath your feet.");
+			//}
+		}
 	}
 }

@@ -170,7 +170,10 @@ namespace CSAngband {
 			        /* Find any relevant keymap */
 					if(keymap_ok) {
 						act = Keymap.find(mode, ke.key);
-					}
+						if (act == null) {
+							ret = ke;
+						}
+					} 
 			    }
 
 			    /* Erase the message line */

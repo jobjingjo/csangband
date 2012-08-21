@@ -713,46 +713,6 @@ bool summon_specific(int y1, int x1, int lev, int type, int delay)
 
 
 /*
- * Make player fully aware of the given mimic.
- */
-void become_aware(int m_idx)
-{
-	monster_type *m_ptr = cave_monster(cave, m_idx);
-	monster_race *r_ptr = &r_info[m_ptr.r_idx];
-	monster_lore *l_ptr = &l_list[m_ptr.r_idx];
-
-	if(m_ptr.unaware) {
-		m_ptr.unaware = false;
-
-		/* Learn about mimicry */
-		if (rf_has(r_ptr.flags, RF_UNAWARE))
-			rf_on(l_ptr.flags, RF_UNAWARE);
-
-		/* Delete any false items */
-		if (m_ptr.mimicked_o_idx > 0) {
-			object_type *o_ptr = object_byid(m_ptr.mimicked_o_idx);
-			char o_name[80];
-			object_desc(o_name, sizeof(o_name), o_ptr, ODESC_FULL);
-
-			/* Print a message */
-			msg("The %s was really a monster!", o_name);
-
-			/* Clear the mimicry */
-			o_ptr.mimicking_m_idx = 0;
-			delete_object_idx(m_ptr.mimicked_o_idx);
-			m_ptr.mimicked_o_idx = 0;
-		}
-		
-		/* Update monster and item lists */
-		p_ptr.update |= (PU_UPDATE_VIEW | PU_MONSTERS);
-		p_ptr.redraw |= (PR_MONLIST | PR_ITEMLIST);
-	}
-}
-
-
-
-
-/*
  * Learn about an "observed" resistance or other player state property, or
  * lack of it.
  */

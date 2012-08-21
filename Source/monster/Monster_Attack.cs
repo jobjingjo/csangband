@@ -54,7 +54,7 @@ namespace CSAngband.Monster {
 			int ac = p.state.ac + p.state.to_a;
 
 			// Extract the effective monster level
-			int rlev = ((Race.level >= 1) ? Race.level : 1);
+			int rlev = ((r_ptr.level >= 1) ? r_ptr.level : 1);
 
 
 			// Get the monster name (or "it")
@@ -79,10 +79,10 @@ namespace CSAngband.Monster {
 			    string act = null;
 
 			    // Extract the attack infomation
-			    RBE effect = Race.blow[ap_cnt].effect;
-			    RBM method = Race.blow[ap_cnt].method;
-			    int d_dice = Race.blow[ap_cnt].d_dice;
-			    int d_side = Race.blow[ap_cnt].d_side;
+			    RBE effect = r_ptr.blow[ap_cnt].effect;
+			    RBM method = r_ptr.blow[ap_cnt].method;
+			    int d_dice = r_ptr.blow[ap_cnt].d_dice;
+			    int d_side = r_ptr.blow[ap_cnt].d_side;
 
 
 			    // Hack -- no more attacks

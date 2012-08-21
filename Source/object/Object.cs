@@ -142,6 +142,10 @@ namespace CSAngband.Object
 
 		public Quark note; /* Inscription index */
 
+		public Object copy() {
+			return (Object)this.MemberwiseClone();
+		}
+
 		/**
 		 * Returns percent chance of an object breaking after throwing or shooting.
 		 *

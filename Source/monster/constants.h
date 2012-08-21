@@ -38,17 +38,6 @@
 #define RF_RACE_MASK \
 	RF_ORC, RF_TROLL, RF_GIANT, RF_DRAGON, RF_DEMON, \
 	RF_UNDEAD, RF_EVIL, RF_ANIMAL, RF_METAL, RF_NONLIVING
-
-
-
-/*
- * Some monster types are different.
- */
-#define monster_is_unusual(R) \
-	flags_test((R).flags, RF_SIZE, RF_DEMON, RF_UNDEAD, RF_STUPID, RF_NONLIVING, FLAG_END)
-
-#define monster_is_nonliving(R) \
-	flags_test((R).flags, RF_SIZE, RF_DEMON, RF_UNDEAD, RF_NONLIVING, FLAG_END)
 	
 
 /*** Obsolete - these will be removed soon - they are still used in monster1.c
