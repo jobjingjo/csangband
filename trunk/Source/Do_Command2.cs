@@ -10,33 +10,32 @@ namespace CSAngband {
 		 * Go up one level
 		 */
 		public static void go_up(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			///* Verify stairs */
-			//if (cave.feat[p_ptr.py][p_ptr.px] != FEAT_LESS)
-			//{
-			//    msg("I see no up staircase here.");
-			//    return;
-			//}
+			/* Verify stairs */
+			if (Cave.cave.feat[Misc.p_ptr.py][Misc.p_ptr.px] != Cave.FEAT_LESS)
+			{
+			    Utilities.msg("I see no up staircase here.");
+			    return;
+			}
 
-			///* Ironman */
-			//if (OPT(birth_ironman))
-			//{
-			//    msg("Nothing happens!");
-			//    return;
-			//}
+			/* Ironman */
+			if (Option.birth_ironman.value)
+			{
+			    Utilities.msg("Nothing happens!");
+			    return;
+			}
 
-			///* Hack -- take a turn */
-			//p_ptr.energy_use = 100;
+			/* Hack -- take a turn */
+			Misc.p_ptr.energy_use = 100;
 
-			///* Success */
-			//msgt(MSG_STAIRS_UP, "You enter a maze of up staircases.");
+			/* Success */
+			Utilities.msgt(Message_Type.MSG_STAIRS_UP, "You enter a maze of up staircases.");
 
-			///* Create a way back */
-			//p_ptr.create_up_stair = false;
-			//p_ptr.create_down_stair = true;
+			/* Create a way back */
+			Misc.p_ptr.create_up_stair = false;
+			Misc.p_ptr.create_down_stair = true;
 
-			///* Change level */
-			//dungeon_change_level(p_ptr.depth - 1);
+			/* Change level */
+			Dungeon.dungeon_change_level(Misc.p_ptr.depth - 1);
 		}
 
 
@@ -44,26 +43,25 @@ namespace CSAngband {
 		 * Go down one level
 		 */
 		public static void go_down(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			///* Verify stairs */
-			//if (cave.feat[p_ptr.py][p_ptr.px] != FEAT_MORE)
-			//{
-			//    msg("I see no down staircase here.");
-			//    return;
-			//}
+			/* Verify stairs */
+			if (Cave.cave.feat[Misc.p_ptr.py][Misc.p_ptr.px] != Cave.FEAT_MORE)
+			{
+			    Utilities.msg("I see no down staircase here.");
+			    return;
+			}
 
-			///* Hack -- take a turn */
-			//p_ptr.energy_use = 100;
+			/* Hack -- take a turn */
+			Misc.p_ptr.energy_use = 100;
 
-			///* Success */
-			//msgt(MSG_STAIRS_DOWN, "You enter a maze of down staircases.");
+			/* Success */
+			Utilities.msgt(Message_Type.MSG_STAIRS_DOWN, "You enter a maze of down staircases.");
 
-			///* Create a way back */
-			//p_ptr.create_up_stair = true;
-			//p_ptr.create_down_stair = false;
+			/* Create a way back */
+			Misc.p_ptr.create_up_stair = true;
+			Misc.p_ptr.create_down_stair = false;
 
-			///* Change level */
-			//dungeon_change_level(p_ptr.depth + 1);
+			/* Change level */
+			Dungeon.dungeon_change_level(Misc.p_ptr.depth + 1);
 		}
 
 

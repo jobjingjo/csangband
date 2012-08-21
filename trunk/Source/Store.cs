@@ -226,7 +226,7 @@ namespace CSAngband {
 		/*
 		 * Shuffle one of the stores.
 		 */
-		void store_shuffle()
+		public void store_shuffle()
 		{
 			Owner o = owner;
 
@@ -261,7 +261,7 @@ namespace CSAngband {
 		/*
 		 * Maintain the inventory at the stores.
 		 */
-		void store_maint()
+		public void store_maint()
 		{
 			int j;
 			uint stock;
