@@ -46,47 +46,6 @@ void sound(int val)
 }
 
 
-
-/*
- * Save the screen, and increase the "icky" depth.
- *
- * This function must match exactly one call to "screen_load()".
- */
-void screen_save(void)
-{
-	/* Hack -- Flush messages */
-	message_flush();
-
-	/* Save the screen (if legal) */
-	Term_save();
-
-	/* Increase "icky" depth */
-	character_icky++;
-}
-
-
-/*
- * Load the screen, and decrease the "icky" depth.
- *
- * This function must match exactly one call to "screen_save()".
- */
-void screen_load(void)
-{
-	/* Hack -- Flush messages */
-	message_flush();
-
-	/* Load the screen (if legal) */
-	Term_load();
-
-	/* Decrease "icky" depth */
-	character_icky--;
-
-	/* Mega hack -redraw big graphics - sorry NRM */
-	if (character_icky == 0 && (tile_width > 1 || tile_height > 1))
-		Term_redraw();
-}
-
-
 /*
  * Write text to the given file and apply line-wrapping.
  *

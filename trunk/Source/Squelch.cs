@@ -194,7 +194,7 @@ namespace CSAngband {
 			    return 0;
 
 			/* Get an object description */
-			Object_Desc.object_desc(ref o_name, 80, o_ptr, Object_Desc.Detail.PREFIX | Object_Desc.Detail.FULL);
+			o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
 
 			if(note == null)
 				o_ptr.note = Quark.Add(note);

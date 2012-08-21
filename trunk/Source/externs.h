@@ -52,9 +52,6 @@ extern alloc_entry *alloc_race_table;
 extern byte gf_to_attr[GF_MAX][BOLT_MAX];
 extern char gf_to_char[GF_MAX][BOLT_MAX];
 
-
-
-extern bool item_tester_full;
 extern byte item_tester_tval;
 extern bool (*get_mon_num_hook)(int r_idx);
 extern ang_file *text_out_file;
@@ -113,8 +110,6 @@ extern ui_event inkey_ex(void);
 extern void sound(int val);
 extern void msg(const char *fmt, ...);
 extern void msgt(unsigned int type, const char *fmt, ...);
-extern void screen_save(void);
-extern void screen_load(void);
 extern void c_put_str(byte attr, const char *str, int row, int col);
 extern void put_str(const char *str, int row, int col);
 extern void c_prt(byte attr, const char *str, int row, int col);

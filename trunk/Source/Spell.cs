@@ -99,7 +99,7 @@ namespace CSAngband {
 			Misc.p_ptr.redraw |= (Misc.PR_INVEN | Misc.PR_EQUIP);
 
 			/* Description */
-			Object.Object_Desc.object_desc(ref o_name, 80, o_ptr, Object.Object_Desc.Detail.PREFIX | Object.Object_Desc.Detail.FULL);
+			o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
 
 			/* Determine the message type. */
 			/* CC: we need to think more carefully about how we define "bad" with

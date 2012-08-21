@@ -488,18 +488,7 @@ char *ANGBAND_DIR_XTRA_GRAF;
 char *ANGBAND_DIR_XTRA_SOUND;
 char *ANGBAND_DIR_XTRA_ICON;
 
-/*
- * Total Hack -- allow all items to be listed (even empty ones)
- * This is only used by "do_cmd_inven_e()" and is cleared there.
- */
-bool item_tester_full;
 
-
-/*
- * Here is a "pseudo-hook" used during calls to "get_item()" and
- * "show_inven()" and "show_equip()", and the choice window routines.
- */
-byte item_tester_tval;
 
 
 

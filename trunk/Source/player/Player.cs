@@ -540,46 +540,41 @@ namespace CSAngband.Player {
 		/* Is the player capable of casting a spell? */
 		public static bool can_cast()
 		{
-			throw new NotImplementedException();
-			/*
-			if (!p_ptr.class.spell_book)
+			if (Misc.p_ptr.Class.spell_book == 0)
 			{
-				msg("You cannot pray or produce magics.");
+				Utilities.msg("You cannot pray or produce magics.");
 				return false;
 			}
 
-			if (p_ptr.timed[TMD_BLIND] || no_light())
+			if (Misc.p_ptr.timed[(int)Timed_Effect.BLIND] != 0 || Cave.no_light())
 			{
-				msg("You cannot see!");
+				Utilities.msg("You cannot see!");
 				return false;
 			}
 
-			if (p_ptr.timed[TMD_CONFUSED])
+			if (Misc.p_ptr.timed[(int)Timed_Effect.CONFUSED] != 0)
 			{
-				msg("You are too confused!");
+				Utilities.msg("You are too confused!");
 				return false;
 			}
 
 			return true;
-			 */
 		}
 
 		/* Is the player capable of studying? */
 		public static bool can_study()
 		{
-			throw new NotImplementedException();
-			/*
-			if (!player_can_cast())
+			if (!can_cast())
 				return false;
 
-			if (!p_ptr.new_spells)
+			if (Misc.p_ptr.new_spells == 0)
 			{
-				const char *p = ((p_ptr.class.spell_book == TV_MAGIC_BOOK) ? "spell" : "prayer");
-				msg("You cannot learn any new %ss!", p);
+				string p = ((Misc.p_ptr.Class.spell_book == TVal.TV_MAGIC_BOOK) ? "spell" : "prayer");
+				Utilities.msg("You cannot learn any new {0}s!", p);
 				return false;
 			}
 
-			return true;*/
+			return true;
 		}
 
 		/* Determine if the player can read scrolls. */

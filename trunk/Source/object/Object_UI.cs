@@ -726,6 +726,273 @@ namespace CSAngband.Object {
 		//    return (item);
 		}
 
+		/**
+		 * Modes for item lists in "show_inven()"  "show_equip()" and "show_floor()"
+		 */
+		public enum olist_detail_t
+		{
+			OLIST_NONE   = 0x00,   /* No options */
+   			OLIST_WINDOW = 0x01,   /* Display list in a sub-term (left-align) */
+   			OLIST_QUIVER = 0x02,   /* Display quiver lines */
+   			OLIST_GOLD   = 0x04,   /* Include gold in the list */
+			OLIST_WEIGHT = 0x08,   /* Show item weight */
+			OLIST_PRICE  = 0x10,   /* Show item price */
+			OLIST_FAIL   = 0x20    /* Show device failure */
 
+		}
+
+		/*
+		 * Display the inventory.  Builds a list of objects and passes them
+		 * off to show_obj_list() for display.  Mode flags documented in
+		 * object.h
+		 */
+		public static void show_inven(olist_detail_t mode)
+		{
+			int i, last_slot = -1;
+			int diff = Player.Player.weight_remaining();
+
+			Object o_ptr;
+
+			int num_obj = 0;
+			string[] labels = new string[50]; //up to 80 long each
+			Object[] objects = new Object[50];
+
+			bool in_term = (mode & olist_detail_t.OLIST_WINDOW) != 0 ? true : false;
+
+			/* Include burden for term windows */
+			if (in_term)
+			{
+				labels[num_obj] = String.Format("Burden {0}.{1} lb ({2}.{3} lb {4}) ",
+			            Misc.p_ptr.total_weight / 10, Misc.p_ptr.total_weight % 10,
+			            Math.Abs(diff) / 10, Math.Abs(diff) % 10,
+			            (diff < 0 ? "overweight" : "remaining"));
+
+			    objects[num_obj] = null;
+			    num_obj++;
+			}
+
+			/* Find the last occupied inventory slot */
+			for (i = 0; i < Misc.INVEN_PACK; i++)
+			{
+			    o_ptr = Misc.p_ptr.inventory[i];
+			    if (o_ptr.kind != null) last_slot = i;
+			}
+
+			/* Build the object list */
+			for (i = 0; i <= last_slot; i++)
+			{
+			    o_ptr = Misc.p_ptr.inventory[i];
+
+			    /* Acceptable items get a label */
+			    if (o_ptr.item_tester_okay())
+			        labels[num_obj] = index_to_label(i).ToString() + ") ";
+
+			    /* Unacceptable items are still displayed in term windows */
+			    else if (in_term)
+					labels[num_obj] = "   ";
+
+			    /* Unacceptable items are skipped in the main window */
+			    else continue;
+
+			    /* Save the object */
+			    objects[num_obj] = o_ptr;
+			    num_obj++;
+			}
+
+			/* Display the object list */
+			if (in_term)
+			    /* Term window starts with a burden header */
+			    show_obj_list(num_obj, 1, labels, objects, mode);
+			else
+			    show_obj_list(num_obj, 0, labels, objects, mode);
+		}
+
+		/*
+		 * Display a list of objects.  Each object may be prefixed with a label.
+		 * Used by show_inven(), show_equip(), and show_floor().  Mode flags are
+		 * documented in object.h
+		 */
+		static void show_obj_list(int num_obj, int num_head, string[] labels, Object[] objects, olist_detail_t mode)
+		{
+			int i, row = 0, col = 0;
+			ConsoleColor attr;
+			int max_len = 0;
+			int ex_width = 0, ex_offset, ex_offset_ctr;
+
+			Object o_ptr;
+			string[] o_name = new string[50]; //max length 80
+			string tmp_val; //80
+	
+			bool in_term;
+	
+			in_term = (mode & olist_detail_t.OLIST_WINDOW) != 0 ? true : false;
+
+			if (in_term) max_len = 40;
+
+			/* Calculate name offset and max name length */
+			for (i = 0; i < num_obj; i++)
+			{
+				o_ptr = objects[i];
+
+				/* null objects are used to skip lines, or display only a label */		
+				if (o_ptr == null || o_ptr.kind == null)
+				{
+					if (i < num_head)
+						o_name[i] = "";
+					else
+						o_name[i] = "(nothing)";
+				}
+				else
+					o_name[i] = o_ptr.object_desc(Detail.PREFIX | Detail.FULL);
+
+				/* Max length of label + object name */
+				max_len = Math.Max(max_len, labels[i].Length + o_name[i].Length);
+			}
+
+			/* Take the quiver message into consideration */
+			if ((mode & olist_detail_t.OLIST_QUIVER) != 0 && Misc.p_ptr.quiver_slots > 0)
+				max_len = Math.Max(max_len, 24);
+
+			/* Width of extra fields */
+			if ((mode & olist_detail_t.OLIST_WEIGHT) != 0) ex_width += 9;
+			if ((mode & olist_detail_t.OLIST_PRICE) != 0) ex_width += 9;
+			if ((mode & olist_detail_t.OLIST_FAIL) != 0) ex_width += 10;
+
+			/* Determine beginning row and column */
+			if (in_term)
+			{
+				/* Term window */
+				row = 0;
+				col = 0;
+			}
+			else
+			{
+				/* Main window */
+				row = 1;
+				col = Term.instance.wid - 1 - max_len - ex_width;
+
+				if (col < 3) col = 0;
+			}
+
+			/* Column offset of the first extra field */
+			ex_offset = Math.Min(max_len, (Term.instance.wid - 1 - ex_width - col));
+
+			/* Output the list */
+			for (i = 0; i < num_obj; i++)
+			{
+				o_ptr = objects[i];
+		
+				/* Clear the line */
+				Utilities.prt("", row + i, Math.Max(col - 2, 0));
+
+				/* If we have no label then we won't display anything */
+				if (labels[i].Length == 0) continue;
+
+				/* Print the label */
+				Utilities.put_str(labels[i], row + i, col);
+
+				/* Limit object name */
+				if (labels[i].Length + o_name[i].Length > ex_offset)
+				{
+					int truncate = ex_offset - labels[i].Length;
+			
+					if (truncate < 0) truncate = 0;
+					if (truncate > o_name[i].Length - 1) truncate = o_name[i].Length - 1;
+
+					o_name[i] = o_name[i].Substring(0, truncate);
+					//o_name[i][truncate] = '\0';
+				}
+		
+				/* Item kind determines the color of the output */
+				if (o_ptr != null && o_ptr.kind != null)
+					attr = Misc.tval_to_attr[o_ptr.tval % Misc.tval_to_attr.Length];
+				else
+					attr = ConsoleColor.Gray;
+
+				/* Object name */
+				Utilities.c_put_str(attr, o_name[i], row + i, col + labels[i].Length);
+
+				/* If we don't have an object, we can skip the rest of the output */
+				if (o_ptr == null || o_ptr.kind == null) continue;
+
+				/* Extra fields */
+				ex_offset_ctr = ex_offset;
+		
+				if ((mode & olist_detail_t.OLIST_PRICE) != 0)
+				{
+					throw new NotImplementedException();
+					//int price = price_item(o_ptr, true, o_ptr.number);
+					//strnfmt(tmp_val, sizeof(tmp_val), "%6d au", price);
+					//put_str(tmp_val, row + i, col + ex_offset_ctr);
+					//ex_offset_ctr += 9;
+				}
+
+				if ((mode & olist_detail_t.OLIST_FAIL) != 0)
+				{
+					throw new NotImplementedException();
+					//int fail = (9 + get_use_device_chance(o_ptr)) / 10;
+					//if (object_effect_is_known(o_ptr))
+					//    strnfmt(tmp_val, sizeof(tmp_val), "%4d%% fail", fail);
+					//else
+					//    my_strcpy(tmp_val, "    ? fail", sizeof(tmp_val));
+					//put_str(tmp_val, row + i, col + ex_offset_ctr);
+					//ex_offset_ctr += 10;
+				}
+
+				if ((mode & olist_detail_t.OLIST_WEIGHT) != 0)
+				{
+					int weight = o_ptr.weight * o_ptr.number;
+					//tmp_val = String.Format("%4d.%1d lb", weight / 10, weight % 10);
+					tmp_val = String.Format("{0}.{1} lb", weight / 10, weight % 10);
+					Utilities.put_str(tmp_val, row + i, col + ex_offset_ctr);
+					ex_offset_ctr += 9;
+				}
+			}
+
+			/* For the inventory: print the quiver count */
+			if ((mode & olist_detail_t.OLIST_QUIVER) != 0)
+			{
+				int count, j;
+
+				/* Quiver may take multiple lines */
+				for(j = 0; j < Misc.p_ptr.quiver_slots; j++, i++)
+				{
+				    string fmt = "in Quiver: {0} missile{1}";
+				    char letter = index_to_label(in_term ? i - 1 : i);
+
+				    /* Number of missiles in this "slot" */
+				    if (j == Misc.p_ptr.quiver_slots - 1 && Misc.p_ptr.quiver_remainder > 0)
+				        count = Misc.p_ptr.quiver_remainder;
+				    else
+				        count = 99;
+
+				    /* Clear the line */
+				    Utilities.prt("", row + i, Math.Max(col - 2, 0));
+
+				    /* Print the (disabled) label */
+				    tmp_val = String.Format("{0}) ", letter);
+				    Utilities.c_put_str(ConsoleColor.Gray, tmp_val, row + i, col);
+
+				    /* Print the count */
+				    tmp_val = String.Format(fmt, count, count == 1 ? "" : "s");
+				    Utilities.c_put_str(ConsoleColor.DarkYellow, tmp_val, row + i, col + 3); //Umber
+				}
+			}
+
+			/* Clear term windows */
+			if (in_term)
+			{
+				for (; i < Term.instance.hgt; i++)
+				{
+					Utilities.prt("", row + i, Math.Max(col - 2, 0));
+				}
+			}
+	
+			/* Print a drop shadow for the main window if necessary */
+			else if (i > 0 && row + i < 24)
+			{
+				Utilities.prt("", row + i, Math.Max(col - 2, 0));
+			}
+		}
 	}
 }
