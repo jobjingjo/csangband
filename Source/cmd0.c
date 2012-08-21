@@ -92,28 +92,4 @@ static bool cmd_menu(command_list *list, void *selection_p)
 
 
 
-static bool cmd_list_action(menu_type *m, const ui_event *event, int oid)
-{
-	if (event.type == EVT_SELECT)
-		return cmd_menu(&cmds_all[oid], menu_priv(m));
-	else
-		return false;
-}
-
-static void cmd_list_entry(menu_type *menu, int oid, bool cursor, int row, int col, int width)
-{
-	byte attr = (cursor ? TERM_L_BLUE : TERM_WHITE);
-	Term_putstr(col, row, -1, attr, cmds_all[oid].name);
-}
-
-static menu_type *command_menu;
-static menu_iter command_menu_iter =
-{
-	null,
-	null,
-	cmd_list_entry,
-	cmd_list_action,
-	null
-};
-
 

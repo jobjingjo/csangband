@@ -6,6 +6,32 @@ using System.Text;
 namespace CSAngband {
 	class Command {
 		/* cmd0.c */
+
+		public static Menu_Type command_menu;
+		public static Menu_Type.menu_iter command_menu_iter = new Menu_Type.menu_iter(
+			null,
+			null,
+			cmd_list_entry,
+			cmd_list_action,
+			null
+		);
+
+		static bool cmd_list_action(Menu_Type m, ui_event mevent, int oid)
+		{
+			throw new NotImplementedException();
+			//if (event.type == EVT_SELECT)
+			//    return cmd_menu(&cmds_all[oid], menu_priv(m));
+			//else
+			//    return false;
+		}
+
+		static void cmd_list_entry(Menu_Type menu, int oid, bool cursor, int row, int col, int width)
+		{
+			throw new NotImplementedException();
+			//byte attr = (cursor ? TERM_L_BLUE : TERM_WHITE);
+			//Term_putstr(col, row, -1, attr, cmds_all[oid].name);
+		}
+
 		/* List indexed by char */
 		public static Command_Info[] converted_list = new Command_Info[Char.MaxValue+1];
 		

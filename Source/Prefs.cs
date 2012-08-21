@@ -440,7 +440,7 @@ namespace CSAngband {
 			if (light_idx < (int)Grid_Data.grid_light_level.FEAT_LIGHTING_MAX)
 			{
 			    feature = Misc.f_info[idx];
-			    feature.x_attr[light_idx] = (ConsoleColor)p.getint("attr");
+			    feature.x_attr[light_idx] = Utilities.num_to_attr(p.getint("attr"));
 			    feature.x_char[light_idx] = (char)p.getint("char");
 			}
 			else
@@ -448,7 +448,7 @@ namespace CSAngband {
 			    for (light_idx = 0; light_idx < (int)Grid_Data.grid_light_level.FEAT_LIGHTING_MAX; light_idx++)
 			    {
 			        feature = Misc.f_info[idx];
-			        feature.x_attr[light_idx] = (ConsoleColor)p.getint("attr");
+			        feature.x_attr[light_idx] = Utilities.num_to_attr(p.getint("attr"));
 			        feature.x_char[light_idx] = (char)p.getint("char");
 			    }
 			}

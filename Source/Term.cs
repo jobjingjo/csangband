@@ -1915,7 +1915,7 @@ namespace CSAngband {
 					scr_aa[x] = na;
 					scr_cc[x] = nc;
 
-					scr_taa[x] = (ConsoleColor)0;
+					scr_taa[x] = Utilities.num_to_attr(0);
 					scr_tcc[x] = '\0';
 				}
 

@@ -393,7 +393,7 @@ namespace CSAngband.Monster {
 
 			/* Set the color if necessary */
 			if (r_ptr.flags.has(Monster_Flag.ATTR_RAND.value))
-				n_ptr.attr = (ConsoleColor)Random.randint1(Enum.GetValues(typeof(ConsoleColor)).Length - 1);
+				n_ptr.attr = Utilities.num_to_attr(Random.randint1(Enum.GetValues(typeof(ConsoleColor)).Length - 1));
 
 			/* Place the monster in the dungeon */
 			if (place_monster(y, x, n_ptr, origin) == 0)
