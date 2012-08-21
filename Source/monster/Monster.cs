@@ -828,7 +828,7 @@ namespace CSAngband.Monster {
 			                o_ptr.object_flags(ref obj_flags);
 
 			                /* Get the object name */
-			                Object_Desc.object_desc(ref o_name, 80, o_ptr, Object_Desc.Detail.PREFIX | Object_Desc.Detail.FULL);
+			                o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
 
 			                /* Get the monster name */
 			                m_name = m_ptr.monster_desc(Desc.IND1);

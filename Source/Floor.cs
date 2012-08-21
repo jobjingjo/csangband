@@ -49,9 +49,9 @@ namespace CSAngband {
 
 			    /* Describe the object.  Less detail if blind. */
 			    if (blind)
-			        Object_Desc.object_desc(ref o_name, 80, o_ptr, Object_Desc.Detail.PREFIX | Object_Desc.Detail.BASE);
+			        o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.BASE);
 			    else
-			        Object_Desc.object_desc(ref o_name, 80, o_ptr, Object_Desc.Detail.PREFIX | Object_Desc.Detail.FULL);
+			        o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
 
 			    /* Message */
 			    Utilities.message_flush();

@@ -832,5 +832,17 @@ namespace CSAngband {
 		 */
 		public delegate bool item_tester_hook_func(Object.Object o);
 		public static item_tester_hook_func item_tester_hook;
+
+		/*
+		 * Total Hack -- allow all items to be listed (even empty ones)
+		 * This is only used by "do_cmd_inven_e()" and is cleared there.
+		 */
+		public static bool item_tester_full;
+
+		/*
+		 * Here is a "pseudo-hook" used during calls to "get_item()" and
+		 * "show_inven()" and "show_equip()", and the choice window routines.
+		 */
+		public static byte item_tester_tval;
 	}
 }

@@ -1632,6 +1632,44 @@ namespace CSAngband {
 			return (true);
 		}
 
+		/*
+		 * Save the screen, and increase the "icky" depth.
+		 *
+		 * This function must match exactly one call to "screen_load()".
+		 */
+		public static void screen_save()
+		{
+			/* Hack -- Flush messages */
+			message_flush();
+
+			/* Save the screen (if legal) */
+			Term.save();
+
+			/* Increase "icky" depth */
+			Misc.character_icky++;
+		}
+
+
+		/*
+		 * Load the screen, and decrease the "icky" depth.
+		 *
+		 * This function must match exactly one call to "screen_save()".
+		 */
+		public static void screen_load()
+		{
+			/* Hack -- Flush messages */
+			message_flush();
+
+			/* Load the screen (if legal) */
+			Term.load();
+
+			/* Decrease "icky" depth */
+			Misc.character_icky--;
+
+			/* Mega hack -redraw big graphics - sorry NRM */
+			if (Misc.character_icky == 0 && (Term.tile_width > 1 || Term.tile_height > 1))
+			    Term.redraw();
+		}
 
 	}
 }

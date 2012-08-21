@@ -294,7 +294,6 @@
     <Content Include="Source\parser.h" />
     <Content Include="Source\pathfind.c" />
     <Content Include="Source\pathfind.h" />
-    <Content Include="Source\Player\calcs.c" />
     <Content Include="Source\Player\player.h" />
     <Content Include="Source\Player\spell.c" />
     <Content Include="Source\Player\timed.c" />

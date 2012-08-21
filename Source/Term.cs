@@ -1939,20 +1939,20 @@ namespace CSAngband {
 
 
 
-		///*
-		// * Redraw (and refresh) the whole window.
-		// */
-		//errr Term_redraw(void)
-		//{
-		//    /* Force "total erase" */
-		//    instance.total_erase = true;
+		/*
+		 * Redraw (and refresh) the whole window.
+		 */
+		public static int redraw()
+		{
+		    /* Force "total erase" */
+		    instance.total_erase = true;
 
-		//    /* Hack -- Refresh */
-		//    Term_fresh();
+		    /* Hack -- Refresh */
+		    fresh();
 
-		//    /* Success */
-		//    return (0);
-		//}
+		    /* Success */
+		    return (0);
+		}
 
 
 		///*
@@ -2172,29 +2172,29 @@ namespace CSAngband {
 		//    return Term_event_push(&ke);
 		//}
 
-		//errr Term_event_push(const ui_event *ke)
-		//{
-		//    /* Hack -- Refuse to enqueue non-keys */
-		//    if (!ke) return (-1);
+		public static int event_push(ui_event ke)
+		{
+		    /* Hack -- Refuse to enqueue non-keys */
+		    if (ke == null) return (-1);
 
-		//    /* Hack -- Overflow may induce circular queue */
-		//    if (instance.key_tail == 0) instance.key_tail = instance.key_size;
+		    /* Hack -- Overflow may induce circular queue */
+		    if (instance.key_tail == 0) instance.key_tail = instance.key_size;
 
-		//    /* Back up, Store the char */
-		//    /* Store the char, advance the queue */
-		//    instance.key_queue[--instance.key_tail] = *ke;
+		    /* Back up, Store the char */
+		    /* Store the char, advance the queue */
+		    instance.key_queue[--instance.key_tail] = ke;
 
-		//    /* Success (unless overflow) */
-		//    if (instance.key_head != instance.key_tail) return (0);
+		    /* Success (unless overflow) */
+		    if (instance.key_head != instance.key_tail) return (0);
 
-		//#if 0
-		//    /* Hack -- Forget the oldest key */
-		//    if (++instance.key_tail == instance.key_size) instance.key_tail = 0;
-		//#endif
+			//#if 0
+			//    /* Hack -- Forget the oldest key */
+			//    if (++instance.key_tail == instance.key_size) instance.key_tail = 0;
+			//#endif
 
-		//    /* Problem */
-		//    return (1);
-		//}
+		    /* Problem */
+		    return (1);
+		}
 
 
 
@@ -2260,90 +2260,88 @@ namespace CSAngband {
 
 		///*** Extra routines ***/
 
-		///*
-		// * Save the "requested" screen into the "memorized" screen
-		// *
-		// * Every "Term_save()" should match exactly one "Term_load()"
-		// */
-		//errr Term_save(void)
-		//{
-		//    int w = instance.wid;
-		//    int h = instance.hgt;
+		/*
+		 * Save the "requested" screen into the "memorized" screen
+		 *
+		 * Every "Term_save()" should match exactly one "Term_load()"
+		 */
+		public static int save()
+		{
+		    int w = instance.wid;
+		    int h = instance.hgt;
 
-		//    term_win *mem;
+			/* Allocate window */
+		    Term_Win mem = new Term_Win();
+			
+		    /* Initialize window */
+		    mem.init(w, h);
 
-		//    /* Allocate window */
-		//    mem = ZNEW(term_win);
+		    /* Grab */
+			mem.copy(instance.scr, w, h);
 
-		//    /* Initialize window */
-		//    term_win_init(mem, w, h);
+		    /* Front of the queue */
+		    mem.next = instance.mem;
+		    instance.mem = mem;
 
-		//    /* Grab */
-		//    term_win_copy(mem, instance.scr, w, h);
+		    /* One more saved */
+		    instance.saved++;
 
-		//    /* Front of the queue */
-		//    mem.next = instance.mem;
-		//    instance.mem = mem;
-
-		//    /* One more saved */
-		//    instance.saved++;
-
-		//    /* Success */
-		//    return (0);
-		//}
+		    /* Success */
+		    return (0);
+		}
 
 
-		///*
-		// * Restore the "requested" contents (see above).
-		// *
-		// * Every "Term_save()" should match exactly one "Term_load()"
-		// */
-		//errr Term_load(void)
-		//{
-		//    int y;
+		/*
+		 * Restore the "requested" contents (see above).
+		 *
+		 * Every "Term_save()" should match exactly one "Term_load()"
+		 */
+		public static int load()
+		{
+		    int y;
 
-		//    int w = instance.wid;
-		//    int h = instance.hgt;
+		    int w = instance.wid;
+		    int h = instance.hgt;
 
-		//    term_win *tmp;
+		    Term_Win tmp;
 
-		//    /* Pop off window from the list */
-		//    if (instance.mem)
-		//    {
-		//        /* Save pointer to old mem */
-		//        tmp = instance.mem;
+		    /* Pop off window from the list */
+		    if (instance.mem != null)
+		    {
+		        /* Save pointer to old mem */
+		        tmp = instance.mem;
 
-		//        /* Forget it */
-		//        instance.mem = instance.mem.next;
+		        /* Forget it */
+		        instance.mem = instance.mem.next;
 
-		//        /* Load */
-		//        term_win_copy(instance.scr, tmp, w, h);
+		        /* Load */
+				instance.scr.copy(tmp, w, h);
 
-		//        /* Free the old window */
-		//        (void)term_win_nuke(tmp);
+		        /* Free the old window */
+				tmp.nuke();
 
-		//        /* Kill it */
-		//        FREE(tmp);
-		//    }
+		        /* Kill it */
+		        //FREE(tmp);
+		    }
 
-		//    /* Assume change */
-		//    for (y = 0; y < h; y++)
-		//    {
-		//        /* Assume change */
-		//        instance.x1[y] = 0;
-		//        instance.x2[y] = w - 1;
-		//    }
+		    /* Assume change */
+		    for (y = 0; y < h; y++)
+		    {
+		        /* Assume change */
+		        instance.x1[y] = 0;
+		        instance.x2[y] = (byte)(w - 1);
+		    }
 
-		//    /* Assume change */
-		//    instance.y1 = 0;
-		//    instance.y2 = h - 1;
+		    /* Assume change */
+		    instance.y1 = 0;
+		    instance.y2 = (byte)(h - 1);
 
-		//    /* One less saved */
-		//    instance.saved--;
+		    /* One less saved */
+		    instance.saved--;
 
-		//    /* Success */
-		//    return (0);
-		//}
+		    /* Success */
+		    return (0);
+		}
 
 
 

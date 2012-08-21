@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace CSAngband.Object {
-	class Object_Desc {
+	partial class Object {
 		/**
 		 * Modes for object_desc().
 		 */
@@ -686,7 +686,7 @@ namespace CSAngband.Object {
 		 *
 		 * \returns The number of bytes used of the buffer.
 		 */
-		public static int object_desc(ref string buf, int max, Object o_ptr, Detail mode)
+		public string object_desc(Detail mode)
 		{
 			bool prefix = (int)(mode & Detail.PREFIX) != 0;
 			bool spoil = (int)(mode & Detail.SPOIL) != 0;
@@ -694,59 +694,57 @@ namespace CSAngband.Object {
 			int end = 0, i = 0;
 
 			/* Simple description for null item */
-			if(o_ptr.tval == 0) {
-				buf = "(nothing)";
-				return buf.Length;
+			if(tval == 0) {
+				return "(nothing)";
 			}
 
-			bool known = o_ptr.is_known() || (o_ptr.ident & Object.IDENT_STORE) != 0 || spoil;
+			bool known = is_known() || (ident & Object.IDENT_STORE) != 0 || spoil;
 
 			/* We've seen it at least once now we're aware of it */
-			if (known && o_ptr.ego != null && !spoil) o_ptr.ego.everseen = true;
+			if (known && ego != null && !spoil) ego.everseen = true;
 
 
 			/*** Some things get really simple descriptions ***/
 
-			if(o_ptr.tval == TVal.TV_GOLD) {
-				buf = o_ptr.pval[Misc.DEFAULT_PVAL] + " gold pieces worth of " + o_ptr.kind.Name + 
-					(Squelch.item_ok(o_ptr) ? " {squelch}" : "");
-				return buf.Length;
+			if(tval == TVal.TV_GOLD) {
+				return pval[Misc.DEFAULT_PVAL] + " gold pieces worth of " + kind.Name +  (Squelch.item_ok(this) ? " {squelch}" : "");
 			}
 
 			/** Construct the name **/
 
 			/* Copy the base name to the buffer */
-			end = obj_desc_name(ref buf, max, end, o_ptr, prefix, mode, spoil);
+			string buf = "";
+			end = obj_desc_name(ref buf, 80, end, this, prefix, mode, spoil);
 
 			if ((mode & Detail.COMBAT) != 0)
 			{
-			    if (o_ptr.tval == TVal.TV_CHEST)
-			        end = obj_desc_chest(o_ptr, ref buf, max, end);
-			    else if (o_ptr.tval == TVal.TV_LIGHT)
-			        end = obj_desc_light(o_ptr, ref buf, max, end);
+			    if (tval == TVal.TV_CHEST)
+			        end = obj_desc_chest(this, ref buf, 80, end);
+			    else if (tval == TVal.TV_LIGHT)
+			        end = obj_desc_light(this, ref buf, 80, end);
 
-			    end = obj_desc_combat(o_ptr, ref buf, max, end, spoil);
+			    end = obj_desc_combat(this, ref buf, 80, end, spoil);
 			}
 
 			if ((mode & Detail.EXTRA) != 0)
 			{
-			    for (i = 0; i < o_ptr.num_pvals; i++)
-			        if (spoil || o_ptr.this_pval_is_visible(i)) {
-			            end = obj_desc_pval(o_ptr, buf, max, end, spoil);
+			    for (i = 0; i < num_pvals; i++)
+			        if (spoil || this_pval_is_visible(i)) {
+			            end = obj_desc_pval(this, buf, 80, end, spoil);
 			            break;
 			        }
 
-			    end = obj_desc_charges(o_ptr, ref buf, max, end);
+			    end = obj_desc_charges(this, ref buf, 80, end);
 
 			    if ((mode & Detail.STORE) != 0)
 			    {
-			        end = obj_desc_aware(o_ptr, ref buf, max, end);
+			        end = obj_desc_aware(this, ref buf, 80, end);
 			    }
 			    else
-			        end = obj_desc_inscrip(o_ptr, ref buf, max, end);
+			        end = obj_desc_inscrip(this, ref buf, 80, end);
 			}
 
-			return end;
+			return buf;
 		}
 	}
 }

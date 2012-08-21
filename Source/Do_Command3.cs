@@ -10,39 +10,38 @@ namespace CSAngband {
 		 */
 		public static void inven()
 		{
-			throw new NotImplementedException();
-			/*ui_event e;
-			int diff = weight_remaining();
+			ui_event e;
+			int diff = Player.Player.weight_remaining();
 
 			// Hack -- Start in "inventory" mode
-			p_ptr.command_wrk = (USE_INVEN);
+			Misc.p_ptr.command_wrk = (Misc.USE_INVEN);
 
 			// Save screen
-			screen_save();
+			Utilities.screen_save();
 
 			// Hack -- show empty slots
-			item_tester_full = true;
+			Misc.item_tester_full = true;
 
 			// Display the inventory
-			show_inven(OLIST_WEIGHT | OLIST_QUIVER);
+			Object.Object.show_inven(Object.Object.olist_detail_t.OLIST_WEIGHT | Object.Object.olist_detail_t.OLIST_QUIVER);
 
 			// Hack -- hide empty slots
-			item_tester_full = false;
+			Misc.item_tester_full = false;
 
 			// Prompt for a command
-			prt(format("(Inventory) Burden %d.%d lb (%d.%d lb %s). Command: ",
-						p_ptr.total_weight / 10, p_ptr.total_weight % 10,
-						abs(diff) / 10, abs(diff) % 10,
+			Utilities.prt(String.Format("(Inventory) Burden {0}.{1} lb ({2}.{3} lb {4}). Command: ",
+						Misc.p_ptr.total_weight / 10, Misc.p_ptr.total_weight % 10,
+						Math.Abs(diff) / 10, Math.Abs(diff) % 10,
 						(diff < 0 ? "overweight" : "remaining")),
 				0, 0);
 
 			// Get a new command
-			e = inkey_ex();
-			if (!(e.type == EVT_KBRD && e.key.code == ESCAPE))
-				Term_event_push(&e);
+			e = Utilities.inkey_ex();
+			if (!(e.type == ui_event_type.EVT_KBRD && e.key.code == keycode_t.ESCAPE))
+				Term.event_push(e);
 
 			// Load screen
-			screen_load();*/
+			Utilities.screen_load();
 		}
 
 

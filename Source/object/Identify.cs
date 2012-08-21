@@ -119,7 +119,7 @@ namespace CSAngband.Object {
 			    else
 			        text = Misc.inscrip_text[(int)feel];
 
-			    Object_Desc.object_desc(ref o_name, 80, o_ptr, Object_Desc.Detail.BASE);
+			    o_name = o_ptr.object_desc(Detail.BASE);
 
 			    /* Average pseudo-ID means full ID */
 			    if (feel == obj_pseudo_t.INSCRIP_AVERAGE)

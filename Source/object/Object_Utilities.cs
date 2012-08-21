@@ -750,30 +750,29 @@ namespace CSAngband.Object {
 		 */
 		public bool item_tester_okay()
 		{
-			throw new NotImplementedException();
-			///* Hack -- allow listing empty slots */
-			//if (item_tester_full) return (true);
+			/* Hack -- allow listing empty slots */
+			if (Misc.item_tester_full) return (true);
 
-			///* Require an item */
-			//if (!o_ptr.kind) return (false);
+			/* Require an item */
+			if (kind == null) return (false);
 
-			///* Hack -- ignore "gold" */
-			//if (o_ptr.tval == TV_GOLD) return (false);
+			/* Hack -- ignore "gold" */
+			if (tval == TVal.TV_GOLD) return (false);
 
-			///* Check the tval */
-			//if (item_tester_tval)
-			//{
-			//    if (item_tester_tval != o_ptr.tval) return (false);
-			//}
+			/* Check the tval */
+			if (Misc.item_tester_tval != 0)
+			{
+			    if (Misc.item_tester_tval != tval) return (false);
+			}
 
-			///* Check the hook */
-			//if (item_tester_hook)
-			//{
-			//    if (!(*item_tester_hook)(o_ptr)) return (false);
-			//}
+			/* Check the hook */
+			if (Misc.item_tester_hook != null)
+			{
+			    if (!Misc.item_tester_hook(this)) return (false);
+			}
 
-			///* Assume okay */
-			//return (true);
+			/* Assume okay */
+			return (true);
 		}
 
 		/*

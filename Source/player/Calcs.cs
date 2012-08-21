@@ -1472,5 +1472,19 @@ namespace CSAngband.Player {
 			if (update != 0) update_stuff();
 			if (redraw != 0) redraw_stuff();
 		}
+
+		/*
+		 * Computes weight remaining before burdened.
+		 */
+		public static int weight_remaining()
+		{
+			int i;
+
+			/* Weight limit based only on strength */
+			i = 60 * adj_str_wgt[Misc.p_ptr.state.stat_ind[(int)Stat.Str]] - Misc.p_ptr.total_weight - 1;
+
+			/* Return the result */
+			return (i);
+		}
 	}
 }

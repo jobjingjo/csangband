@@ -42,7 +42,7 @@ namespace CSAngband {
 		//byte[] vta;
 		//char[] vtc;
 
-		Term_Win next;
+		public Term_Win next;
 
 		/*
 		 * Initialize a "term_win" (using the given window size)
@@ -89,52 +89,50 @@ namespace CSAngband {
 		/*
 		 * Copy a "term_win" from another
 		 */
-		static int copy(Term_Win f, int w, int h)
+		public int copy(Term_Win f, int w, int h)
 		{
-			throw new NotImplementedException();
-			//int x, y;
+			int x, y;
 
-			///* Copy contents */
-			//for (y = 0; y < h; y++)
-			//{
-			//    byte *f_aa = f.a[y];
-			//    char *f_cc = f.c[y];
+			/* Copy contents */
+			for (y = 0; y < h; y++)
+			{
+			    ConsoleColor[] f_aa = f.a[y];
+			    char[] f_cc = f.c[y];
 
-			//    byte *s_aa = s.a[y];
-			//    char *s_cc = s.c[y];
+			    ConsoleColor[] s_aa = a[y];
+			    char[] s_cc = c[y];
 
-			//    byte *f_taa = f.ta[y];
-			//    char *f_tcc = f.tc[y];
+			    ConsoleColor[] f_taa = f.ta[y];
+			    char[] f_tcc = f.tc[y];
 
-			//    byte *s_taa = s.ta[y];
-			//    char *s_tcc = s.tc[y];
+			    ConsoleColor[] s_taa = ta[y];
+			    char[] s_tcc = tc[y];
 
-			//    for (x = 0; x < w; x++)
-			//    {
-			//        *s_aa++ = *f_aa++;
-			//        *s_cc++ = *f_cc++;
+			    for (x = 0; x < w; x++)
+			    {
+					s_aa[x] = f_aa[x];
+					s_cc[x] = f_cc[x];
 
-			//        *s_taa++ = *f_taa++;
-			//        *s_tcc++ = *f_tcc++;
-			//    }
-			//}
+					s_taa[x] = f_taa[x];
+					s_tcc[x] = f_tcc[x];
+			    }
+			}
 
-			///* Copy cursor */
-			//s.cx = f.cx;
-			//s.cy = f.cy;
-			//s.cu = f.cu;
-			//s.cv = f.cv;
+			/* Copy cursor */
+			cx = f.cx;
+			cy = f.cy;
+			cu = f.cu;
+			cv = f.cv;
 
-			///* Success */
-			//return (0);
+			/* Success */
+			return (0);
 		}
 
 		/*
 		 * Nuke a term_win (see below)
 		 */
-		static int nuke()
+		public int nuke()
 		{
-			throw new NotImplementedException();
 			///* Free the window access arrays */
 			//FREE(s.a);
 			//FREE(s.c);
@@ -152,7 +150,7 @@ namespace CSAngband {
 			//FREE(s.vtc);
 
 			///* Success */
-			//return (0);
+			return (0);
 		}
 	}
 }
