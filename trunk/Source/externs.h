@@ -56,7 +56,6 @@ extern char gf_to_char[GF_MAX][BOLT_MAX];
 
 extern bool item_tester_full;
 extern byte item_tester_tval;
-extern bool (*item_tester_hook)(const object_type *);
 extern bool (*get_mon_num_hook)(int r_idx);
 extern ang_file *text_out_file;
 extern int text_out_indent;

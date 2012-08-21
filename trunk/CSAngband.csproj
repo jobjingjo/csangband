@@ -131,6 +131,7 @@
     <Compile Include="Source\Object\Object_Kind.cs" />
     <Compile Include="Source\Object\Object_Make.cs" />
     <Compile Include="Source\Object\Object_Power.cs" />
+    <Compile Include="Source\Object\Object_UI.cs" />
     <Compile Include="Source\Object\Object_Utilities.cs" />
     <Compile Include="Source\Object\Origin.cs" />
     <Compile Include="Source\Object\Randart.cs" />

@@ -825,5 +825,12 @@ namespace CSAngband {
 		 * Flag to override which store is selected if in a knowledge menu
 		 */
 		public static STORE store_knowledge = STORE.NONE;
+
+		/*
+		 * Here is a "hook" used during calls to "get_item()" and
+		 * "show_inven()" and "show_equip()", and the choice window routines.
+		 */
+		public delegate bool item_tester_hook_func(Object.Object o);
+		public static item_tester_hook_func item_tester_hook;
 	}
 }
