@@ -247,8 +247,7 @@ namespace CSAngband {
 			if (fear && m_ptr.ml) {
 				//char m_name[80];
 				string m_name = m_ptr.monster_desc(0);
-				throw new NotImplementedException();
-				//add_monster_message(m_name, cave.m_idx[y][x], MON_MSG_FLEE_IN_TERROR, true);
+				Monster_Message.add_monster_message(m_name, Cave.cave.m_idx[y][x], (int)MON_MSG.FLEE_IN_TERROR, true);
 			}
 		}
 

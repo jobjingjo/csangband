@@ -378,11 +378,6 @@ quest *q_list;
 struct store *stores;
 
 /*
- * Flag to override which store is selected if in a knowledge menu
- */
-int store_knowledge = STORE_NONE;
-
-/*
  * Array[RANDNAME_NUM_TYPES][num_names] of random names
  */
 const char *** name_sections; //NICHOLAS: This is in RandomName.cs

@@ -1067,23 +1067,22 @@ namespace CSAngband {
 		/* Get the current store or null if there isn't one */
 		public static Store current_store()
 		{
-			throw new NotImplementedException();
-			//int n = STORE_NONE;
+			STORE n = STORE.NONE;
 
-			///* If we're displaying store knowledge whilst not in a store,
-			// * override the value returned
-			// */
-			//if (store_knowledge != STORE_NONE)
-			//    n = store_knowledge;
+			/* If we're displaying store knowledge whilst not in a store,
+			 * override the value returned
+			 */
+			if (Misc.store_knowledge != STORE.NONE)
+			    n = Misc.store_knowledge;
 
-			//else if ((cave.feat[p_ptr.py][p_ptr.px] >= FEAT_SHOP_HEAD) &&
-			//        (cave.feat[p_ptr.py][p_ptr.px] <= FEAT_SHOP_TAIL))
-			//    n = cave.feat[p_ptr.py][p_ptr.px] - FEAT_SHOP_HEAD;
+			else if ((Cave.cave.feat[Misc.p_ptr.py][Misc.p_ptr.px] >= Cave.FEAT_SHOP_HEAD) &&
+			        (Cave.cave.feat[Misc.p_ptr.py][Misc.p_ptr.px] <= Cave.FEAT_SHOP_TAIL))
+			    n = (STORE)(Cave.cave.feat[Misc.p_ptr.py][Misc.p_ptr.px] - Cave.FEAT_SHOP_HEAD);
 
-			//if (n != STORE_NONE)
-			//    return &stores[n];
-			//else
-			//    return null;
+			if (n != STORE.NONE)
+			    return Misc.stores[(int)n];
+			else
+			    return null;
 		}
 
 	}
