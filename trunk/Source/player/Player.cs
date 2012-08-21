@@ -353,13 +353,14 @@ namespace CSAngband.Player {
 			return res;
 		}
 
-		void exp_gain(Int32 amount){
+		public void exp_gain(Int32 amount){
 			exp += amount;
 			if (exp < max_exp)
 				max_exp += amount / 10;
 			adjust_level(true);
 		}
-		void exp_lose(Int32 amount, bool permanent){
+		
+		public void exp_lose(Int32 amount, bool permanent){
 			if (exp < amount)
 				amount = exp;
 			exp -= amount;
@@ -584,33 +585,31 @@ namespace CSAngband.Player {
 		/* Determine if the player can read scrolls. */
 		public static bool can_read()
 		{
-			throw new NotImplementedException();
-			/*
-			if (p_ptr.timed[TMD_BLIND])
+			if (Misc.p_ptr.timed[(int)Timed_Effect.BLIND] != 0)
 			{
-				msg("You can't see anything.");
+				Utilities.msg("You can't see anything.");
 				return false;
 			}
 
-			if (no_light())
+			if (Cave.no_light())
 			{
-				msg("You have no light to read by.");
+				Utilities.msg("You have no light to read by.");
 				return false;
 			}
 
-			if (p_ptr.timed[TMD_CONFUSED])
+			if (Misc.p_ptr.timed[(int)Timed_Effect.CONFUSED] != 0)
 			{
-				msg("You are too confused to read!");
+				Utilities.msg("You are too confused to read!");
 				return false;
 			}
 
-			if (p_ptr.timed[TMD_AMNESIA])
+			if (Misc.p_ptr.timed[(int)Timed_Effect.AMNESIA] != 0)
 			{
-				msg("You can't remember how to read!");
+				Utilities.msg("You can't remember how to read!");
 				return false;
 			}
 
-			return true;*/
+			return true;
 		}
 
 		/* Determine if the player can fire with the bow */

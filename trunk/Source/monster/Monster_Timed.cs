@@ -52,7 +52,7 @@ namespace CSAngband.Monster {
 		 *
 		 * Returns true if the monster's timer changed.
 		 */
-		static bool mon_dec_timed(int m_idx, int ef_idx, int timer, ushort flag, bool id)
+		public static bool mon_dec_timed(int m_idx, int ef_idx, int timer, ushort flag, bool id)
 		{
 			Monster m_ptr;
 
@@ -255,7 +255,7 @@ namespace CSAngband.Monster {
 		 *
 		 * Returns true if the monster's timer was changed.
 		 */
-		static bool mon_clear_timed(int m_idx, int ef_idx, ushort flag, bool id)
+		public static bool mon_clear_timed(int m_idx, int ef_idx, ushort flag, bool id)
 		{
 			Monster m_ptr;
 
@@ -271,5 +271,46 @@ namespace CSAngband.Monster {
 
 			return mon_set_timed(m_ptr, ef_idx, 0, flag, id);
 		}
+
+		/**
+		 * Increases the timed effect `ef_idx` by `timer`.
+		 *
+		 * Calculates the new timer, then passes that to mon_set_timed().
+		 * Note that each effect has a maximum number of turns it can be active for.
+		 * If this function would put an effect timer over that cap, it sets it for
+		 * that cap instead.
+		 *
+		 * Returns true if the monster's timer changed.
+		 */
+		public static bool mon_inc_timed(int m_idx, int ef_idx, int timer, ushort flag, bool id)
+		{
+			Monster m_ptr;
+			mon_timed_effect effect;
+
+			Misc.assert(ef_idx >= 0 && ef_idx < (int)Misc.MON_TMD.MAX);
+			effect = effects[ef_idx];
+
+			Misc.assert(m_idx > 0);
+			m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+
+			/* For negative amounts, we use mon_dec_timed instead */
+			Misc.assert(timer > 0);
+
+			/* Make it last for a mimimum # of turns if it is a new effect */
+			if ((m_ptr.m_timed[ef_idx] == 0) && (timer < 2)) timer = 2;
+
+			/* New counter amount - prevent overflow */
+			if (short.MaxValue - timer < m_ptr.m_timed[ef_idx])
+			    timer = short.MaxValue;
+			else
+			    timer += m_ptr.m_timed[ef_idx];
+
+			/* Reduce to max_timer if necessary*/
+			if (timer > effect.max_timer)
+			    timer = effect.max_timer;
+
+			return mon_set_timed(m_ptr, ef_idx, timer, flag, id);
+		}
+
 	}
 }

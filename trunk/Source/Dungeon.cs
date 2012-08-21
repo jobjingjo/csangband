@@ -1393,45 +1393,45 @@ namespace CSAngband {
 			/* Tracking a monster */
 			if (Misc.p_ptr.monster_race_idx != 0)
 			{
-				throw new NotImplementedException();
-				///* Get the monster lore */
-				//Monster_Lore l_ptr = Misc.l_list[Misc.p_ptr.monster_race_idx];
+				/* Get the monster lore */
+				Monster_Lore l_ptr = Misc.l_list[Misc.p_ptr.monster_race_idx];
 
-				//for (i = 0; i < MONSTER_BLOW_MAX; i++)
-				//{
-				//    if (old_blows[i] != l_ptr.blows[i])
-				//    {
-				//        changed = true;
-				//        break;
-				//    }
-				//}
+				for (i = 0; i < Monster_Blow.MONSTER_BLOW_MAX; i++)
+				{
+				    if (old_blows[i] != l_ptr.blows[i])
+				    {
+				        changed = true;
+				        break;
+				    }
+				}
 
-				///* Check for change of any kind */
-				//if (changed ||
-				//    (old_monster_race_idx != p_ptr.monster_race_idx) ||
-				//    !rf_is_equal(old_flags, l_ptr.flags) ||
-				//    !rsf_is_equal(old_spell_flags, l_ptr.spell_flags) ||
-				//    (old_cast_innate != l_ptr.cast_innate) ||
-				//    (old_cast_spell != l_ptr.cast_spell))
-				//{
-				//    /* Memorize old race */
-				//    old_monster_race_idx = p_ptr.monster_race_idx;
+				/* Check for change of any kind */
+				if (changed ||
+				    (old_monster_race_idx != Misc.p_ptr.monster_race_idx) ||
+				    !old_flags.is_equal(l_ptr.flags) ||
+				    !old_spell_flags.is_equal(l_ptr.spell_flags) ||
+				    (old_cast_innate != l_ptr.cast_innate) ||
+				    (old_cast_spell != l_ptr.cast_spell))
+				{
+				    /* Memorize old race */
+				    old_monster_race_idx = Misc.p_ptr.monster_race_idx;
 
-				//    /* Memorize flags */
-				//    rf_copy(old_flags, l_ptr.flags);
-				//    rsf_copy(old_spell_flags, l_ptr.spell_flags);
+				    /* Memorize flags */
+				    old_flags.copy(l_ptr.flags);
+				    old_spell_flags.copy(l_ptr.spell_flags);
 
-				//    /* Memorize blows */
-				//    memmove(old_blows, l_ptr.blows, sizeof(byte)*MONSTER_BLOW_MAX);
+				    /* Memorize blows */
+				    //memmove(old_blows, l_ptr.blows, sizeof(byte)*MONSTER_BLOW_MAX);
+					l_ptr.blows = old_blows;
 
-				//    /* Memorize castings */
-				//    old_cast_innate = l_ptr.cast_innate;
-				//    old_cast_spell = l_ptr.cast_spell;
+				    /* Memorize castings */
+				    old_cast_innate = l_ptr.cast_innate;
+				    old_cast_spell = l_ptr.cast_spell;
 
-				//    /* Redraw stuff */
-				//    p_ptr.redraw |= (PR_MONSTER);
-				//    redraw_stuff(p_ptr);
-				//}
+				    /* Redraw stuff */
+				    Misc.p_ptr.redraw |= (Misc.PR_MONSTER);
+				    Misc.p_ptr.redraw_stuff();
+				}
 			}
 		}
 

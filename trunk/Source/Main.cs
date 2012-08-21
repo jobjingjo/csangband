@@ -863,8 +863,8 @@ namespace CSAngband {
 				//Todo: Make sure this works!
 				ConsoleKeyInfo ck = Console.ReadKey(true);
 				keycode_t to_send = (keycode_t)ck.KeyChar;
+				keycode_t mods = keycode_t.KC_NONE;
 
-				/* Capture keys that have char of '\0' */
 				if(ck.Key == ConsoleKey.DownArrow) {
 					to_send = keycode_t.ARROW_DOWN;
 				} else if(ck.Key == ConsoleKey.UpArrow) {
@@ -873,8 +873,22 @@ namespace CSAngband {
 					to_send = keycode_t.ARROW_LEFT;
 				} else if(ck.Key == ConsoleKey.RightArrow) {
 					to_send = keycode_t.ARROW_RIGHT;
+				} else if(ck.Key == ConsoleKey.Enter) {
+					to_send = keycode_t.KC_ENTER;
+				} else if(ck.Key == ConsoleKey.Escape) {
+					to_send = keycode_t.ESCAPE;
+				} else if(ck.Key == ConsoleKey.Backspace) {
+					to_send = keycode_t.KC_BACKSPACE;
 				}
-				Term.keypress(to_send, (byte)ck.Modifiers);
+
+				if(ck.Modifiers == ConsoleModifiers.Shift) {
+					mods = keycode_t.KC_MOD_SHIFT;
+				} else if(ck.Modifiers == ConsoleModifiers.Control) {
+					mods = keycode_t.KC_MOD_CONTROL;
+				} else if(ck.Modifiers == ConsoleModifiers.Alt) {
+					mods = keycode_t.KC_MOD_ALT;
+				}
+				Term.keypress(to_send, (byte)mods);
 			}
 
 			return true;

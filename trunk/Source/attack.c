@@ -34,26 +34,7 @@
 
 
 
-/**
- * Determine if the player "hits" a monster.
- */
-bool test_hit(int chance, int ac, int vis) {
-	int k = randint0(100);
 
-	/* There is an automatic 12% chance to hit,
-	 * and 5% chance to miss.
-	 */
-	if (k < 17) return k < 12;
-
-	/* Penalize invisible targets */
-	if (!vis) chance /= 2;
-
-	/* Starting a bit higher up on the scale */
-	if (chance < 9) chance = 9;
-
-	/* Power competes against armor */
-	return randint0(chance) >= (ac * 2 / 3);
-}
 
 
 /**
@@ -82,46 +63,6 @@ static int critical_shot(int weight, int plus, int dam, u32b *msg_type) {
 		return 3 * dam + 15;
 	}
 }
-
-
-/**
- * Determine damage for critical hits from melee.
- *
- * Factor in weapon weight, total plusses, player level.
- */
-static int critical_norm(int weight, int plus, int dam, u32b *msg_type) {
-	int chance = weight + (p_ptr.state.to_h + plus) * 5 + p_ptr.lev * 3;
-	int power = weight + randint1(650);
-
-	if (randint1(5000) > chance) {
-		*msg_type = MSG_HIT;
-		return dam;
-
-	} else if (power < 400) {
-		*msg_type = MSG_HIT_GOOD;
-		return 2 * dam + 5;
-
-	} else if (power < 700) {
-		*msg_type = MSG_HIT_GREAT;
-		return 2 * dam + 10;
-
-	} else if (power < 900) {
-		*msg_type = MSG_HIT_SUPERB;
-		return 3 * dam + 15;
-
-	} else if (power < 1300) {
-		*msg_type = MSG_HIT_HI_GREAT;
-		return 3 * dam + 20;
-
-	} else {
-		*msg_type = MSG_HIT_HI_SUPERB;
-		return 4 * dam + 20;
-	}
-}
-
-
-
-
 
 /**
  * This is a helper function used by do_cmd_throw and do_cmd_fire.

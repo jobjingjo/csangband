@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CSAngband.Monster;
+using CSAngband.Object;
 
 namespace CSAngband {
 	static class Attack {
@@ -13,149 +15,202 @@ namespace CSAngband {
 		};
 
 		//public static int breakage_chance(const object_type *o_ptr, bool hit_target);
+
+		/**
+		 * Determine if the player "hits" a monster.
+		 */
 		public static bool test_hit(int chance, int ac, int vis) {
-			throw new NotImplementedException();
-			return false;
+			int k = Random.randint0(100);
+
+			/* There is an automatic 12% chance to hit,
+			 * and 5% chance to miss.
+			 */
+			if (k < 17) return k < 12;
+
+			/* Penalize invisible targets */
+			if (vis == 0) chance /= 2;
+
+			/* Starting a bit higher up on the scale */
+			if (chance < 9) chance = 9;
+
+			/* Power competes against armor */
+			return Random.randint0(chance) >= (ac * 2 / 3);
 		}
 
 		/**
 		 * Attack the monster at the given location with a single blow.
 		 */
 		static bool py_attack_real(int y, int x, ref bool fear) {
-			throw new NotImplementedException();
-			///* Information about the target of the attack */
-			//monster_type *m_ptr = cave_monster(cave, cave.m_idx[y][x]);
-			//monster_race *r_ptr = &r_info[m_ptr.r_idx];
+			/* Information about the target of the attack */
+			Monster.Monster m_ptr = Cave.cave_monster(Cave.cave, Cave.cave.m_idx[y][x]);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
 			//char m_name[80];
-			//bool stop = false;
+			string m_name;
+			bool stop = false;
 
-			///* The weapon used */
-			//object_type *o_ptr = &p_ptr.inventory[INVEN_WIELD];
+			/* The weapon used */
+			Object.Object o_ptr = Misc.p_ptr.inventory[Misc.INVEN_WIELD];
 
-			///* Information about the attack */
-			//int bonus = p_ptr.state.to_h + o_ptr.to_h;
-			//int chance = p_ptr.state.skills[SKILL_TO_HIT_MELEE] + bonus * BTH_PLUS_ADJ;
-			//bool do_quake = false;
-			//bool success = false;
+			/* Information about the attack */
+			int bonus = Misc.p_ptr.state.to_h + o_ptr.to_h;
+			int chance = Misc.p_ptr.state.skills[(int)Skill.TO_HIT_MELEE] + bonus * Misc.BTH_PLUS_ADJ;
+			bool do_quake = false;
+			bool success = false;
 
-			///* Default to punching for one damage */
-			//const char *hit_verb = "punch";
-			//int dmg = 1;
-			//u32b msg_type = MSG_HIT;
+			/* Default to punching for one damage */
+			string hit_verb = "punch";
+			int dmg = 1;
+			Message_Type msg_type = Message_Type.MSG_HIT;
 
-			///* Extract monster name (or "it") */
-			//monster_desc(m_name, sizeof(m_name), m_ptr, 0);
+			/* Extract monster name (or "it") */
+			m_name = m_ptr.monster_desc(0);
 
-			///* Auto-Recall if possible and visible */
-			//if (m_ptr.ml) monster_race_track(m_ptr.r_idx);
+			/* Auto-Recall if possible and visible */
+			if (m_ptr.ml) Cave.monster_race_track(m_ptr.r_idx);
 
-			///* Track a new monster */
-			//if (m_ptr.ml) health_track(p_ptr, cave.m_idx[y][x]);
+			/* Track a new monster */
+			if (m_ptr.ml) Cave.health_track(Misc.p_ptr, Cave.cave.m_idx[y][x]);
 
-			///* Handle player fear (only for invisible monsters) */
-			//if (check_state(p_ptr, OF_AFRAID, p_ptr.state.flags)) {
-			//    msgt(MSG_AFRAID, "You are too afraid to attack %s!", m_name);
-			//    return false;
+			/* Handle player fear (only for invisible monsters) */
+			if (Misc.p_ptr.check_state(Object_Flag.AFRAID, Misc.p_ptr.state.flags)) {
+			    Utilities.msgt(Message_Type.MSG_AFRAID, "You are too afraid to attack %s!", m_name);
+			    return false;
+			}
+
+			/* Disturb the monster */
+			Monster.Monster.mon_clear_timed(Cave.cave.m_idx[y][x], (int)Misc.MON_TMD.SLEEP, Misc.MON_TMD_FLG_NOMESSAGE,false);
+
+			/* See if the player hit */
+			success = test_hit(chance, (int)r_ptr.ac, m_ptr.ml?1:0);
+
+			/* If a miss, skip this hit */
+			if (!success) {
+			    Utilities.msgt(Message_Type.MSG_MISS, "You miss {0}.", m_name);
+			    return false;
+			}
+
+			/* Handle normal weapon */
+			if (o_ptr.kind != null) {
+			    int i;
+			    Slay best_s_ptr = null;
+
+			    hit_verb = "hit";
+
+			    /* Get the best attack from all slays or
+			     * brands on all non-launcher equipment */
+			    for (i = Misc.INVEN_LEFT; i < Misc.INVEN_TOTAL; i++) {
+			        Object.Object obj = Misc.p_ptr.inventory[i];
+			        if (obj.kind != null)
+			            Slay.improve_attack_modifier(obj, m_ptr, ref best_s_ptr, true, false);
+			    }
+
+			    Slay.improve_attack_modifier(o_ptr, m_ptr, ref best_s_ptr, true, false);
+			    if (best_s_ptr != null)
+			        hit_verb = best_s_ptr.melee_verb;
+
+			    dmg = Random.damroll(o_ptr.dd, o_ptr.ds);
+			    dmg *= (best_s_ptr == null) ? 1 : best_s_ptr.mult;
+
+			    dmg += o_ptr.to_d;
+			    dmg = critical_norm(o_ptr.weight, o_ptr.to_h, dmg, ref msg_type);
+
+			    /* Learn by use for the weapon */
+			    o_ptr.notice_attack_plusses();
+
+			    if (Misc.p_ptr.check_state(Object_Flag.IMPACT, Misc.p_ptr.state.flags) && dmg > 50) {
+			        do_quake = true;
+			        Object.Object.wieldeds_notice_flag(Misc.p_ptr, Object_Flag.IMPACT.value);
+			    }
+			}
+
+			/* Learn by use for other equipped items */
+			Object.Object.wieldeds_notice_on_attack();
+
+			/* Apply the player damage bonuses */
+			dmg += Misc.p_ptr.state.to_d;
+
+			/* No negative damage */
+			if (dmg <= 0) dmg = 0;
+
+			/* Tell the player what happened */
+			if (dmg <= 0)
+			    Utilities.msgt(Message_Type.MSG_MISS, "You fail to harm {0}.", m_name);
+			else if (msg_type == Message_Type.MSG_HIT)
+			    Utilities.msgt(Message_Type.MSG_HIT, "You {0} {1}.", hit_verb, m_name);
+			else if (msg_type == Message_Type.MSG_HIT_GOOD)
+			    Utilities.msgt(Message_Type.MSG_HIT_GOOD, "You {0} {1}. {2}", hit_verb, m_name, "It was a good hit!");
+			else if (msg_type == Message_Type.MSG_HIT_GREAT)
+			    Utilities.msgt(Message_Type.MSG_HIT_GREAT, "You {0} {1}. {2}", hit_verb, m_name, "It was a great hit!");
+			else if (msg_type == Message_Type.MSG_HIT_SUPERB)
+			    Utilities.msgt(Message_Type.MSG_HIT_SUPERB, "You {0} {1}. {2}", hit_verb, m_name, "It was a superb hit!");
+			else if (msg_type == Message_Type.MSG_HIT_HI_GREAT)
+			    Utilities.msgt(Message_Type.MSG_HIT_HI_GREAT, "You {0} {1}. {2}", hit_verb, m_name, "It was a *GREAT* hit!");
+			else if (msg_type == Message_Type.MSG_HIT_HI_SUPERB)
+			    Utilities.msgt(Message_Type.MSG_HIT_HI_SUPERB, "You {0} {1}. {2}", hit_verb, m_name, "It was a *SUPERB* hit!");
+
+			/* Complex message */
+			if (Misc.p_ptr.wizard)
+			    Utilities.msg("You do {0} (out of {1}) damage.", dmg, m_ptr.hp);
+
+			/* Confusion attack */
+			if (Misc.p_ptr.confusing != 0) {
+				Misc.p_ptr.confusing = 0;//false;
+			    Utilities.msg("Your hands stop glowing.");
+
+				Monster.Monster.mon_inc_timed(Cave.cave.m_idx[y][x], (int)Misc.MON_TMD.CONF,
+				        (10 + Random.randint0(Misc.p_ptr.lev) / 10), Misc.MON_TMD_FLG_NOTIFY, false);
+			}
+
+			/* Damage, check for fear and death */
+			stop = Monster.Monster_Make.mon_take_hit(Cave.cave.m_idx[y][x], dmg, ref fear, null);
+
+			if (stop)
+			    fear = false;
+
+			/* Apply earthquake brand */
+			if (do_quake) {
+				throw new NotImplementedException();
+				//earthquake(Misc.p_ptr.py, Misc.p_ptr.px, 10);
+				//if (Cave.cave.m_idx[y][x] == 0) stop = true;
+			}
+
+			return stop;
+		}
+
+		/**
+		 * Determine damage for critical hits from melee.
+		 *
+		 * Factor in weapon weight, total plusses, player level.
+		 */
+		static int critical_norm(int weight, int plus, int dam, ref Message_Type msg_type) {
+			throw new NotImplementedException();
+			//int chance = weight + (p_ptr.state.to_h + plus) * 5 + p_ptr.lev * 3;
+			//int power = weight + randint1(650);
+
+			//if (randint1(5000) > chance) {
+			//    *msg_type = MSG_HIT;
+			//    return dam;
+
+			//} else if (power < 400) {
+			//    *msg_type = MSG_HIT_GOOD;
+			//    return 2 * dam + 5;
+
+			//} else if (power < 700) {
+			//    *msg_type = MSG_HIT_GREAT;
+			//    return 2 * dam + 10;
+
+			//} else if (power < 900) {
+			//    *msg_type = MSG_HIT_SUPERB;
+			//    return 3 * dam + 15;
+
+			//} else if (power < 1300) {
+			//    *msg_type = MSG_HIT_HI_GREAT;
+			//    return 3 * dam + 20;
+
+			//} else {
+			//    *msg_type = MSG_HIT_HI_SUPERB;
+			//    return 4 * dam + 20;
 			//}
-
-			///* Disturb the monster */
-			//mon_clear_timed(cave.m_idx[y][x], MON_TMD_SLEEP, MON_TMD_FLG_NOMESSAGE,
-			//    false);
-
-			///* See if the player hit */
-			//success = test_hit(chance, r_ptr.ac, m_ptr.ml);
-
-			///* If a miss, skip this hit */
-			//if (!success) {
-			//    msgt(MSG_MISS, "You miss %s.", m_name);
-			//    return false;
-			//}
-
-			///* Handle normal weapon */
-			//if (o_ptr.kind) {
-			//    int i;
-			//    const struct slay *best_s_ptr = null;
-
-			//    hit_verb = "hit";
-
-			//    /* Get the best attack from all slays or
-			//     * brands on all non-launcher equipment */
-			//    for (i = INVEN_LEFT; i < INVEN_TOTAL; i++) {
-			//        struct object *obj = &p_ptr.inventory[i];
-			//        if (obj.kind)
-			//            improve_attack_modifier(obj, m_ptr, &best_s_ptr, true, false);
-			//    }
-
-			//    improve_attack_modifier(o_ptr, m_ptr, &best_s_ptr, true, false);
-			//    if (best_s_ptr != null)
-			//        hit_verb = best_s_ptr.melee_verb;
-
-			//    dmg = damroll(o_ptr.dd, o_ptr.ds);
-			//    dmg *= (best_s_ptr == null) ? 1 : best_s_ptr.mult;
-
-			//    dmg += o_ptr.to_d;
-			//    dmg = critical_norm(o_ptr.weight, o_ptr.to_h, dmg, &msg_type);
-
-			//    /* Learn by use for the weapon */
-			//    object_notice_attack_plusses(o_ptr);
-
-			//    if (check_state(p_ptr, OF_IMPACT, p_ptr.state.flags) && dmg > 50) {
-			//        do_quake = true;
-			//        wieldeds_notice_flag(p_ptr, OF_IMPACT);
-			//    }
-			//}
-
-			///* Learn by use for other equipped items */
-			//wieldeds_notice_on_attack();
-
-			///* Apply the player damage bonuses */
-			//dmg += p_ptr.state.to_d;
-
-			///* No negative damage */
-			//if (dmg <= 0) dmg = 0;
-
-			///* Tell the player what happened */
-			//if (dmg <= 0)
-			//    msgt(MSG_MISS, "You fail to harm %s.", m_name);
-			//else if (msg_type == MSG_HIT)
-			//    msgt(MSG_HIT, "You %s %s.", hit_verb, m_name);
-			//else if (msg_type == MSG_HIT_GOOD)
-			//    msgt(MSG_HIT_GOOD, "You %s %s. %s", hit_verb, m_name, "It was a good hit!");
-			//else if (msg_type == MSG_HIT_GREAT)
-			//    msgt(MSG_HIT_GREAT, "You %s %s. %s", hit_verb, m_name, "It was a great hit!");
-			//else if (msg_type == MSG_HIT_SUPERB)
-			//    msgt(MSG_HIT_SUPERB, "You %s %s. %s", hit_verb, m_name, "It was a superb hit!");
-			//else if (msg_type == MSG_HIT_HI_GREAT)
-			//    msgt(MSG_HIT_HI_GREAT, "You %s %s. %s", hit_verb, m_name, "It was a *GREAT* hit!");
-			//else if (msg_type == MSG_HIT_HI_SUPERB)
-			//    msgt(MSG_HIT_HI_SUPERB, "You %s %s. %s", hit_verb, m_name, "It was a *SUPERB* hit!");
-
-			///* Complex message */
-			//if (p_ptr.wizard)
-			//    msg("You do %d (out of %d) damage.", dmg, m_ptr.hp);
-
-			///* Confusion attack */
-			//if (p_ptr.confusing) {
-			//    p_ptr.confusing = false;
-			//    msg("Your hands stop glowing.");
-
-			//    mon_inc_timed(cave.m_idx[y][x], MON_TMD_CONF,
-			//            (10 + randint0(p_ptr.lev) / 10), MON_TMD_FLG_NOTIFY, false);
-			//}
-
-			///* Damage, check for fear and death */
-			//stop = mon_take_hit(cave.m_idx[y][x], dmg, fear, null);
-
-			//if (stop)
-			//    (*fear) = false;
-
-			///* Apply earthquake brand */
-			//if (do_quake) {
-			//    earthquake(p_ptr.py, p_ptr.px, 10);
-			//    if (cave.m_idx[y][x] == 0) stop = true;
-			//}
-
-			//return stop;
 		}
 
 

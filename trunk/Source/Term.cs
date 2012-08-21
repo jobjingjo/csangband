@@ -258,15 +258,13 @@ namespace CSAngband {
 		public static Term instance;
 
 		public static bool panel_contains(uint y, uint x) {
-			throw new NotImplementedException();
-			//return true;
-			//unsigned int hgt;
-			//unsigned int wid;
-			//if (!Term)
-			//    return true;
-			//hgt = SCREEN_HGT;
-			//wid = SCREEN_WID;
-			//return (y - instance.offset_y) < hgt && (x - instance.offset_x) < wid;
+			uint hgt;
+			uint wid;
+			if (Term.instance == null)
+			    return true;
+			hgt = (uint)Misc.SCREEN_HGT;
+			wid = (uint)Misc.SCREEN_WID;
+			return (y - instance.offset_y) < hgt && (x - instance.offset_x) < wid;
 		}
 
 		/*
