@@ -507,7 +507,9 @@ namespace CSAngband {
 			if (Misc.p_ptr.is_dead) return;
 
 			/* Announce (or repeat) the feeling */
-			if (Misc.p_ptr.depth == 0) Command.display_feeling(false);
+			//Nick: May not need this, looks like it just repeats the town feeling. 
+			//Misc.p_ptr.update_stuff(); above already does this...
+			if (Misc.p_ptr.depth == 0) Command.display_feeling(false); 
 
 			/* Give player minimum energy to start a new level, but do not reduce higher value from savefile for level in progress */
 			if (Misc.p_ptr.energy < Misc.INITIAL_DUNGEON_ENERGY)

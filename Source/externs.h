@@ -46,7 +46,6 @@ extern color_type color_table[MAX_COLORS];
 extern const char *angband_sound_name[MSG_MAX];
 extern monster_lore *l_list;
 extern quest *q_list;
-extern int store_knowledge;
 extern alloc_entry *alloc_ego_table;
 extern s16b alloc_race_size;
 extern alloc_entry *alloc_race_table;

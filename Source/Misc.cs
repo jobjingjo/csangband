@@ -820,5 +820,10 @@ namespace CSAngband {
 		public const int BTH_PLUS_ADJ    =	3; 	/* Adjust BTH per plus-to-hit */
 		public const int MON_MULT_ADJ	=	8; 	/* High value slows multiplication */
 		public const int MON_DRAIN_LIFE = 2;	/* Percent of player exp drained per hit */
+
+		/*
+		 * Flag to override which store is selected if in a knowledge menu
+		 */
+		public static STORE store_knowledge = STORE.NONE;
 	}
 }
