@@ -14,9 +14,9 @@ namespace CSAngband {
 		 */
 		public static void Init()
 		{
-			for(int i = 0; i < converted_list.Length; i++) {
+			/*for(int i = 0; i < converted_list.Length; i++) {
 				converted_list[i] = new Command_Info();
-			}
+			}*/
 
 			// Go through all generic commands
 			for (int j = 0; j < Command_List.all.Length; j++)
@@ -24,8 +24,9 @@ namespace CSAngband {
 				Command_Info[] commands = Command_List.all[j].list;
 
 				// Fill everything in 
-				for(int i = 0; i < Command_List.all[j].list.Length; i++)
+				for(int i = 0; i < Command_List.all[j].list.Length; i++) {
 					converted_list[commands[i].key] = commands[i];
+				}
 			}
 		}
 

@@ -118,7 +118,7 @@ namespace CSAngband {
 			keypress[] tmp = new keypress[2]{ new keypress(), new keypress()};
 
 			ui_event ke = new ui_event();
-			ui_event ret = ke;
+			//ui_event ret = ke;
 
 			keypress[] act = null;
 
@@ -170,9 +170,9 @@ namespace CSAngband {
 			        /* Find any relevant keymap */
 					if(keymap_ok) {
 						act = Keymap.find(mode, ke.key);
-						if (act == null) {
-							ret = ke;
-						}
+						//if (act == null) {
+						//    ret = ke;
+						//}
 					} 
 			    }
 
@@ -206,9 +206,9 @@ namespace CSAngband {
 			        Utilities.inkey_next = new List<keypress>(request_command_buffer);
 
 			        /* Continue */
-					ret.type = ke.type;
-					ret.mouse = ke.mouse;
-					ret.key = act[0];
+					//ret.type = ke.type;
+					//ret.mouse = ke.mouse;
+					//ret.key = act[0];
 			        continue;
 			    }
 
@@ -216,7 +216,7 @@ namespace CSAngband {
 			    break;
 			}
 
-			return ret;
+			return ke;
 		}
 
 
@@ -279,12 +279,12 @@ namespace CSAngband {
 			    return true;
 
 			cmd = Command.converted_list[c];
-			if (cmd.cmd == Command_Code.NULL || cmd == null) return false;
+			if (cmd == null) return false;
 
 			if (Command.key_confirm_command(c) && (cmd.prereq == null || cmd.prereq())) {
 			    if (cmd.hook != null)
 			        cmd.hook();
-			    else if (cmd.cmd != null)
+			    else if (cmd.cmd != Command_Code.NULL)
 					Game_Command.insert_repeated(cmd.cmd, Misc.p_ptr.command_arg);
 			}
 
