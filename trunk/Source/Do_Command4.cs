@@ -21,65 +21,64 @@ namespace CSAngband {
 		 */
 		public static void redraw()
 		{
-			throw new NotImplementedException();
-			//int j;
+			int j;
 
-			//term *old = Term;
+			Term old = Term.instance;
 
 
-			///* Low level flush */
-			//Term_flush();
+			/* Low level flush */
+			Term.flush();
 
-			///* Reset "inkey()" */
-			//flush();
+			/* Reset "inkey()" */
+			Utilities.flush();
 	
-			//if (character_dungeon)
-			//    verify_panel();
+			if (Player.Player.character_dungeon)
+			    Xtra2.verify_panel();
 
 
-			///* Hack -- React to changes */
-			//Term_xtra(TERM_XTRA_REACT, 0);
+			/* Hack -- React to changes */
+			Term.xtra(TERM_XTRA.REACT, 0);
 
 
-			///* Combine and Reorder the pack (later) */
-			//p_ptr.notice |= (PN_COMBINE | PN_REORDER);
+			/* Combine and Reorder the pack (later) */
+			Misc.p_ptr.notice |= (Misc.PN_COMBINE | Misc.PN_REORDER);
 
 
-			///* Update torch */
-			//p_ptr.update |= (PU_TORCH);
+			/* Update torch */
+			Misc.p_ptr.update |= (Misc.PU_TORCH);
 
-			///* Update stuff */
-			//p_ptr.update |= (PU_BONUS | PU_HP | PU_MANA | PU_SPELLS);
+			/* Update stuff */
+			Misc.p_ptr.update |= (Misc.PU_BONUS | Misc.PU_HP | Misc.PU_MANA | Misc.PU_SPELLS);
 
-			///* Fully update the visuals */
-			//p_ptr.update |= (PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS);
+			/* Fully update the visuals */
+			Misc.p_ptr.update |= (Misc.PU_FORGET_VIEW | Misc.PU_UPDATE_VIEW | Misc.PU_MONSTERS);
 
-			///* Redraw everything */
-			//p_ptr.redraw |= (PR_BASIC | PR_EXTRA | PR_MAP | PR_INVEN | PR_EQUIP |
-			//                  PR_MESSAGE | PR_MONSTER | PR_OBJECT |
-			//                  PR_MONLIST | PR_ITEMLIST);
+			/* Redraw everything */
+			Misc.p_ptr.redraw |= (uint)(Misc.PR_BASIC | Misc.PR_EXTRA | Misc.PR_MAP | Misc.PR_INVEN | Misc.PR_EQUIP |
+								Misc.PR_MESSAGE | Misc.PR_MONSTER | Misc.PR_OBJECT |
+								Misc.PR_MONLIST | Misc.PR_ITEMLIST);
 
-			///* Clear screen */
-			//Term_clear();
+			/* Clear screen */
+			Term.clear();
 
-			///* Hack -- update */
-			//handle_stuff(p_ptr);
+			/* Hack -- update */
+			Misc.p_ptr.handle_stuff();
 
-			///* Place the cursor on the player */
-			//if (0 != character_dungeon)
-			//    move_cursor_relative(p_ptr.px, p_ptr.py);
+			/* Place the cursor on the player */
+			if (Player.Player.character_dungeon)
+			    Cave.move_cursor_relative(Misc.p_ptr.px, Misc.p_ptr.py);
 
 
-			///* Redraw every window */
-			//for (j = 0; j < ANGBAND_TERM_MAX; j++)
-			//{
-			//    if (!angband_term[j]) continue;
+			/* Redraw every window */
+			for (j = 0; j < Misc.ANGBAND_TERM_MAX; j++)
+			{
+			    if (Misc.angband_term[j] == null) continue;
 
-			//    Term_activate(angband_term[j]);
-			//    Term_redraw();
-			//    Term_fresh();
-			//    Term_activate(old);
-			//}
+			    Misc.angband_term[j].activate();
+			    Term.redraw();
+			    Term.fresh();
+			    old.activate();
+			}
 		}
 
 

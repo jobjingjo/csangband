@@ -1671,5 +1671,39 @@ namespace CSAngband {
 			    Term.redraw();
 		}
 
+		/*
+		 * A Hengband-like 'window' function, that draws a surround box in ASCII art.
+		 */
+		public static void window_make(int origin_x, int origin_y, int end_x, int end_y)
+		{
+			int n;
+			Region to_clear = new Region();
+
+			to_clear.col = origin_x;
+			to_clear.row = origin_y;
+			to_clear.width = end_x - origin_x;
+			to_clear.page_rows = end_y - origin_y;
+
+			to_clear.erase();
+
+			Term.putch(origin_x, origin_y, ConsoleColor.White, '+');
+			Term.putch(end_x, origin_y, ConsoleColor.White, '+');
+			Term.putch(origin_x, end_y, ConsoleColor.White, '+');
+			Term.putch(end_x, end_y, ConsoleColor.White, '+');
+
+			for (n = 1; n < (end_x - origin_x); n++)
+			{
+			    Term.putch(origin_x + n, origin_y, ConsoleColor.White, '-');
+			    Term.putch(origin_x + n, end_y, ConsoleColor.White, '-');
+			}
+
+			for (n = 1; n < (end_y - origin_y); n++)
+			{
+			    Term.putch(origin_x, origin_y + n, ConsoleColor.White, '|');
+			    Term.putch(end_x, origin_y + n, ConsoleColor.White, '|');
+			}
+		}
+
+
 	}
 }
