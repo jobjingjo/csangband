@@ -1520,7 +1520,7 @@ namespace CSAngband {
 			    o_ptr = Object.Object.byid((short)i);
 
 			    /* Skip dead objects */
-			    if (o_ptr.kind == null) continue;
+			    if (o_ptr == null || o_ptr.kind == null) continue;
 
 			    /* Recharge rods on the ground */
 			    if (o_ptr.tval == TVal.TV_ROD)

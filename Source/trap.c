@@ -92,15 +92,7 @@ void pick_trap(int y, int x)
 	cave_set_feat(cave, y, x, feat);
 }
 
-/* Places a trap. All traps are untyped until discovered. */
-void place_trap(struct cave *c, int y, int x)
-{
-	assert(cave_in_bounds(c, y, x));
-	assert(cave_isempty(c, y, x));
 
-	/* Place an invisible trap */
-	cave_set_feat(c, y, x, FEAT_INVIS);
-}
 
 /*
  * Handle player hitting a real trap

@@ -990,5 +990,91 @@ namespace CSAngband.Object {
 			//    msg("You feel something roll beneath your feet.");
 			//}
 		}
+
+		/*
+		 * Let the floor carry an object, deleting old squelched items if necessary
+		 */
+		public static short floor_carry(Cave c, int y, int x, Object j_ptr)
+		{
+			int n = 0;
+
+			short o_idx;
+
+			short this_o_idx, next_o_idx = 0;
+
+
+			/* Scan objects in that grid for combination */
+			for (this_o_idx = c.o_idx[y][x]; this_o_idx != 0; this_o_idx = next_o_idx)
+			{
+				Object o_ptr = byid(this_o_idx);
+
+				/* Get the next object */
+				next_o_idx = o_ptr.next_o_idx;
+
+				/* Check for combination */
+				if (o_ptr.similar(j_ptr, object_stack_t.OSTACK_FLOOR))
+				{
+					/* Combine the items */
+					o_ptr.absorb(j_ptr);
+
+					/* Result */
+					return (this_o_idx);
+				}
+
+				/* Count objects */
+				n++;
+			}
+
+			/* Option -- disallow stacking */
+			if (Option.birth_no_stacking.value && n != 0) return (0);
+
+			/* The stack is already too large */
+			if (n >= Misc.MAX_FLOOR_STACK)
+			{
+				throw new NotImplementedException();
+				///* Squelch the oldest squelched object */
+				//short squelch_idx = floor_get_idx_oldest_squelched(y, x);
+
+				//if (squelch_idx)
+				//    delete_object_idx(squelch_idx);
+				//else
+				//    return 0;
+			}
+
+
+			/* Make an object */
+			o_idx = o_pop();
+
+			/* Success */
+			if (o_idx != 0)
+			{
+				Object o_ptr;
+
+				/* Get the object */
+				o_ptr = byid(o_idx);
+
+				/* Structure Copy */
+				o_ptr = j_ptr.copy();
+
+				/* Location */
+				o_ptr.iy = (byte)y;
+				o_ptr.ix = (byte)x;
+
+				/* Forget monster */
+				o_ptr.held_m_idx = 0;
+
+				/* Link the object to the pile */
+				o_ptr.next_o_idx = c.o_idx[y][x];
+
+				/* Link the floor to the object */
+				c.o_idx[y][x] = o_idx;
+
+				Cave.cave_note_spot(c, y, x);
+				Cave.cave_light_spot(c, y, x);
+			}
+
+			/* Result */
+			return (o_idx);
+		}
 	}
 }

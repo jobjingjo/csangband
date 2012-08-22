@@ -44,13 +44,6 @@
 
 
 
-/*
- * Normal levels get at least 14 monsters
- */
-#define MIN_M_ALLOC_LEVEL	14
-
-
-
 /*** Constants for accessing the player struct ***/
 
 /*** General index values ***/

@@ -1432,8 +1432,7 @@ namespace CSAngband {
 
 		public static bool cave_in_bounds(Cave c, int y, int x)
 		{
-			throw new NotImplementedException();
-			//return x >= 0 && x < c.width && y >= 0 && y < c.height;
+			return x >= 0 && x < c.width && y >= 0 && y < c.height;
 		}
 
 		public bool in_bounds_fully(int y, int x)
@@ -3806,14 +3805,13 @@ namespace CSAngband {
 		 * of cave generation (and should be avoided).
 		 */
 		public static bool cave_isrock(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//switch (c.feat[y][x]) {
-			//    case FEAT_WALL_EXTRA:
-			//    case FEAT_WALL_INNER:
-			//    case FEAT_WALL_OUTER:
-			//    case FEAT_WALL_SOLID: return true;
-			//    default: return false;
-			//}
+			switch (c.feat[y][x]) {
+			    case FEAT_WALL_EXTRA:
+			    case FEAT_WALL_INNER:
+			    case FEAT_WALL_OUTER:
+			    case FEAT_WALL_SOLID: return true;
+			    default: return false;
+			}
 		}
 
 		/**
@@ -3823,56 +3821,51 @@ namespace CSAngband {
 		 * of cave generation (and should be avoided).
 		 */
 		public static bool cave_isperm(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//switch (c.feat[y][x]) {
-			//    case FEAT_PERM_EXTRA:
-			//    case FEAT_PERM_INNER:
-			//    case FEAT_PERM_OUTER:
-			//    case FEAT_PERM_SOLID: return true;
-			//    default: return false;
-			//}
+			switch (c.feat[y][x]) {
+			    case FEAT_PERM_EXTRA:
+			    case FEAT_PERM_INNER:
+			    case FEAT_PERM_OUTER:
+			    case FEAT_PERM_SOLID: return true;
+			    default: return false;
+			}
 		}
 
 		/**
 		 * true if the square is a magma wall.
 		 */
 		public static bool cave_ismagma(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//switch (c.feat[y][x]) {
-			//    case FEAT_MAGMA:
-			//    case FEAT_MAGMA_H:
-			//    case FEAT_MAGMA_K: return true;
-			//    default: return false;
-			//}
+			switch (c.feat[y][x]) {
+			    case FEAT_MAGMA:
+			    case FEAT_MAGMA_H:
+			    case FEAT_MAGMA_K: return true;
+			    default: return false;
+			}
 		}
 
 		/**
 		 * true if the square is a quartz wall.
 		 */
 		public static bool cave_isquartz(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//switch (c.feat[y][x]) {
-			//    case FEAT_QUARTZ:
-			//    case FEAT_QUARTZ_H:
-			//    case FEAT_QUARTZ_K: return true;
-			//    default: return false;
-			//}
+			switch (c.feat[y][x]) {
+			    case FEAT_QUARTZ:
+			    case FEAT_QUARTZ_H:
+			    case FEAT_QUARTZ_K: return true;
+			    default: return false;
+			}
 		}
 
 		/**
 		 * true if the square is a mineral wall (magma/quartz).
 		 */
 		public static bool cave_ismineral(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return cave_isrock(c, y, x) || cave_ismagma(c, y, x) || cave_isquartz(c, y, x);
+			return cave_isrock(c, y, x) || cave_ismagma(c, y, x) || cave_isquartz(c, y, x);
 		}
 
 		/**
 		 * true if the square is rubble.
 		 */
 		public static bool cave_isrubble(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			///return c.feat[y][x] == FEAT_RUBBLE;
+			return c.feat[y][x] == FEAT_RUBBLE;
 		}
 
 		/**
@@ -3882,16 +3875,14 @@ namespace CSAngband {
 		 * is replaced by a closed door.
 		 */
 		public static bool cave_issecretdoor(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return c.feat[y][x] == FEAT_SECRET;
+			return c.feat[y][x] == FEAT_SECRET;
 		}
 
 		/**
 		 * true if the square is an open door.
 		 */
 		public static bool cave_isopendoor(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return c.feat[y][x] == FEAT_OPEN;
+			return c.feat[y][x] == FEAT_OPEN;
 		}
 
 		/**
@@ -3906,18 +3897,16 @@ namespace CSAngband {
 		 * true if the square is a closed, locked door.
 		 */
 		public static bool cave_islockeddoor(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//int feat = c.feat[y][x];
-			//return feat >= FEAT_DOOR_HEAD + 0x01 && feat <= FEAT_DOOR_TAIL;
+			int feat = c.feat[y][x];
+			return feat >= FEAT_DOOR_HEAD + 0x01 && feat <= FEAT_DOOR_TAIL;
 		}
 
 		/**
 		 * true if the square is a closed, jammed door.
 		 */
 		public static bool cave_isjammeddoor(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//int feat = c.feat[y][x];
-			//return feat >= FEAT_DOOR_HEAD + 0x08 && feat <= FEAT_DOOR_TAIL;
+			int feat = c.feat[y][x];
+			return feat >= FEAT_DOOR_HEAD + 0x08 && feat <= FEAT_DOOR_TAIL;
 		}
 
 		/**
@@ -3926,18 +3915,16 @@ namespace CSAngband {
 		 * This includes open, closed, and hidden doors.
 		 */
 		public static bool cave_isdoor(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return (cave_isopendoor(c, y, x) ||
-			//        cave_issecretdoor(c, y, x) ||
-			//        cave_iscloseddoor(cave, y, x));
+			return (cave_isopendoor(c, y, x) ||
+			        cave_issecretdoor(c, y, x) ||
+			        cave_iscloseddoor(cave, y, x));
 		}
 
 		/**
 		 * true if the square is an unknown trap (it will appear as a floor tile).
 		 */
 		public static bool cave_issecrettrap(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return c.feat[y][x] == FEAT_INVIS;
+			return c.feat[y][x] == FEAT_INVIS;
 		}
 
 		/**
@@ -3952,8 +3939,7 @@ namespace CSAngband {
 		 * true if the square contains a trap, known or unknown.
 		 */
 		public static bool cave_istrap(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return cave_issecrettrap(cave, y, x) || cave_isknowntrap(cave, y, x);
+			return cave_issecrettrap(cave, y, x) || cave_isknowntrap(cave, y, x);
 		}
 
 
@@ -3986,18 +3972,16 @@ namespace CSAngband {
 		 * true if the square is a floor square without items.
 		 */
 		public static bool cave_canputitem(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return cave_isfloor(c, y, x) && !c.o_idx[y][x];
+			return cave_isfloor(c, y, x) && c.o_idx[y][x] == 0;
 		}
 
 		/**
 		 * true if the square can be dug: this includes rubble and non-permanent walls.
 		 */
 		public static bool cave_isdiggable(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return (cave_ismineral(c, y, x) ||
-			//        cave_issecretdoor(c, y, x) || 
-			//        cave_isrubble(c, y, x));
+			return (cave_ismineral(c, y, x) ||
+			        cave_issecretdoor(c, y, x) || 
+			        cave_isrubble(c, y, x));
 		}
 
 		/**
@@ -4006,8 +3990,7 @@ namespace CSAngband {
 		 * This function is the logical negation of cave_iswall().
 		 */
 		public static bool cave_ispassable(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return !(c.info[y][x] & CAVE_WALL);
+			return (c.info[y][x] & CAVE_WALL) == 0;
 		}
 
 		/**
@@ -4026,8 +4009,7 @@ namespace CSAngband {
 		 * secret doors and rubble.
 		 */
 		public static bool cave_isstrongwall(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return cave_ismineral(c, y, x) || cave_isperm(c, y, x);
+			return cave_ismineral(c, y, x) || cave_isperm(c, y, x);
 		}
 
 		/**
@@ -4036,17 +4018,14 @@ namespace CSAngband {
 		 * This doesn't say what kind of square it is, just that it is part of a vault.
 		 */
 		public static bool cave_isvault(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return c.info[y][x] & CAVE_ICKY;
+			return (c.info[y][x] & CAVE_ICKY) != 0;
 		}
 
 		/**
 		 * true if the square is part of a room.
 		 */
 		public static bool cave_isroom(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//return c.info[y][x] & CAVE_ROOM;
-
+			return (c.info[y][x] & CAVE_ROOM) != 0;
 		}
 
 		/**
@@ -4088,11 +4067,10 @@ namespace CSAngband {
 		 * Add visible treasure to a mineral square.
 		 */
 		public static void upgrade_mineral(Cave c, int y, int x) {
-			throw new NotImplementedException();
-			//switch (c.feat[y][x]) {
-			//    case FEAT_MAGMA: cave_set_feat(c, y, x, FEAT_MAGMA_K); break;
-			//    case FEAT_QUARTZ: cave_set_feat(c, y, x, FEAT_QUARTZ_K); break;
-			//}
+			switch (c.feat[y][x]) {
+			    case FEAT_MAGMA: cave_set_feat(c, y, x, FEAT_MAGMA_K); break;
+			    case FEAT_QUARTZ: cave_set_feat(c, y, x, FEAT_QUARTZ_K); break;
+			}
 		}
 	}
 }

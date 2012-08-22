@@ -118,6 +118,16 @@ namespace CSAngband {
 		 * name and the function used to build it.
 		 */
 		class room_profile {
+			public room_profile(string a, room_builder b, int c, int d, int e, bool f, int g, int h) {
+				name = a;
+				builder = b;
+				height = c;
+				width = d;
+				level = e;
+				crowded = f;
+				rarity = g;
+				cutoff = h;
+			}
 			public string name;
 			public room_builder builder; /* Function used to build the room */
 			public int height, width; /* Space required in blocks */
@@ -161,6 +171,12 @@ namespace CSAngband {
 
 		public static void ROOM_LOG(string s){
 			if (Option.cheat_room.value) Utilities.msg(s);
+		}
+
+		public static void ROOM_LOG(string fmt, params object[] vals) {
+			string s = String.Format(fmt, vals);
+			if(Option.cheat_room.value)
+				Utilities.msg(s);
 		}
 
 		/*
@@ -317,80 +333,80 @@ namespace CSAngband {
 		);
 
 
-		///* name function width height min-depth crowded? rarity %cutoff */
-		//static struct room_profile[] default_rooms = {
-		//    /* greater vaults only have rarity 1 but they have other checks */
-		//    {"greater vault", build_greater_vault, 4, 6, 10, false, 1, 100},
+		/* name function width height min-depth crowded? rarity %cutoff */
+		static room_profile[] default_rooms = new room_profile[] {
+		    /* greater vaults only have rarity 1 but they have other checks */
+		    new room_profile("greater vault", build_greater_vault, 4, 6, 10, false, 1, 100),
 
-		//    /* very rare rooms (rarity=2) */
-		//    {"medium vault", build_medium_vault, 2, 3, 5, false, 2, 10},
-		//    {"lesser vault", build_lesser_vault, 2, 3, 5, false, 2, 25},
-		//    {"monster pit", build_pit, 1, 3, 5, true, 2, 40},
-		//    {"monster nest", build_nest, 1, 3, 5, true, 2, 50},
+		    /* very rare rooms (rarity=2) */
+		    new room_profile("medium vault", build_medium_vault, 2, 3, 5, false, 2, 10),
+		    new room_profile("lesser vault", build_lesser_vault, 2, 3, 5, false, 2, 25),
+		    new room_profile("monster pit", build_pit, 1, 3, 5, true, 2, 40),
+		    new room_profile("monster nest", build_nest, 1, 3, 5, true, 2, 50),
 
-		//    /* unusual rooms (rarity=1) */
-		//    {"large room", build_large, 1, 3, 3, false, 1, 25},
-		//    {"crossed room", build_crossed, 1, 3, 3, false, 1, 50},
-		//    {"circular room", build_circular, 2, 2, 1, false, 1, 60},
-		//    {"overlap room", build_overlap, 1, 3, 1, false, 1, 100},
+		    /* unusual rooms (rarity=1) */
+		    new room_profile("large room", build_large, 1, 3, 3, false, 1, 25),
+		    new room_profile("crossed room", build_crossed, 1, 3, 3, false, 1, 50),
+		    new room_profile("circular room", build_circular, 2, 2, 1, false, 1, 60),
+		    new room_profile("overlap room", build_overlap, 1, 3, 1, false, 1, 100),
 
-		//    /* normal rooms */
-		//    {"simple room", build_simple, 1, 3, 1, false, 0, 100}
-		//};
+		    /* normal rooms */
+		    new room_profile("simple room", build_simple, 1, 3, 1, false, 0, 100)
+		};
 
 
-		///*
-		// * Profiles used for generating dungeon levels.
-		// */
-		//const int NUM_CAVE_PROFILES = 3;
-		//static struct cave_profile[] cave_profiles = new cave_profile[NUM_CAVE_PROFILES]{
-		//    {
-		//        "labyrinth", labyrinth_gen, 0, 200, 0, 0,
+		/*
+		 * Profiles used for generating dungeon levels.
+		 */
+		const int NUM_CAVE_PROFILES = 3;
+		static cave_profile[] cave_profiles = new cave_profile[NUM_CAVE_PROFILES]{
+		    new cave_profile(
+		        "labyrinth", labyrinth_gen, 0, 200, 0, 0,
 
-		//        /* tunnels -- not applicable */
-		//        {"tunnel-default", 10, 30, 15, 25, 90},
+		        /* tunnels -- not applicable */
+		        new tunnel_profile("tunnel-default", 10, 30, 15, 25, 90),
 
-		//        /* streamers -- not applicable */
-		//        {"streamer-default", 5, 2, 3, 90, 2, 40},
+		        /* streamers -- not applicable */
+		        new streamer_profile("streamer-default", 5, 2, 3, 90, 2, 40),
 
-		//        /* room_profiles -- not applicable */
-		//        null,
+		        /* room_profiles -- not applicable */
+		        null,
 
-		//        /* cutoff -- unused because of internal checks in labyrinth_gen  */
-		//        100
-		//    },
-		//    {
-		//        "cavern", cavern_gen, 0, 200, 0, 0,
+		        /* cutoff -- unused because of internal checks in labyrinth_gen  */
+		        100
+		    ),
+		    new cave_profile(
+		        "cavern", cavern_gen, 0, 200, 0, 0,
 
-		//        /* tunnels -- not applicable */
-		//        {"tunnel-default", 10, 30, 15, 25, 90},
+		        /* tunnels -- not applicable */
+		        new tunnel_profile("tunnel-default", 10, 30, 15, 25, 90),
 
-		//        /* streamers -- not applicable */
-		//        {"streamer-default", 5, 2, 3, 90, 2, 40},
+		        /* streamers -- not applicable */
+		        new streamer_profile("streamer-default", 5, 2, 3, 90, 2, 40),
 
-		//        /* room_profiles -- not applicable */
-		//        null,
+		        /* room_profiles -- not applicable */
+		        null,
 
-		//        /* cutoff -- debug  */
-		//        10
-		//    },
-		//    {
-		//        /* name builder dun_rooms dun_unusual max_rarity n_room_profiles */
-		//        "default", default_gen, 50, 200, 2, N_ELEMENTS(default_rooms),
+		        /* cutoff -- debug  */
+		        10
+		    ),
+		    new cave_profile(
+		        /* name builder dun_rooms dun_unusual max_rarity n_room_profiles */
+		        "default", default_gen, 50, 200, 2, default_rooms.Length,
 
-		//        /* name rnd chg con pen jct */
-		//        {"tunnel-default", 10, 30, 15, 25, 90},
+		        /* name rnd chg con pen jct */
+		        new tunnel_profile("tunnel-default", 10, 30, 15, 25, 90),
 
-		//        /* name den rng mag mc qua qc */
-		//        {"streamer-default", 5, 2, 3, 90, 2, 40},
+		        /* name den rng mag mc qua qc */
+		        new streamer_profile("streamer-default", 5, 2, 3, 90, 2, 40),
 
-		//        /* room_profiles */
-		//        default_rooms,
+		        /* room_profiles */
+		        default_rooms,
 
-		//        /* cutoff */
-		//        100
-		//    }
-		//};
+		        /* cutoff */
+		        100
+		    )
+		};
 
 
 		/**
@@ -485,111 +501,111 @@ namespace CSAngband {
 		/**
 		 * Locate a grid nearby (y0, x0) within +/- yd, xd.
 		 */
-		//static void find_nearby_grid(Cave c, int *y, int y0, int yd, int *x, int x0, int xd) {
-		//    int y1 = y0 - yd;
-		//    int x1 = x0 - xd;
-		//    int y2 = y0 + yd + 1;
-		//    int x2 = x0 + xd + 1;
-		//    cave_find_in_range(c, y, y1, y2, x, x1, x2, cave_in_bounds);
-		//}
+		static void find_nearby_grid(Cave c, out int y, int y0, int yd, out int x, int x0, int xd) {
+		    int y1 = y0 - yd;
+		    int x1 = x0 - xd;
+		    int y2 = y0 + yd + 1;
+		    int x2 = x0 + xd + 1;
+		    cave_find_in_range(c, out y, y1, y2, out x, x1, x2, cave_in_bounds);
+		}
 
 
 		/**
 		 * Given two points, pick a valid cardinal direction from one to the other.
 		 */
-		//static void correct_dir(int *rdir, int *cdir, int y1, int x1, int y2, int x2) {
-		//    /* Extract vertical and horizontal directions */
-		//    *rdir = CMP(y2, y1);
-		//    *cdir = CMP(x2, x1);
+		static void correct_dir(ref int rdir, ref int cdir, int y1, int x1, int y2, int x2) {
+			/* Extract vertical and horizontal directions */
+			rdir = Basic.CMP(y2, y1);
+			cdir = Basic.CMP(x2, x1);
 
-		//    /* If we only have one direction to go, then we're done */
-		//    if (!*rdir || !*cdir) return;
+			/* If we only have one direction to go, then we're done */
+			if (rdir == 0 || cdir == 0) return;
 
-		//    /* If we need to go diagonally, then choose a random direction */
-		//    if (randint0(100) < 50)
-		//        *rdir = 0;
-		//    else
-		//        *cdir = 0;
-		//}
-
-
-		///**
-		// * Pick a random cardinal direction.
-		// */
-		//static void rand_dir(int *rdir, int *cdir) {
-		//    /* Pick a random direction and extract the dy/dx components */
-		//    int i = randint0(4);
-		//    *rdir = ddy_ddd[i];
-		//    *cdir = ddx_ddd[i];
-		//}
+			/* If we need to go diagonally, then choose a random direction */
+			if (Random.randint0(100) < 50)
+			    rdir = 0;
+			else
+			    cdir = 0;
+		}
 
 
-		//static bool cave_isstart(Cave c, int y, int x) {
-		//    if (!cave_isempty(c, y, x)) return false;
-		//    if (cave_isvault(c, y, x)) return false;
-		//    return true;
-		//}
-
-		///**
-		// * Place the player at a random starting location.
-		// */
-		//static void new_player_spot(Cave c, Player.Player p) {
-		//    int y, x;
-
-		//    /* Try to find a good place to put the player */
-		//    cave_find_in_range(c, &y, 0, c.height, &x, 0, c.width, cave_isstart);
-
-		//    /* Create stairs the player came down if allowed and necessary */
-		//    if (OPT(birth_no_stairs)) {
-		//    } else if (p.create_down_stair) {
-		//        cave_set_feat(c, y, x, FEAT_MORE);
-		//        p.create_down_stair = false;
-		//    } else if (p.create_up_stair) {
-		//        cave_set_feat(c, y, x, FEAT_LESS);
-		//        p.create_up_stair = false;
-		//    }
-
-		//    player_place(c, p, y, x);
-		//}
+		/**
+		 * Pick a random cardinal direction.
+		 */
+		static void rand_dir(ref int rdir, ref int cdir) {
+			/* Pick a random direction and extract the dy/dx components */
+			int i = Random.randint0(4);
+			rdir = Misc.ddy_ddd[i];
+			cdir = Misc.ddx_ddd[i];
+		}
 
 
-		///**
-		// * Return how many cardinal directions around (x, y) contain walls.
-		// */
-		//static int next_to_walls(Cave c, int y, int x) {
-		//    int k = 0;
-		//    assert(cave_in_bounds(c, y, x));
+		static bool cave_isstart(Cave c, int y, int x) {
+		    if (!cave_isempty(c, y, x)) return false;
+		    if (cave_isvault(c, y, x)) return false;
+		    return true;
+		}
 
-		//    if (cave_iswall(c, y + 1, x)) k++;
-		//    if (cave_iswall(c, y - 1, x)) k++;
-		//    if (cave_iswall(c, y, x + 1)) k++;
-		//    if (cave_iswall(c, y, x - 1)) k++;
+		/**
+		 * Place the player at a random starting location.
+		 */
+		static void new_player_spot(Cave c, Player.Player p) {
+			int y, x;
 
-		//    return k;
-		//}
+			/* Try to find a good place to put the player */
+			cave_find_in_range(c, out y, 0, c.height, out x, 0, c.width, cave_isstart);
+
+			/* Create stairs the player came down if allowed and necessary */
+			if (Option.birth_no_stairs.value) {
+			} else if (p.create_down_stair) {
+			    cave_set_feat(c, y, x, FEAT_MORE);
+			    p.create_down_stair = false;
+			} else if (p.create_up_stair) {
+			    cave_set_feat(c, y, x, FEAT_LESS);
+			    p.create_up_stair = false;
+			}
+
+			Monster_Make.player_place(c, p, y, x);
+		}
 
 
-		///**
-		// * Place rubble at (x, y).
-		// */
-		//static void place_rubble(Cave c, int y, int x) {
-		//    cave_set_feat(c, y, x, FEAT_RUBBLE);
-		//}
+		/**
+		 * Return how many cardinal directions around (x, y) contain walls.
+		 */
+		static int next_to_walls(Cave c, int y, int x) {
+		    int k = 0;
+		    Misc.assert(cave_in_bounds(c, y, x));
+
+		    if (cave_iswall(c, y + 1, x)) k++;
+		    if (cave_iswall(c, y - 1, x)) k++;
+		    if (cave_iswall(c, y, x + 1)) k++;
+		    if (cave_iswall(c, y, x - 1)) k++;
+
+		    return k;
+		}
 
 
-		///**
-		// * Place stairs (of the requested type 'feat' if allowed) at (x, y).
-		// *
-		// * All stairs from town go down. All stairs on an unfinished quest level go up.
-		// */
-		//static void place_stairs(Cave c, int y, int x, int feat) {
-		//    if (!c.depth)
-		//        cave_set_feat(c, y, x, FEAT_MORE);
-		//    else if (is_quest(c.depth) || c.depth >= MAX_DEPTH - 1)
-		//        cave_set_feat(c, y, x, FEAT_LESS);
-		//    else
-		//        cave_set_feat(c, y, x, feat);
-		//}
+		/**
+		 * Place rubble at (x, y).
+		 */
+		static void place_rubble(Cave c, int y, int x) {
+		    cave_set_feat(c, y, x, FEAT_RUBBLE);
+		}
+
+
+		/**
+		 * Place stairs (of the requested type 'feat' if allowed) at (x, y).
+		 *
+		 * All stairs from town go down. All stairs on an unfinished quest level go up.
+		 */
+		static void place_stairs(Cave c, int y, int x, int feat) {
+		    if (c.depth == 0)
+		        cave_set_feat(c, y, x, FEAT_MORE);
+		    else if (is_quest(c.depth) || c.depth >= Misc.MAX_DEPTH - 1)
+		        cave_set_feat(c, y, x, FEAT_LESS);
+		    else
+		        cave_set_feat(c, y, x, feat);
+		}
 
 
 		///**
@@ -602,59 +618,60 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Place a random object at (x, y).
-		// */
-		//void place_object(Cave c, int y, int x, int level, bool good,
-		//    bool great, byte origin)
-		//{
-		//    s32b rating = 0;
-		//    object_type otype;
+		/**
+		 * Place a random object at (x, y).
+		 */
+		public static void place_object(Cave c, int y, int x, int level, bool good, bool great, Origin origin)
+		{
+		    int rating = 0;
+		    Object.Object otype;
 
-		//    assert(cave_in_bounds(c, y, x));
+		    Misc.assert(cave_in_bounds(c, y, x));
 
-		//    if (!cave_canputitem(c, y, x)) return;
+		    if (!cave_canputitem(c, y, x)) return;
 
-		//    object_wipe(&otype);
-		//    if (!make_object(c, &otype, level, good, great, &rating)) return;
+			otype = new Object.Object();
+		    //object_wipe(&otype);
+		    if (!Object.Object.make_object(c, ref otype, level, good, great, ref rating)) return;
 
-		//    otype.origin = origin;
-		//    otype.origin_depth = c.depth;
+		    otype.origin = origin;
+		    otype.origin_depth = (byte)c.depth;
 
-		//    /* Give it to the floor */
-		//    /* XXX Should this be done in floor_carry? */
-		//    if (!floor_carry(c, y, x, &otype)) {
-		//        if (otype.artifact)
-		//            otype.artifact.created = false;
-		//        return;
-		//    } else {
-		//            if (otype.artifact)
-		//            c.good_item = true;
-		//        c.obj_rating += rating;
-		//    }
-		//}
+		    /* Give it to the floor */
+		    /* XXX Should this be done in floor_carry? */
+		    if (Object.Object.floor_carry(c, y, x, otype) == 0) {
+		        if (otype.artifact != null)
+		            otype.artifact.created = false;
+		        return;
+		    } else {
+		        if (otype.artifact != null)
+		            c.good_item = true;
+		        c.obj_rating += (uint)rating;
+		    }
+		}
 
 
-		///**
-		// * Place a random amount of gold at (x, y).
-		// */
-		//void place_gold(Cave c, int y, int x, int level, byte origin) {
-		//    object_type *i_ptr;
-		//    object_type object_type_body;
+		/**
+		 * Place a random amount of gold at (x, y).
+		 */
+		public static void place_gold(Cave c, int y, int x, int level, Origin origin) {
+		    Object.Object i_ptr;
+		    //object_type object_type_body;
 
-		//    assert(cave_in_bounds(c, y, x));
+		    Misc.assert(cave_in_bounds(c, y, x));
 
-		//    if (!cave_canputitem(c, y, x)) return;
+		    if (!cave_canputitem(c, y, x)) return;
 
-		//    i_ptr = &object_type_body;
-		//    object_wipe(i_ptr);
-		//    make_gold(i_ptr, level, SV_GOLD_ANY);
+		    //i_ptr = &object_type_body;
+		    //object_wipe(i_ptr);
+			i_ptr = new Object.Object();
+		    Object.Object.make_gold(ref i_ptr, level, (int)SVal.sval_gold.SV_GOLD_ANY);
 
-		//    i_ptr.origin = origin;
-		//    i_ptr.origin_depth = level;
+		    i_ptr.origin = origin;
+		    i_ptr.origin_depth = (byte)level;
 
-		//    floor_carry(c, y, x, i_ptr);
-		//}
+		    Object.Object.floor_carry(c, y, x, i_ptr);
+		}
 
 
 		///**
@@ -665,38 +682,38 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Place a closed door at (x, y).
-		// */
-		//void place_closed_door(Cave c, int y, int x) {
-		//    int tmp = randint0(400);
+		/**
+		 * Place a closed door at (x, y).
+		 */
+		public static void place_closed_door(Cave c, int y, int x) {
+		    int tmp = Random.randint0(400);
 
-		//    if (tmp < 300)
-		//        cave_set_feat(c, y, x, FEAT_DOOR_HEAD + 0x00);
-		//    else if (tmp < 399)
-		//        cave_set_feat(c, y, x, FEAT_DOOR_HEAD + randint1(7));
-		//    else
-		//        cave_set_feat(c, y, x, FEAT_DOOR_HEAD + 0x08 + randint0(8));
-		//}
+		    if (tmp < 300)
+		        cave_set_feat(c, y, x, FEAT_DOOR_HEAD + 0x00);
+		    else if (tmp < 399)
+		        cave_set_feat(c, y, x, FEAT_DOOR_HEAD + Random.randint1(7));
+		    else
+		        cave_set_feat(c, y, x, FEAT_DOOR_HEAD + 0x08 + Random.randint0(8));
+		}
 
 
-		///**
-		// * Place a random door at (x, y).
-		// *
-		// * The door generated could be closed, open, broken, or secret.
-		// */
-		//void place_random_door(Cave c, int y, int x) {
-		//    int tmp = randint0(100);
+		/**
+		 * Place a random door at (x, y).
+		 *
+		 * The door generated could be closed, open, broken, or secret.
+		 */
+		public static void place_random_door(Cave c, int y, int x) {
+			int tmp = Random.randint0(100);
 
-		//    if (tmp < 30)
-		//        cave_set_feat(c, y, x, FEAT_OPEN);
-		//    else if (tmp < 40)
-		//        cave_set_feat(c, y, x, FEAT_BROKEN);
-		//    else if (tmp < 60)
-		//        cave_set_feat(c, y, x, FEAT_SECRET);
-		//    else
-		//        place_closed_door(c, y, x);
-		//}
+			if (tmp < 30)
+			    cave_set_feat(c, y, x, FEAT_OPEN);
+			else if (tmp < 40)
+			    cave_set_feat(c, y, x, FEAT_BROKEN);
+			else if (tmp < 60)
+			    cave_set_feat(c, y, x, FEAT_SECRET);
+			else
+			    place_closed_door(c, y, x);
+		}
 
 
 		///**
@@ -723,141 +740,140 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Place some staircases near walls.
-		// */
-		//static void alloc_stairs(Cave c, int feat, int num, int walls) {
-		//    int y, x, i, j, done;
+		/**
+		 * Place some staircases near walls.
+		 */
+		static void alloc_stairs(Cave c, int feat, int num, int walls) {
+			int y, x, i, j;
+			bool done;
 
-		//    /* Place "num" stairs */
-		//    for (i = 0; i < num; i++) {
-		//        /* Place some stairs */
-		//        for (done = false; !done; ) {
-		//            /* Try several times, then decrease "walls" */
-		//            for (j = 0; !done && j <= 1000; j++) {
-		//                find_empty(c, &y, &x);
+			/* Place "num" stairs */
+			for (i = 0; i < num; i++) {
+			    /* Place some stairs */
+			    for (done = false; !done; ) {
+			        /* Try several times, then decrease "walls" */
+			        for (j = 0; !done && j <= 1000; j++) {
+			            find_empty(c, out y, out x);
 
-		//                if (next_to_walls(c, y, x) < walls) continue;
+			            if (next_to_walls(c, y, x) < walls) continue;
 
-		//                place_stairs(c, y, x, feat);
-		//                done = true;
-		//            }
+			            place_stairs(c, y, x, feat);
+			            done = true;
+			        }
 
-		//            /* Require fewer walls */
-		//            if (walls) walls--;
-		//        }
-		//    }
-		//}
-
-
-		///**
-		// * Allocates 'num' random objects in the dungeon.
-		// *
-		// * See alloc_object() for more information.
-		// */
-		//static void alloc_objects(Cave c, int set, int typ, int num, int depth,
-		//    byte origin)
-		//{
-		//    int k;
-		//    int l = 0;
-		//    for (k = 0; k < num; k++) {
-		//        bool ok = alloc_object(c, set, typ, depth, origin);
-		//        if (!ok) l++;
-		//    }
-		//}
+			        /* Require fewer walls */
+			        if (walls != 0) walls--;
+			    }
+			}
+		}
 
 
-		///**
-		// * Allocates a single random object in the dungeon.
-		// *
-		// * 'set' controls where the object is placed (corridor, room, either).
-		// * 'typ' conrols the kind of object (rubble, trap, gold, item).
-		// */
-		//static bool alloc_object(Cave c, int set, int typ, int depth,
-		//    byte origin)
-		//{
-		//    int x, y;
-		//    int tries = 0;
-		//    bool room;
-
-		//    /* Pick a "legal" spot */
-		//    while (tries < 2000) {
-		//        tries++;
-
-		//        find_empty(c, &y, &x);
-
-		//        /* See if our spot is in a room or not */
-		//        room = (c.info[y][x] & CAVE_ROOM) ? true : false;
-
-		//        /* If we are ok with a corridor and we're in one, we're done */
-		//        if (set & SET_CORR && !room) break;
-
-		//        /* If we are ok with a room and we're in one, we're done */
-		//        if (set & SET_ROOM && room) break;
-		//    }
-
-		//    if (tries == 2000) return false;
-
-		//    /* Place something */
-		//    switch (typ) {
-		//        case TYP_RUBBLE: place_rubble(c, y, x); break;
-		//        case TYP_TRAP: place_trap(c, y, x); break;
-		//        case TYP_GOLD: place_gold(c, y, x, depth, origin); break;
-		//        case TYP_OBJECT: place_object(c, y, x, depth, false, false, origin); break;
-		//        case TYP_GOOD: place_object(c, y, x, depth, true, false, origin); break;
-		//        case TYP_GREAT: place_object(c, y, x, depth, true, true, origin); break;
-		//    }
-		//    return true;
-		//}
+		/**
+		 * Allocates 'num' random objects in the dungeon.
+		 *
+		 * See alloc_object() for more information.
+		 */
+		static void alloc_objects(Cave c, int set, int typ, int num, int depth, Origin origin)
+		{
+			int k;
+			int l = 0;
+			for (k = 0; k < num; k++) {
+			    bool ok = alloc_object(c, set, typ, depth, origin);
+			    if (!ok) l++;
+			}
+		}
 
 
+		/**
+		 * Allocates a single random object in the dungeon.
+		 *
+		 * 'set' controls where the object is placed (corridor, room, either).
+		 * 'typ' conrols the kind of object (rubble, trap, gold, item).
+		 */
+		static bool alloc_object(Cave c, int set, int typ, int depth, Origin origin)
+		{
+		    int x = 0, y = 0;
+		    int tries = 0;
+		    bool room;
 
-		///**
-		// * Places a streamer of rock through dungeon.
-		// *
-		// * Note that their are actually six different terrain features used to
-		// * represent streamers. Three each of magma and quartz, one for basic vein, one
-		// * with hidden gold, and one with known gold. The hidden gold types are
-		// * currently unused.
-		// */
-		//static void build_streamer(Cave c, int feat, int chance) {
-		//    int i, tx, ty;
-		//    int y, x, dir;
+		    /* Pick a "legal" spot */
+		    while (tries < 2000) {
+		        tries++;
 
-		//    /* Hack -- Choose starting point */
-		//    y = rand_spread(DUNGEON_HGT / 2, 10);
-		//    x = rand_spread(DUNGEON_WID / 2, 15);
+		        find_empty(c, out y, out x);
 
-		//    /* Choose a random direction */
-		//    dir = ddd[randint0(8)];
+		        /* See if our spot is in a room or not */
+		        room = (c.info[y][x] & CAVE_ROOM) != 0 ? true : false;
 
-		//    /* Place streamer into dungeon */
-		//    while (true) {
-		//        /* One grid per density */
-		//        for (i = 0; i < dun.profile.str.den; i++) {
-		//            int d = dun.profile.str.rng;
+		        /* If we are ok with a corridor and we're in one, we're done */
+		        if ((set & SET_CORR) != 0 && !room) break;
 
-		//            /* Pick a nearby grid */
-		//            find_nearby_grid(c, &ty, y, d, &tx, x, d);
+		        /* If we are ok with a room and we're in one, we're done */
+		        if ((set & SET_ROOM) != 0 && room) break;
+		    }
 
-		//            /* Only convert walls */
-		//            if (cave_isrock(c, ty, tx)) {
-		//                /* Turn the rock into the vein type */
-		//                cave_set_feat(c, ty, tx, feat);
+		    if (tries == 2000) return false;
 
-		//                /* Sometimes add known treasure */
-		//                if (one_in_(chance)) upgrade_mineral(c, ty, tx);
-		//            }
-		//        }
+		    /* Place something */
+		    switch (typ) {
+		        case TYP_RUBBLE: place_rubble(c, y, x); break;
+		        case TYP_TRAP: Trap.place_trap(c, y, x); break;
+		        case TYP_GOLD: place_gold(c, y, x, depth, origin); break;
+		        case TYP_OBJECT: place_object(c, y, x, depth, false, false, origin); break;
+		        case TYP_GOOD: place_object(c, y, x, depth, true, false, origin); break;
+		        case TYP_GREAT: place_object(c, y, x, depth, true, true, origin); break;
+		    }
+		    return true;
+		}
 
-		//        /* Advance the streamer */
-		//        y += ddy[dir];
-		//        x += ddx[dir];
 
-		//        /* Stop at dungeon edge */
-		//        if (!cave_in_bounds(c, y, x)) break;
-		//    }
-		//}
+
+		/**
+		 * Places a streamer of rock through dungeon.
+		 *
+		 * Note that their are actually six different terrain features used to
+		 * represent streamers. Three each of magma and quartz, one for basic vein, one
+		 * with hidden gold, and one with known gold. The hidden gold types are
+		 * currently unused.
+		 */
+		static void build_streamer(Cave c, int feat, int chance) {
+			int i, tx, ty;
+			int y, x, dir;
+
+			/* Hack -- Choose starting point */
+			y = Random.rand_spread(DUNGEON_HGT / 2, 10);
+			x = Random.rand_spread(DUNGEON_WID / 2, 15);
+
+			/* Choose a random direction */
+			dir = Misc.ddd[Random.randint0(8)];
+
+			/* Place streamer into dungeon */
+			while (true) {
+			    /* One grid per density */
+			    for (i = 0; i < dun.profile.str.den; i++) {
+			        int d = dun.profile.str.rng;
+
+			        /* Pick a nearby grid */
+			        find_nearby_grid(c, out ty, y, d, out tx, x, d);
+
+			        /* Only convert walls */
+			        if (cave_isrock(c, ty, tx)) {
+			            /* Turn the rock into the vein type */
+			            cave_set_feat(c, ty, tx, feat);
+
+			            /* Sometimes add known treasure */
+			            if (Random.one_in_(chance)) upgrade_mineral(c, ty, tx);
+			        }
+			    }
+
+			    /* Advance the streamer */
+			    y += Misc.ddy[dir];
+			    x += Misc.ddx[dir];
+
+			    /* Stop at dungeon edge */
+			    if (!cave_in_bounds(c, y, x)) break;
+			}
+		}
 
 
 		///**
@@ -943,18 +959,18 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Mark squares as being in a room, and optionally light them.
-		// *
-		// * The boundaries (y1, x1, y2, x2) are inclusive.
-		// */
-		//static void generate_room(Cave c, int y1, int x1, int y2, int x2, int light) {
-		//    int y, x;
-		//    int add = CAVE_ROOM | (light ? CAVE_GLOW : 0);
-		//    for (y = y1; y <= y2; y++)
-		//        for (x = x1; x <= x2; x++)
-		//            c.info[y][x] |= add;
-		//}
+		/**
+		 * Mark squares as being in a room, and optionally light them.
+		 *
+		 * The boundaries (y1, x1, y2, x2) are inclusive.
+		 */
+		static void generate_room(Cave c, int y1, int x1, int y2, int x2, bool light) {
+		    int y, x;
+		    int add = CAVE_ROOM | (light ? CAVE_GLOW : 0);
+		    for (y = y1; y <= y2; y++)
+		        for (x = x1; x <= x2; x++)
+		            c.info[y][x] |= (short)add;
+		}
 
 
 		/**
@@ -970,24 +986,24 @@ namespace CSAngband {
 		}
 
 
-		///**
-		// * Fill the edges of a rectangle with a feature.
-		// *
-		// * The boundaries (y1, x1, y2, x2) are inclusive.
-		// */
-		//static void draw_rectangle(Cave c, int y1, int x1, int y2, int x2, int feat) {
-		//    int y, x;
+		/**
+		 * Fill the edges of a rectangle with a feature.
+		 *
+		 * The boundaries (y1, x1, y2, x2) are inclusive.
+		 */
+		static void draw_rectangle(Cave c, int y1, int x1, int y2, int x2, int feat) {
+		    int y, x;
 
-		//    for (y = y1; y <= y2; y++) {
-		//        cave_set_feat(c, y, x1, feat);
-		//        cave_set_feat(c, y, x2, feat);
-		//    }
+		    for (y = y1; y <= y2; y++) {
+		        cave_set_feat(c, y, x1, feat);
+		        cave_set_feat(c, y, x2, feat);
+		    }
 
-		//    for (x = x1; x <= x2; x++) {
-		//        cave_set_feat(c, y1, x, feat);
-		//        cave_set_feat(c, y2, x, feat);
-		//    }
-		//}
+		    for (x = x1; x <= x2; x++) {
+		        cave_set_feat(c, y1, x, feat);
+		        cave_set_feat(c, y2, x, feat);
+		    }
+		}
 
 
 		//static void fill_xrange(Cave c, int y, int x1, int x2, int feat, int info) {
@@ -1086,453 +1102,456 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Build a circular room (interior radius 4-7).
-		// */
-		//static bool build_circular(Cave c, int y0, int x0) {
-		//    /* Pick a room size */
-		//    int radius = 2 + randint1(2) + randint1(3);
-
-		//    /* Occasional light */
-		//    bool light = c.depth <= randint1(25) ? true : false;
-
-		//    /* Mark interior squares as being in a room (optionally lit) */
-		//    int info = CAVE_ROOM | (light ? CAVE_GLOW : 0);
-
-		//    /* Generate outer walls and inner floors */
-		//    fill_circle(c, y0, x0, radius + 1, 1, FEAT_WALL_OUTER, info);
-		//    fill_circle(c, y0, x0, radius, 0, FEAT_FLOOR, info);
-
-		//    /* Especially large circular rooms will have a middle chamber */
-		//    if (radius - 4 > 0 && randint0(4) < radius - 4) {
-		//        /* choose a random direction */
-		//        int cd, rd;
-		//        rand_dir(&rd, &cd);
-
-		//        /* draw a room with a secret door on a random side */
-		//        draw_rectangle(c, y0 - 2, x0 - 2, y0 + 2, x0 + 2, FEAT_WALL_INNER);
-		//        cave_set_feat(c, y0 + cd * 2, x0 + rd * 2, FEAT_SECRET);
-
-		//        /* Place a treasure in the vault */
-		//        vault_objects(c, y0, x0, c.depth, randint0(2));
-
-		//        /* create some monsterss */
-		//        vault_monsters(c, y0, x0, c.depth + 1, randint0(3));
-		//    }
-
-		//    return true;
-		//}
-
-
-		///**
-		// * Builds a normal rectangular room.
-		// */
-		//static bool build_simple(Cave c, int y0, int x0) {
-		//    int y, x;
-		//    int light = false;
-
-		//    /* Pick a room size */
-		//    int y1 = y0 - randint1(4);
-		//    int x1 = x0 - randint1(11);
-		//    int y2 = y0 + randint1(3);
-		//    int x2 = x0 + randint1(11);
-
-		//    /* Occasional light */
-		//    if (c.depth <= randint1(25)) light = true;
-
-		//    /* Generate new room */
-		//    generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
-
-		//    /* Generate outer walls and inner floors */
-		//    draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
-		//    fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
-
-		//    if (one_in_(20)) {
-		//        /* Sometimes make a pillar room */
-		//        for (y = y1; y <= y2; y += 2)
-		//            for (x = x1; x <= x2; x += 2)
-		//                cave_set_feat(c, y, x, FEAT_WALL_INNER);
-
-		//    } else if (one_in_(50)) {
-		//        /* Sometimes make a ragged-edge room */
-		//        for (y = y1 + 2; y <= y2 - 2; y += 2) {
-		//            cave_set_feat(c, y, x1, FEAT_WALL_INNER);
-		//            cave_set_feat(c, y, x2, FEAT_WALL_INNER);
-		//        }
-
-		//        for (x = x1 + 2; x <= x2 - 2; x += 2) {
-		//            cave_set_feat(c, y1, x, FEAT_WALL_INNER);
-		//            cave_set_feat(c, y2, x, FEAT_WALL_INNER);
-		//        }
-		//    }
-		//    return true;
-		//}
-
-
-		///**
-		// * Builds an overlapping rectangular room.
-		// */
-		//static bool build_overlap(Cave c, int y0, int x0) {
-		//    int y1a, x1a, y2a, x2a;
-		//    int y1b, x1b, y2b, x2b;
-
-		//    int light = false;
-
-		//    /* Occasional light */
-		//    if (c.depth <= randint1(25)) light = true;
-
-		//    /* Determine extents of room (a) */
-		//    y1a = y0 - randint1(4);
-		//    x1a = x0 - randint1(11);
-		//    y2a = y0 + randint1(3);
-		//    x2a = x0 + randint1(10);
-
-		//    /* Determine extents of room (b) */
-		//    y1b = y0 - randint1(3);
-		//    x1b = x0 - randint1(10);
-		//    y2b = y0 + randint1(4);
-		//    x2b = x0 + randint1(11);
+		/**
+		 * Build a circular room (interior radius 4-7).
+		 */
+		static bool build_circular(Cave c, int y0, int x0) {
+			throw new NotImplementedException();
+			///* Pick a room size */
+			//int radius = 2 + randint1(2) + randint1(3);
+
+			///* Occasional light */
+			//bool light = c.depth <= randint1(25) ? true : false;
+
+			///* Mark interior squares as being in a room (optionally lit) */
+			//int info = CAVE_ROOM | (light ? CAVE_GLOW : 0);
+
+			///* Generate outer walls and inner floors */
+			//fill_circle(c, y0, x0, radius + 1, 1, FEAT_WALL_OUTER, info);
+			//fill_circle(c, y0, x0, radius, 0, FEAT_FLOOR, info);
+
+			///* Especially large circular rooms will have a middle chamber */
+			//if (radius - 4 > 0 && randint0(4) < radius - 4) {
+			//    /* choose a random direction */
+			//    int cd, rd;
+			//    rand_dir(&rd, &cd);
+
+			//    /* draw a room with a secret door on a random side */
+			//    draw_rectangle(c, y0 - 2, x0 - 2, y0 + 2, x0 + 2, FEAT_WALL_INNER);
+			//    cave_set_feat(c, y0 + cd * 2, x0 + rd * 2, FEAT_SECRET);
+
+			//    /* Place a treasure in the vault */
+			//    vault_objects(c, y0, x0, c.depth, randint0(2));
+
+			//    /* create some monsterss */
+			//    vault_monsters(c, y0, x0, c.depth + 1, randint0(3));
+			//}
+
+			//return true;
+		}
+
+
+		/**
+		 * Builds a normal rectangular room.
+		 */
+		static bool build_simple(Cave c, int y0, int x0) {
+			int y, x;
+			bool light = false;
+
+			/* Pick a room size */
+			int y1 = y0 - Random.randint1(4);
+			int x1 = x0 - Random.randint1(11);
+			int y2 = y0 + Random.randint1(3);
+			int x2 = x0 + Random.randint1(11);
+
+			/* Occasional light */
+			if (c.depth <= Random.randint1(25)) light = true;
+
+			/* Generate new room */
+			generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
+
+			/* Generate outer walls and inner floors */
+			draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+			fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
+
+			if (Random.one_in_(20)) {
+			    /* Sometimes make a pillar room */
+			    for (y = y1; y <= y2; y += 2)
+			        for (x = x1; x <= x2; x += 2)
+			            cave_set_feat(c, y, x, FEAT_WALL_INNER);
+
+			} else if (Random.one_in_(50)) {
+			    /* Sometimes make a ragged-edge room */
+			    for (y = y1 + 2; y <= y2 - 2; y += 2) {
+			        cave_set_feat(c, y, x1, FEAT_WALL_INNER);
+			        cave_set_feat(c, y, x2, FEAT_WALL_INNER);
+			    }
+
+			    for (x = x1 + 2; x <= x2 - 2; x += 2) {
+			        cave_set_feat(c, y1, x, FEAT_WALL_INNER);
+			        cave_set_feat(c, y2, x, FEAT_WALL_INNER);
+			    }
+			}
+			return true;
+		}
+
+
+		/**
+		 * Builds an overlapping rectangular room.
+		 */
+		static bool build_overlap(Cave c, int y0, int x0) {
+			int y1a, x1a, y2a, x2a;
+			int y1b, x1b, y2b, x2b;
+
+			bool light = false;
+
+			/* Occasional light */
+			if (c.depth <= Random.randint1(25)) light = true;
+
+			/* Determine extents of room (a) */
+			y1a = y0 - Random.randint1(4);
+			x1a = x0 - Random.randint1(11);
+			y2a = y0 + Random.randint1(3);
+			x2a = x0 + Random.randint1(10);
 
-		//    /* Generate new room (a) */
-		//    generate_room(c, y1a-1, x1a-1, y2a+1, x2a+1, light);
+			/* Determine extents of room (b) */
+			y1b = y0 - Random.randint1(3);
+			x1b = x0 - Random.randint1(10);
+			y2b = y0 + Random.randint1(4);
+			x2b = x0 + Random.randint1(11);
 
-		//    /* Generate new room (b) */
-		//    generate_room(c, y1b-1, x1b-1, y2b+1, x2b+1, light);
+			/* Generate new room (a) */
+			generate_room(c, y1a-1, x1a-1, y2a+1, x2a+1, light);
 
-		//    /* Generate outer walls (a) */
-		//    draw_rectangle(c, y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
+			/* Generate new room (b) */
+			generate_room(c, y1b-1, x1b-1, y2b+1, x2b+1, light);
 
-		//    /* Generate outer walls (b) */
-		//    draw_rectangle(c, y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
+			/* Generate outer walls (a) */
+			draw_rectangle(c, y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
 
-		//    /* Generate inner floors (a) */
-		//    fill_rectangle(c, y1a, x1a, y2a, x2a, FEAT_FLOOR);
+			/* Generate outer walls (b) */
+			draw_rectangle(c, y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
 
-		//    /* Generate inner floors (b) */
-		//    fill_rectangle(c, y1b, x1b, y2b, x2b, FEAT_FLOOR);
+			/* Generate inner floors (a) */
+			fill_rectangle(c, y1a, x1a, y2a, x2a, FEAT_FLOOR);
 
-		//    return true;
-		//}
+			/* Generate inner floors (b) */
+			fill_rectangle(c, y1b, x1b, y2b, x2b, FEAT_FLOOR);
 
+			return true;
+		}
 
-		///**
-		// * Builds a cross-shaped room.
-		// *
-		// * Room "a" runs north/south, and Room "b" runs east/east 
-		// * So a "central pillar" would run from x1a,y1b to x2a,y2b.
-		// *
-		// * Note that currently, the "center" is always 3x3, but I think that the code
-		// * below will work for 5x5 (and perhaps even for unsymetric values like 4x3 or
-		// * 5x3 or 3x4 or 3x5).
-		// */
-		//static bool build_crossed(Cave c, int y0, int x0) {
-		//    int y, x;
 
-		//    int y1a, x1a, y2a, x2a;
-		//    int y1b, x1b, y2b, x2b;
+		/**
+		 * Builds a cross-shaped room.
+		 *
+		 * Room "a" runs north/south, and Room "b" runs east/east 
+		 * So a "central pillar" would run from x1a,y1b to x2a,y2b.
+		 *
+		 * Note that currently, the "center" is always 3x3, but I think that the code
+		 * below will work for 5x5 (and perhaps even for unsymetric values like 4x3 or
+		 * 5x3 or 3x4 or 3x5).
+		 */
+		static bool build_crossed(Cave c, int y0, int x0) {
+			throw new NotImplementedException();
+			//int y, x;
 
-		//    int dy, dx, wy, wx;
+			//int y1a, x1a, y2a, x2a;
+			//int y1b, x1b, y2b, x2b;
 
-		//    int light = false;
+			//int dy, dx, wy, wx;
 
-		//    /* Occasional light */
-		//    if (c.depth <= randint1(25)) light = true;
+			//int light = false;
 
-		//    /* Pick inner dimension */
-		//    wy = 1;
-		//    wx = 1;
+			///* Occasional light */
+			//if (c.depth <= randint1(25)) light = true;
+
+			///* Pick inner dimension */
+			//wy = 1;
+			//wx = 1;
+
+			///* Pick outer dimension */
+			//dy = rand_range(3, 4);
+			//dx = rand_range(3, 11);
+
+			///* Determine extents of room (a) */
+			//y1a = y0 - dy;
+			//x1a = x0 - wx;
+			//y2a = y0 + dy;
+			//x2a = x0 + wx;
 
-		//    /* Pick outer dimension */
-		//    dy = rand_range(3, 4);
-		//    dx = rand_range(3, 11);
-
-		//    /* Determine extents of room (a) */
-		//    y1a = y0 - dy;
-		//    x1a = x0 - wx;
-		//    y2a = y0 + dy;
-		//    x2a = x0 + wx;
-
-		//    /* Determine extents of room (b) */
-		//    y1b = y0 - wy;
-		//    x1b = x0 - dx;
-		//    y2b = y0 + wy;
-		//    x2b = x0 + dx;
-
-		//    /* Generate new room (a) */
-		//    generate_room(c, y1a-1, x1a-1, y2a+1, x2a+1, light);
-
-		//    /* Generate new room (b) */
-		//    generate_room(c, y1b-1, x1b-1, y2b+1, x2b+1, light);
-
-		//    /* Generate outer walls (a) */
-		//    draw_rectangle(c, y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
-
-		//    /* Generate outer walls (b) */
-		//    draw_rectangle(c, y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
-
-		//    /* Generate inner floors (a) */
-		//    fill_rectangle(c, y1a, x1a, y2a, x2a, FEAT_FLOOR);
-
-		//    /* Generate inner floors (b) */
-		//    fill_rectangle(c, y1b, x1b, y2b, x2b, FEAT_FLOOR);
-
-		//    /* Special features */
-		//    switch (randint1(4)) {
-		//        /* Nothing */
-		//        case 1: break;
-
-		//        /* Large solid middle pillar */
-		//        case 2: {
-		//            fill_rectangle(c, y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
-		//            break;
-		//        }
-
-		//        /* Inner treasure vault */
-		//        case 3: {
-		//            /* Generate a small inner vault */
-		//            draw_rectangle(c, y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
-
-		//            /* Open the inner vault with a secret door */
-		//            generate_hole(c, y1b, x1a, y2b, x2a, FEAT_SECRET);
-
-		//            /* Place a treasure in the vault */
-		//            place_object(c, y0, x0, c.depth, false, false, ORIGIN_SPECIAL);
-
-		//            /* Let's guard the treasure well */
-		//            vault_monsters(c, y0, x0, c.depth + 2, randint0(2) + 3);
-
-		//            /* Traps naturally */
-		//            vault_traps(c, y0, x0, 4, 4, randint0(3) + 2);
-
-		//            break;
-		//        }
-
-		//        /* Something else */
-		//        case 4: {
-		//            if (one_in_(3)) {
-		//                /* Occasionally pinch the center shut */
-
-		//                /* Pinch the east/west sides */
-		//                for (y = y1b; y <= y2b; y++) {
-		//                    if (y == y0) continue;
-		//                    cave_set_feat(c, y, x1a - 1, FEAT_WALL_INNER);
-		//                    cave_set_feat(c, y, x2a + 1, FEAT_WALL_INNER);
-		//                }
-
-		//                /* Pinch the north/south sides */
-		//                for (x = x1a; x <= x2a; x++) {
-		//                    if (x == x0) continue;
-		//                    cave_set_feat(c, y1b - 1, x, FEAT_WALL_INNER);
-		//                    cave_set_feat(c, y2b + 1, x, FEAT_WALL_INNER);
-		//                }
-
-		//                /* Open sides with secret doors */
-		//                if (one_in_(3))
-		//                    generate_open(c, y1b-1, x1a-1, y2b+1, x2a+1, FEAT_SECRET);
-
-		//            } else if (one_in_(3)) {
-		//                /* Occasionally put a "plus" in the center */
-		//                generate_plus(c, y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
-
-		//            } else if (one_in_(3)) {
-		//                /* Occasionally put a "pillar" in the center */
-		//                cave_set_feat(c, y0, x0, FEAT_WALL_INNER);
-		//            }
-
-		//            break;
-		//        }
-		//    }
-
-		//    return true;
-		//}
-
-
-		///**
-		// * Build a large room with an inner room.
-		// *
-		// * Possible sub-types:
-		// *	1 - An inner room
-		// *	2 - An inner room with a small inner room
-		// *	3 - An inner room with a pillar or pillars
-		// *	4 - An inner room with a checkerboard
-		// *	5 - An inner room with four compartments
-		// */
-		//static bool build_large(Cave c, int y0, int x0) {
-		//    int y, x, y1, x1, y2, x2;
-
-		//    int light = false;
-
-		//    /* Occasional light */
-		//    if (c.depth <= randint1(25)) light = true;
-
-		//    /* Large room */
-		//    y1 = y0 - 4;
-		//    y2 = y0 + 4;
-		//    x1 = x0 - 11;
-		//    x2 = x0 + 11;
-
-		//    /* Generate new room */
-		//    generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
-
-		//    /* Generate outer walls */
-		//    draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
-
-		//    /* Generate inner floors */
-		//    fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
-
-		//    /* The inner room */
-		//    y1 = y1 + 2;
-		//    y2 = y2 - 2;
-		//    x1 = x1 + 2;
-		//    x2 = x2 - 2;
-
-		//    /* Generate inner walls */
-		//    draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
-
-		//    /* Inner room variations */
-		//    switch (randint1(5)) {
-		//        /* An inner room */
-		//        case 1: {
-		//            /* Open the inner room with a secret door and place a monster */
-		//            generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
-		//            vault_monsters(c, y0, x0, c.depth + 2, 1);
-		//            break;
-		//        }
-
-
-		//        /* An inner room with a small inner room */
-		//        case 2: {
-		//            /* Open the inner room with a secret door */
-		//            generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
-
-		//            /* Place another inner room */
-		//            draw_rectangle(c, y0-1, x0-1, y0+1, x0+1, FEAT_WALL_INNER);
-
-		//            /* Open the inner room with a locked door */
-		//            generate_hole(c, y0-1, x0-1, y0+1, x0+1, FEAT_DOOR_HEAD + randint1(7));
-
-		//            /* Monsters to guard the treasure */
-		//            vault_monsters(c, y0, x0, c.depth + 2, randint1(3) + 2);
-
-		//            /* Object (80%) or Stairs (20%) */
-		//            if (randint0(100) < 80)
-		//                place_object(c, y0, x0, c.depth, false, false, ORIGIN_SPECIAL);
-		//            else
-		//                place_random_stairs(c, y0, x0);
-
-		//            /* Traps to protect the treasure */
-		//            vault_traps(c, y0, x0, 4, 10, 2 + randint1(3));
-
-		//            break;
-		//        }
-
-
-		//        /* An inner room with an inner pillar or pillars */
-		//        case 3: {
-		//            /* Open the inner room with a secret door */
-		//            generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
-
-		//            /* Inner pillar */
-		//            fill_rectangle(c, y0-1, x0-1, y0+1, x0+1, FEAT_WALL_INNER);
-
-		//            /* Occasionally, two more Large Inner Pillars */
-		//            if (one_in_(2)) {
-		//                if (one_in_(2)) {
-		//                    fill_rectangle(c, y0-1, x0-7, y0+1, x0-5, FEAT_WALL_INNER);
-		//                    fill_rectangle(c, y0-1, x0+5, y0+1, x0+7, FEAT_WALL_INNER);
-		//                } else {
-		//                    fill_rectangle(c, y0-1, x0-6, y0+1, x0-4, FEAT_WALL_INNER);
-		//                    fill_rectangle(c, y0-1, x0+4, y0+1, x0+6, FEAT_WALL_INNER);
-		//                }
-		//            }
-
-		//            /* Occasionally, some Inner rooms */
-		//            if (one_in_(3)) {
-		//                /* Inner rectangle */
-		//                draw_rectangle(c, y0-1, x0-5, y0+1, x0+5, FEAT_WALL_INNER);
-
-		//                /* Secret doors (random top/bottom) */
-		//                place_secret_door(c, y0 - 3 + (randint1(2) * 2), x0 - 3);
-		//                place_secret_door(c, y0 - 3 + (randint1(2) * 2), x0 + 3);
-
-		//                /* Monsters */
-		//                vault_monsters(c, y0, x0 - 2, c.depth + 2, randint1(2));
-		//                vault_monsters(c, y0, x0 + 2, c.depth + 2, randint1(2));
-
-		//                /* Objects */
-		//                if (one_in_(3))
-		//                    place_object(c, y0, x0 - 2, c.depth, false, false,
-		//                        ORIGIN_SPECIAL);
-		//                if (one_in_(3))
-		//                    place_object(c, y0, x0 + 2, c.depth, false, false,
-		//                        ORIGIN_SPECIAL);
-		//            }
-
-		//            break;
-		//        }
-
-
-		//        /* An inner room with a checkerboard */
-		//        case 4: {
-		//            /* Open the inner room with a secret door */
-		//            generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
-
-		//            /* Checkerboard */
-		//            for (y = y1; y <= y2; y++)
-		//                for (x = x1; x <= x2; x++)
-		//                    if ((x + y) & 0x01)
-		//                        cave_set_feat(c, y, x, FEAT_WALL_INNER);
-
-		//            /* Monsters just love mazes. */
-		//            vault_monsters(c, y0, x0 - 5, c.depth + 2, randint1(3));
-		//            vault_monsters(c, y0, x0 + 5, c.depth + 2, randint1(3));
-
-		//            /* Traps make them entertaining. */
-		//            vault_traps(c, y0, x0 - 3, 2, 8, randint1(3));
-		//            vault_traps(c, y0, x0 + 3, 2, 8, randint1(3));
-
-		//            /* Mazes should have some treasure too. */
-		//            vault_objects(c, y0, x0, c.depth, 3);
-
-		//            break;
-		//        }
-
-
-		//        /* Four small rooms. */
-		//        case 5: {
-		//            /* Inner "cross" */
-		//            generate_plus(c, y1, x1, y2, x2, FEAT_WALL_INNER);
-
-		//            /* Doors into the rooms */
-		//            if (randint0(100) < 50) {
-		//                int i = randint1(10);
-		//                place_secret_door(c, y1 - 1, x0 - i);
-		//                place_secret_door(c, y1 - 1, x0 + i);
-		//                place_secret_door(c, y2 + 1, x0 - i);
-		//                place_secret_door(c, y2 + 1, x0 + i);
-		//            } else {
-		//                int i = randint1(3);
-		//                place_secret_door(c, y0 + i, x1 - 1);
-		//                place_secret_door(c, y0 - i, x1 - 1);
-		//                place_secret_door(c, y0 + i, x2 + 1);
-		//                place_secret_door(c, y0 - i, x2 + 1);
-		//            }
-
-		//            /* Treasure, centered at the center of the cross */
-		//            vault_objects(c, y0, x0, c.depth, 2 + randint1(2));
-
-		//            /* Gotta have some monsters */
-		//            vault_monsters(c, y0 + 1, x0 - 4, c.depth + 2, randint1(4));
-		//            vault_monsters(c, y0 + 1, x0 + 4, c.depth + 2, randint1(4));
-		//            vault_monsters(c, y0 - 1, x0 - 4, c.depth + 2, randint1(4));
-		//            vault_monsters(c, y0 - 1, x0 + 4, c.depth + 2, randint1(4)); 
-
-		//            break;
-		//        }
-		//    }
-
-		//    return true;
-		//}
+			///* Determine extents of room (b) */
+			//y1b = y0 - wy;
+			//x1b = x0 - dx;
+			//y2b = y0 + wy;
+			//x2b = x0 + dx;
+
+			///* Generate new room (a) */
+			//generate_room(c, y1a-1, x1a-1, y2a+1, x2a+1, light);
+
+			///* Generate new room (b) */
+			//generate_room(c, y1b-1, x1b-1, y2b+1, x2b+1, light);
+
+			///* Generate outer walls (a) */
+			//draw_rectangle(c, y1a-1, x1a-1, y2a+1, x2a+1, FEAT_WALL_OUTER);
+
+			///* Generate outer walls (b) */
+			//draw_rectangle(c, y1b-1, x1b-1, y2b+1, x2b+1, FEAT_WALL_OUTER);
+
+			///* Generate inner floors (a) */
+			//fill_rectangle(c, y1a, x1a, y2a, x2a, FEAT_FLOOR);
+
+			///* Generate inner floors (b) */
+			//fill_rectangle(c, y1b, x1b, y2b, x2b, FEAT_FLOOR);
+
+			///* Special features */
+			//switch (randint1(4)) {
+			//    /* Nothing */
+			//    case 1: break;
+
+			//    /* Large solid middle pillar */
+			//    case 2: {
+			//        fill_rectangle(c, y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
+			//        break;
+			//    }
+
+			//    /* Inner treasure vault */
+			//    case 3: {
+			//        /* Generate a small inner vault */
+			//        draw_rectangle(c, y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
+
+			//        /* Open the inner vault with a secret door */
+			//        generate_hole(c, y1b, x1a, y2b, x2a, FEAT_SECRET);
+
+			//        /* Place a treasure in the vault */
+			//        place_object(c, y0, x0, c.depth, false, false, ORIGIN_SPECIAL);
+
+			//        /* Let's guard the treasure well */
+			//        vault_monsters(c, y0, x0, c.depth + 2, randint0(2) + 3);
+
+			//        /* Traps naturally */
+			//        vault_traps(c, y0, x0, 4, 4, randint0(3) + 2);
+
+			//        break;
+			//    }
+
+			//    /* Something else */
+			//    case 4: {
+			//        if (one_in_(3)) {
+			//            /* Occasionally pinch the center shut */
+
+			//            /* Pinch the east/west sides */
+			//            for (y = y1b; y <= y2b; y++) {
+			//                if (y == y0) continue;
+			//                cave_set_feat(c, y, x1a - 1, FEAT_WALL_INNER);
+			//                cave_set_feat(c, y, x2a + 1, FEAT_WALL_INNER);
+			//            }
+
+			//            /* Pinch the north/south sides */
+			//            for (x = x1a; x <= x2a; x++) {
+			//                if (x == x0) continue;
+			//                cave_set_feat(c, y1b - 1, x, FEAT_WALL_INNER);
+			//                cave_set_feat(c, y2b + 1, x, FEAT_WALL_INNER);
+			//            }
+
+			//            /* Open sides with secret doors */
+			//            if (one_in_(3))
+			//                generate_open(c, y1b-1, x1a-1, y2b+1, x2a+1, FEAT_SECRET);
+
+			//        } else if (one_in_(3)) {
+			//            /* Occasionally put a "plus" in the center */
+			//            generate_plus(c, y1b, x1a, y2b, x2a, FEAT_WALL_INNER);
+
+			//        } else if (one_in_(3)) {
+			//            /* Occasionally put a "pillar" in the center */
+			//            cave_set_feat(c, y0, x0, FEAT_WALL_INNER);
+			//        }
+
+			//        break;
+			//    }
+			//}
+
+			//return true;
+		}
+
+
+		/**
+		 * Build a large room with an inner room.
+		 *
+		 * Possible sub-types:
+		 *	1 - An inner room
+		 *	2 - An inner room with a small inner room
+		 *	3 - An inner room with a pillar or pillars
+		 *	4 - An inner room with a checkerboard
+		 *	5 - An inner room with four compartments
+		 */
+		static bool build_large(Cave c, int y0, int x0) {
+			throw new NotImplementedException();
+			//int y, x, y1, x1, y2, x2;
+
+			//int light = false;
+
+			///* Occasional light */
+			//if (c.depth <= randint1(25)) light = true;
+
+			///* Large room */
+			//y1 = y0 - 4;
+			//y2 = y0 + 4;
+			//x1 = x0 - 11;
+			//x2 = x0 + 11;
+
+			///* Generate new room */
+			//generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
+
+			///* Generate outer walls */
+			//draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+
+			///* Generate inner floors */
+			//fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
+
+			///* The inner room */
+			//y1 = y1 + 2;
+			//y2 = y2 - 2;
+			//x1 = x1 + 2;
+			//x2 = x2 - 2;
+
+			///* Generate inner walls */
+			//draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
+
+			///* Inner room variations */
+			//switch (randint1(5)) {
+			//    /* An inner room */
+			//    case 1: {
+			//        /* Open the inner room with a secret door and place a monster */
+			//        generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
+			//        vault_monsters(c, y0, x0, c.depth + 2, 1);
+			//        break;
+			//    }
+
+
+			//    /* An inner room with a small inner room */
+			//    case 2: {
+			//        /* Open the inner room with a secret door */
+			//        generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
+
+			//        /* Place another inner room */
+			//        draw_rectangle(c, y0-1, x0-1, y0+1, x0+1, FEAT_WALL_INNER);
+
+			//        /* Open the inner room with a locked door */
+			//        generate_hole(c, y0-1, x0-1, y0+1, x0+1, FEAT_DOOR_HEAD + randint1(7));
+
+			//        /* Monsters to guard the treasure */
+			//        vault_monsters(c, y0, x0, c.depth + 2, randint1(3) + 2);
+
+			//        /* Object (80%) or Stairs (20%) */
+			//        if (randint0(100) < 80)
+			//            place_object(c, y0, x0, c.depth, false, false, ORIGIN_SPECIAL);
+			//        else
+			//            place_random_stairs(c, y0, x0);
+
+			//        /* Traps to protect the treasure */
+			//        vault_traps(c, y0, x0, 4, 10, 2 + randint1(3));
+
+			//        break;
+			//    }
+
+
+			//    /* An inner room with an inner pillar or pillars */
+			//    case 3: {
+			//        /* Open the inner room with a secret door */
+			//        generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
+
+			//        /* Inner pillar */
+			//        fill_rectangle(c, y0-1, x0-1, y0+1, x0+1, FEAT_WALL_INNER);
+
+			//        /* Occasionally, two more Large Inner Pillars */
+			//        if (one_in_(2)) {
+			//            if (one_in_(2)) {
+			//                fill_rectangle(c, y0-1, x0-7, y0+1, x0-5, FEAT_WALL_INNER);
+			//                fill_rectangle(c, y0-1, x0+5, y0+1, x0+7, FEAT_WALL_INNER);
+			//            } else {
+			//                fill_rectangle(c, y0-1, x0-6, y0+1, x0-4, FEAT_WALL_INNER);
+			//                fill_rectangle(c, y0-1, x0+4, y0+1, x0+6, FEAT_WALL_INNER);
+			//            }
+			//        }
+
+			//        /* Occasionally, some Inner rooms */
+			//        if (one_in_(3)) {
+			//            /* Inner rectangle */
+			//            draw_rectangle(c, y0-1, x0-5, y0+1, x0+5, FEAT_WALL_INNER);
+
+			//            /* Secret doors (random top/bottom) */
+			//            place_secret_door(c, y0 - 3 + (randint1(2) * 2), x0 - 3);
+			//            place_secret_door(c, y0 - 3 + (randint1(2) * 2), x0 + 3);
+
+			//            /* Monsters */
+			//            vault_monsters(c, y0, x0 - 2, c.depth + 2, randint1(2));
+			//            vault_monsters(c, y0, x0 + 2, c.depth + 2, randint1(2));
+
+			//            /* Objects */
+			//            if (one_in_(3))
+			//                place_object(c, y0, x0 - 2, c.depth, false, false,
+			//                    ORIGIN_SPECIAL);
+			//            if (one_in_(3))
+			//                place_object(c, y0, x0 + 2, c.depth, false, false,
+			//                    ORIGIN_SPECIAL);
+			//        }
+
+			//        break;
+			//    }
+
+
+			//    /* An inner room with a checkerboard */
+			//    case 4: {
+			//        /* Open the inner room with a secret door */
+			//        generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
+
+			//        /* Checkerboard */
+			//        for (y = y1; y <= y2; y++)
+			//            for (x = x1; x <= x2; x++)
+			//                if ((x + y) & 0x01)
+			//                    cave_set_feat(c, y, x, FEAT_WALL_INNER);
+
+			//        /* Monsters just love mazes. */
+			//        vault_monsters(c, y0, x0 - 5, c.depth + 2, randint1(3));
+			//        vault_monsters(c, y0, x0 + 5, c.depth + 2, randint1(3));
+
+			//        /* Traps make them entertaining. */
+			//        vault_traps(c, y0, x0 - 3, 2, 8, randint1(3));
+			//        vault_traps(c, y0, x0 + 3, 2, 8, randint1(3));
+
+			//        /* Mazes should have some treasure too. */
+			//        vault_objects(c, y0, x0, c.depth, 3);
+
+			//        break;
+			//    }
+
+
+			//    /* Four small rooms. */
+			//    case 5: {
+			//        /* Inner "cross" */
+			//        generate_plus(c, y1, x1, y2, x2, FEAT_WALL_INNER);
+
+			//        /* Doors into the rooms */
+			//        if (randint0(100) < 50) {
+			//            int i = randint1(10);
+			//            place_secret_door(c, y1 - 1, x0 - i);
+			//            place_secret_door(c, y1 - 1, x0 + i);
+			//            place_secret_door(c, y2 + 1, x0 - i);
+			//            place_secret_door(c, y2 + 1, x0 + i);
+			//        } else {
+			//            int i = randint1(3);
+			//            place_secret_door(c, y0 + i, x1 - 1);
+			//            place_secret_door(c, y0 - i, x1 - 1);
+			//            place_secret_door(c, y0 + i, x2 + 1);
+			//            place_secret_door(c, y0 - i, x2 + 1);
+			//        }
+
+			//        /* Treasure, centered at the center of the cross */
+			//        vault_objects(c, y0, x0, c.depth, 2 + randint1(2));
+
+			//        /* Gotta have some monsters */
+			//        vault_monsters(c, y0 + 1, x0 - 4, c.depth + 2, randint1(4));
+			//        vault_monsters(c, y0 + 1, x0 + 4, c.depth + 2, randint1(4));
+			//        vault_monsters(c, y0 - 1, x0 - 4, c.depth + 2, randint1(4));
+			//        vault_monsters(c, y0 - 1, x0 + 4, c.depth + 2, randint1(4)); 
+
+			//        break;
+			//    }
+			//}
+
+			//return true;
+		}
 
 
 		///* Hook for which type of pit we are building */
@@ -1616,274 +1635,276 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Build a monster nest
-		// *
-		// * A monster nest consists of a rectangular moat around a room containing
-		// * monsters of a given type.
-		// *
-		// * The monsters are chosen from a set of 64 randomly selected monster races,
-		// * to allow the nest creation to fail instead of having "holes".
-		// *
-		// * Note the use of the "get_mon_num_prep()" function, and the special
-		// * "get_mon_num_hook()" restriction function, to prepare the "monster
-		// * allocation table" in such a way as to optimize the selection of
-		// * "appropriate" non-unique monsters for the nest.
-		// *
-		// * The available monster nests are specified in edit/pit.txt.
-		// *
-		// * Note that get_mon_num() function can fail, in which case the nest will be
-		// * empty, and will not affect the level rating.
-		// *
-		// * Monster nests will never contain unique monsters.
-		// */
-		//static bool build_nest(Cave c, int y0, int x0) {
-		//    int y, x, y1, x1, y2, x2;
-		//    int i;
-		//    int alloc_obj;
-		//    s16b what[64];
-		//    bool empty = false;
-		//    int light = false;
-		//    int pit_idx;
+		/**
+		 * Build a monster nest
+		 *
+		 * A monster nest consists of a rectangular moat around a room containing
+		 * monsters of a given type.
+		 *
+		 * The monsters are chosen from a set of 64 randomly selected monster races,
+		 * to allow the nest creation to fail instead of having "holes".
+		 *
+		 * Note the use of the "get_mon_num_prep()" function, and the special
+		 * "get_mon_num_hook()" restriction function, to prepare the "monster
+		 * allocation table" in such a way as to optimize the selection of
+		 * "appropriate" non-unique monsters for the nest.
+		 *
+		 * The available monster nests are specified in edit/pit.txt.
+		 *
+		 * Note that get_mon_num() function can fail, in which case the nest will be
+		 * empty, and will not affect the level rating.
+		 *
+		 * Monster nests will never contain unique monsters.
+		 */
+		static bool build_nest(Cave c, int y0, int x0) {
+			throw new NotImplementedException();
+			//int y, x, y1, x1, y2, x2;
+			//int i;
+			//int alloc_obj;
+			//s16b what[64];
+			//bool empty = false;
+			//int light = false;
+			//int pit_idx;
 
-		//    /* Large room */
-		//    y1 = y0 - 4;
-		//    y2 = y0 + 4;
-		//    x1 = x0 - 11;
-		//    x2 = x0 + 11;
+			///* Large room */
+			//y1 = y0 - 4;
+			//y2 = y0 + 4;
+			//x1 = x0 - 11;
+			//x2 = x0 + 11;
 
-		//    /* Generate new room */
-		//    generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
+			///* Generate new room */
+			//generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
 
-		//    /* Generate outer walls */
-		//    draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+			///* Generate outer walls */
+			//draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
 
-		//    /* Generate inner floors */
-		//    fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
+			///* Generate inner floors */
+			//fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
 
-		//    /* Advance to the center room */
-		//    y1 = y1 + 2;
-		//    y2 = y2 - 2;
-		//    x1 = x1 + 2;
-		//    x2 = x2 - 2;
+			///* Advance to the center room */
+			//y1 = y1 + 2;
+			//y2 = y2 - 2;
+			//x1 = x1 + 2;
+			//x2 = x2 - 2;
 
-		//    /* Generate inner walls */
-		//    draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
+			///* Generate inner walls */
+			//draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
 
-		//    /* Open the inner room with a secret door */
-		//    generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
+			///* Open the inner room with a secret door */
+			//generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
 
-		//    /* Set get_mon_num_hook */
-		//    pit_idx = set_pit_type(c.depth, 2);
+			///* Set get_mon_num_hook */
+			//pit_idx = set_pit_type(c.depth, 2);
 
-		//    /* Chance of objects on the floor */
-		//    alloc_obj = pit_info[pit_idx].obj_rarity;
+			///* Chance of objects on the floor */
+			//alloc_obj = pit_info[pit_idx].obj_rarity;
 	
-		//    /* Prepare allocation table */
-		//    get_mon_num_prep();
+			///* Prepare allocation table */
+			//get_mon_num_prep();
 
-		//    /* Pick some monster types */
-		//    for (i = 0; i < 64; i++) {
-		//        /* Get a (hard) monster type */
-		//        what[i] = get_mon_num(c.depth + 10);
+			///* Pick some monster types */
+			//for (i = 0; i < 64; i++) {
+			//    /* Get a (hard) monster type */
+			//    what[i] = get_mon_num(c.depth + 10);
 
-		//        /* Notice failure */
-		//        if (!what[i]) empty = true;
-		//    }
+			//    /* Notice failure */
+			//    if (!what[i]) empty = true;
+			//}
 
-		//    /* Remove restriction */
-		//    get_mon_num_hook = null;
+			///* Remove restriction */
+			//get_mon_num_hook = null;
 
-		//    /* Prepare allocation table */
-		//    get_mon_num_prep();
+			///* Prepare allocation table */
+			//get_mon_num_prep();
 
-		//    /* Oops */
-		//    if (empty) return false;
+			///* Oops */
+			//if (empty) return false;
 
-		//    /* Describe */
-		//    ROOM_LOG("Monster nest (%s)", pit_info[pit_idx].name);
+			///* Describe */
+			//ROOM_LOG("Monster nest (%s)", pit_info[pit_idx].name);
 
-		//    /* Increase the level rating */
-		//    c.mon_rating += (5 + pit_info[pit_idx].ave / 10);
+			///* Increase the level rating */
+			//c.mon_rating += (5 + pit_info[pit_idx].ave / 10);
 
-		//    /* Place some monsters */
-		//    for (y = y0 - 2; y <= y0 + 2; y++) {
-		//        for (x = x0 - 9; x <= x0 + 9; x++) {
-		//            /* Figure out what monster is being used, and place that monster */
-		//            int r_idx = what[randint0(64)];
-		//            place_new_monster(c, y, x, r_idx, false, false, ORIGIN_DROP_PIT);
+			///* Place some monsters */
+			//for (y = y0 - 2; y <= y0 + 2; y++) {
+			//    for (x = x0 - 9; x <= x0 + 9; x++) {
+			//        /* Figure out what monster is being used, and place that monster */
+			//        int r_idx = what[randint0(64)];
+			//        place_new_monster(c, y, x, r_idx, false, false, ORIGIN_DROP_PIT);
 
-		//            /* Occasionally place an item, making it good 1/3 of the time */
-		//            if (one_in_(alloc_obj)) 
-		//                place_object(c, y, x, c.depth + 10, one_in_(3), false,
-		//                    ORIGIN_PIT);
-		//        }
-		//    }
+			//        /* Occasionally place an item, making it good 1/3 of the time */
+			//        if (one_in_(alloc_obj)) 
+			//            place_object(c, y, x, c.depth + 10, one_in_(3), false,
+			//                ORIGIN_PIT);
+			//    }
+			//}
 
-		//    return true;
-		//}
+			//return true;
+		}
 
-		///**
-		// * Build a monster pit
-		// *
-		// * Monster pits are laid-out similarly to monster nests.
-		// *
-		// * The available monster pits are specified in edit/pit.txt.
-		// *
-		// * The inside room in a monster pit appears as shown below, where the
-		// * actual monsters in each location depend on the type of the pit
-		// *
-		// *   #####################
-		// *   #0000000000000000000#
-		// *   #0112233455543322110#
-		// *   #0112233467643322110#
-		// *   #0112233455543322110#
-		// *   #0000000000000000000#
-		// *   #####################
-		// *
-		// * Note that the monsters in the pit are chosen by using get_mon_num() to
-		// * request 16 "appropriate" monsters, sorting them by level, and using the
-		// * "even" entries in this sorted list for the contents of the pit.
-		// *
-		// * Note the use of the get_mon_num_prep() function, and the special
-		// * get_mon_num_hook() restriction function, to prepare the monster allocation
-		// * table in such a way as to optimize the selection of appropriate non-unique
-		// * monsters for the pit.
-		// *
-		// * The get_mon_num() function can fail, in which case the pit will be empty,
-		// * and will not effect the level rating.
-		// *
-		// * Like monster nests, monster pits will never contain unique monsters.
-		// */
-		//static bool build_pit(Cave c, int y0, int x0) {
-		//    int what[16];
-		//    int i, j, y, x, y1, x1, y2, x2;
-		//    bool empty = false;
-		//    int light = false;
-		//    int pit_idx;
+		/**
+		 * Build a monster pit
+		 *
+		 * Monster pits are laid-out similarly to monster nests.
+		 *
+		 * The available monster pits are specified in edit/pit.txt.
+		 *
+		 * The inside room in a monster pit appears as shown below, where the
+		 * actual monsters in each location depend on the type of the pit
+		 *
+		 *   #####################
+		 *   #0000000000000000000#
+		 *   #0112233455543322110#
+		 *   #0112233467643322110#
+		 *   #0112233455543322110#
+		 *   #0000000000000000000#
+		 *   #####################
+		 *
+		 * Note that the monsters in the pit are chosen by using get_mon_num() to
+		 * request 16 "appropriate" monsters, sorting them by level, and using the
+		 * "even" entries in this sorted list for the contents of the pit.
+		 *
+		 * Note the use of the get_mon_num_prep() function, and the special
+		 * get_mon_num_hook() restriction function, to prepare the monster allocation
+		 * table in such a way as to optimize the selection of appropriate non-unique
+		 * monsters for the pit.
+		 *
+		 * The get_mon_num() function can fail, in which case the pit will be empty,
+		 * and will not effect the level rating.
+		 *
+		 * Like monster nests, monster pits will never contain unique monsters.
+		 */
+		static bool build_pit(Cave c, int y0, int x0) {
+			throw new NotImplementedException();
+			//int what[16];
+			//int i, j, y, x, y1, x1, y2, x2;
+			//bool empty = false;
+			//int light = false;
+			//int pit_idx;
 
-		//    /* Large room */
-		//    y1 = y0 - 4;
-		//    y2 = y0 + 4;
-		//    x1 = x0 - 11;
-		//    x2 = x0 + 11;
+			///* Large room */
+			//y1 = y0 - 4;
+			//y2 = y0 + 4;
+			//x1 = x0 - 11;
+			//x2 = x0 + 11;
 
-		//    /* Generate new room, outer walls and inner floor */
-		//    generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
-		//    draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
-		//    fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
+			///* Generate new room, outer walls and inner floor */
+			//generate_room(c, y1-1, x1-1, y2+1, x2+1, light);
+			//draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_OUTER);
+			//fill_rectangle(c, y1, x1, y2, x2, FEAT_FLOOR);
 
-		//    /* Advance to the center room */
-		//    y1 = y1 + 2;
-		//    y2 = y2 - 2;
-		//    x1 = x1 + 2;
-		//    x2 = x2 - 2;
+			///* Advance to the center room */
+			//y1 = y1 + 2;
+			//y2 = y2 - 2;
+			//x1 = x1 + 2;
+			//x2 = x2 - 2;
 
-		//    /* Generate inner walls, and open with a secret door */
-		//    draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
-		//    generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
+			///* Generate inner walls, and open with a secret door */
+			//draw_rectangle(c, y1-1, x1-1, y2+1, x2+1, FEAT_WALL_INNER);
+			//generate_hole(c, y1-1, x1-1, y2+1, x2+1, FEAT_SECRET);
 
-		//    /* Set get_mon_num_hook */
-		//    pit_idx = set_pit_type(c.depth, 1);
+			///* Set get_mon_num_hook */
+			//pit_idx = set_pit_type(c.depth, 1);
 
-		//    /* Prepare allocation table */
-		//    get_mon_num_prep();
+			///* Prepare allocation table */
+			//get_mon_num_prep();
 
-		//    /* Pick some monster types */
-		//    for (i = 0; i < 16; i++) {
-		//        /* Get a (hard) monster type */
-		//        what[i] = get_mon_num(c.depth + 10);
+			///* Pick some monster types */
+			//for (i = 0; i < 16; i++) {
+			//    /* Get a (hard) monster type */
+			//    what[i] = get_mon_num(c.depth + 10);
 
-		//        /* Notice failure */
-		//        if (!what[i]) empty = true;
-		//    }
+			//    /* Notice failure */
+			//    if (!what[i]) empty = true;
+			//}
 
-		//    /* Remove restriction */
-		//    get_mon_num_hook = null;
+			///* Remove restriction */
+			//get_mon_num_hook = null;
 
-		//    /* Prepare allocation table */
-		//    get_mon_num_prep();
+			///* Prepare allocation table */
+			//get_mon_num_prep();
 
-		//    /* Oops */
-		//    if (empty)
-		//        return false;
+			///* Oops */
+			//if (empty)
+			//    return false;
 
-		//    ROOM_LOG("Monster pit (%s)", pit_info[pit_idx].name);
+			//ROOM_LOG("Monster pit (%s)", pit_info[pit_idx].name);
 
-		//    /* Sort the entries XXX XXX XXX */
-		//    for (i = 0; i < 16 - 1; i++) {
-		//        /* Sort the entries */
-		//        for (j = 0; j < 16 - 1; j++) {
-		//            int i1 = j;
-		//            int i2 = j + 1;
+			///* Sort the entries XXX XXX XXX */
+			//for (i = 0; i < 16 - 1; i++) {
+			//    /* Sort the entries */
+			//    for (j = 0; j < 16 - 1; j++) {
+			//        int i1 = j;
+			//        int i2 = j + 1;
 
-		//            int p1 = r_info[what[i1]].level;
-		//            int p2 = r_info[what[i2]].level;
+			//        int p1 = r_info[what[i1]].level;
+			//        int p2 = r_info[what[i2]].level;
 
-		//            /* Bubble */
-		//            if (p1 > p2) {
-		//                int tmp = what[i1];
-		//                what[i1] = what[i2];
-		//                what[i2] = tmp;
-		//            }
-		//        }
-		//    }
+			//        /* Bubble */
+			//        if (p1 > p2) {
+			//            int tmp = what[i1];
+			//            what[i1] = what[i2];
+			//            what[i2] = tmp;
+			//        }
+			//    }
+			//}
 
-		//    /* Select every other entry */
-		//    for (i = 0; i < 8; i++)
-		//        what[i] = what[i * 2];
+			///* Select every other entry */
+			//for (i = 0; i < 8; i++)
+			//    what[i] = what[i * 2];
 
-		//    /* Increase the level rating */
-		//    c.mon_rating += (5 + pit_info[pit_idx].ave / 10);
+			///* Increase the level rating */
+			//c.mon_rating += (5 + pit_info[pit_idx].ave / 10);
 
-		//    /* Top and bottom rows */
-		//    for (x = x0 - 9; x <= x0 + 9; x++) {
-		//        place_new_monster(c, y0 - 2, x, what[0], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y0 + 2, x, what[0], false, false, ORIGIN_DROP_PIT);
-		//    }
+			///* Top and bottom rows */
+			//for (x = x0 - 9; x <= x0 + 9; x++) {
+			//    place_new_monster(c, y0 - 2, x, what[0], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y0 + 2, x, what[0], false, false, ORIGIN_DROP_PIT);
+			//}
 
-		//    /* Middle columns */
-		//    for (y = y0 - 1; y <= y0 + 1; y++) {
-		//        place_new_monster(c, y, x0 - 9, what[0], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 9, what[0], false, false, ORIGIN_DROP_PIT);
+			///* Middle columns */
+			//for (y = y0 - 1; y <= y0 + 1; y++) {
+			//    place_new_monster(c, y, x0 - 9, what[0], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 9, what[0], false, false, ORIGIN_DROP_PIT);
 
-		//        place_new_monster(c, y, x0 - 8, what[1], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 8, what[1], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 - 8, what[1], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 8, what[1], false, false, ORIGIN_DROP_PIT);
 
-		//        place_new_monster(c, y, x0 - 7, what[1], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 7, what[1], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 - 7, what[1], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 7, what[1], false, false, ORIGIN_DROP_PIT);
 
-		//        place_new_monster(c, y, x0 - 6, what[2], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 6, what[2], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 - 6, what[2], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 6, what[2], false, false, ORIGIN_DROP_PIT);
 
-		//        place_new_monster(c, y, x0 - 5, what[2], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 5, what[2], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 - 5, what[2], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 5, what[2], false, false, ORIGIN_DROP_PIT);
 
-		//        place_new_monster(c, y, x0 - 4, what[3], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 4, what[3], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 - 4, what[3], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 4, what[3], false, false, ORIGIN_DROP_PIT);
 
-		//        place_new_monster(c, y, x0 - 3, what[3], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 3, what[3], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 - 3, what[3], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 3, what[3], false, false, ORIGIN_DROP_PIT);
 
-		//        place_new_monster(c, y, x0 - 2, what[4], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y, x0 + 2, what[4], false, false, ORIGIN_DROP_PIT);
-		//    }
+			//    place_new_monster(c, y, x0 - 2, what[4], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y, x0 + 2, what[4], false, false, ORIGIN_DROP_PIT);
+			//}
 
-		//    /* Above/Below the center monster */
-		//    for (x = x0 - 1; x <= x0 + 1; x++) {
-		//        place_new_monster(c, y0 + 1, x, what[5], false, false, ORIGIN_DROP_PIT);
-		//        place_new_monster(c, y0 - 1, x, what[5], false, false, ORIGIN_DROP_PIT);
-		//    }
+			///* Above/Below the center monster */
+			//for (x = x0 - 1; x <= x0 + 1; x++) {
+			//    place_new_monster(c, y0 + 1, x, what[5], false, false, ORIGIN_DROP_PIT);
+			//    place_new_monster(c, y0 - 1, x, what[5], false, false, ORIGIN_DROP_PIT);
+			//}
 
-		//    /* Next to the center monster */
-		//    place_new_monster(c, y0, x0 + 1, what[6], false, false, ORIGIN_DROP_PIT);
-		//    place_new_monster(c, y0, x0 - 1, what[6], false, false, ORIGIN_DROP_PIT);
+			///* Next to the center monster */
+			//place_new_monster(c, y0, x0 + 1, what[6], false, false, ORIGIN_DROP_PIT);
+			//place_new_monster(c, y0, x0 - 1, what[6], false, false, ORIGIN_DROP_PIT);
 
-		//    /* Center monster */
-		//    place_new_monster(c, y0, x0, what[7], false, false, ORIGIN_DROP_PIT);
+			///* Center monster */
+			//place_new_monster(c, y0, x0, what[7], false, false, ORIGIN_DROP_PIT);
 
-		//    return true;
-		//}
+			//return true;
+		}
 
 
 		///**
@@ -1998,409 +2019,415 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Helper function for building vaults.
-		// */
-		//static bool build_vault_type(struct cave*c, int y0, int x0, int typ, const char *label) {
-		//    vault_type *v_ptr = random_vault(typ);
-		//    if (v_ptr == null) {
-		//        /*quit_fmt("got null from random_vault(%d)", typ);*/
-		//        return false;
-		//    }
+		/**
+		 * Helper function for building vaults.
+		 */
+		static bool build_vault_type(Cave c, int y0, int x0, int typ, string label) {
+			throw new NotImplementedException();
+			//vault_type *v_ptr = random_vault(typ);
+			//if (v_ptr == null) {
+			//    /*quit_fmt("got null from random_vault(%d)", typ);*/
+			//    return false;
+			//}
 
-		//    ROOM_LOG("%s (%s)", label, v_ptr.name);
+			//ROOM_LOG("%s (%s)", label, v_ptr.name);
 
-		//    /* Boost the rating */
-		//    c.mon_rating += v_ptr.rat;
+			///* Boost the rating */
+			//c.mon_rating += v_ptr.rat;
 
-		//    /* Build the vault */
-		//    build_vault(c, y0, x0, v_ptr.hgt, v_ptr.wid, v_ptr.text);
+			///* Build the vault */
+			//build_vault(c, y0, x0, v_ptr.hgt, v_ptr.wid, v_ptr.text);
 
-		//    return true;
-		//}
-
-
-		///**
-		// * Build a lesser vault.
-		// */
-		//static bool build_lesser_vault(Cave c, int y0, int x0) {
-		//    return build_vault_type(c, y0, x0, 6, "Lesser vault");
-		//}
+			//return true;
+		}
 
 
-		///**
-		// * Build a (medium) vault.
-		// */
-		//static bool build_medium_vault(Cave c, int y0, int x0) {
-		//    return build_vault_type(c, y0, x0, 7, "Medium vault");
-		//}
+		/**
+		 * Build a lesser vault.
+		 */
+		static bool build_lesser_vault(Cave c, int y0, int x0) {
+		    return build_vault_type(c, y0, x0, 6, "Lesser vault");
+		}
 
 
-		///**
-		// * Build a greater vaults.
-		// *
-		// * Since Greater Vaults are so large (4x6 blocks, in a 6x18 dungeon) there is
-		// * a 63% chance that a randomly chosen quadrant to start a GV on won't work.
-		// * To balance this, we give Greater Vaults an artificially high probability
-		// * of being attempted, and then in this function use a depth check to cancel
-		// * vault creation except at deep depths.
-		// *
-		// * The following code should make a greater vault with frequencies:
-		// * dlvl  freq
-		// * 100+  18.0%
-		// * 90-99 16.0 - 18.0%
-		// * 80-89 10.0 - 11.0%
-		// * 70-79  5.7 -  6.5%
-		// * 60-69  3.3 -  3.8%
-		// * 50-59  1.8 -  2.1%
-		// * 0-49   0.0 -  1.0%
-		// */
-		//static bool build_greater_vault(Cave c, int y0, int x0) {
-		//    int i;
-		//    int numerator   = 2;
-		//    int denominator = 3;
+		/**
+		 * Build a (medium) vault.
+		 */
+		static bool build_medium_vault(Cave c, int y0, int x0) {
+		    return build_vault_type(c, y0, x0, 7, "Medium vault");
+		}
+
+
+		/**
+		 * Build a greater vaults.
+		 *
+		 * Since Greater Vaults are so large (4x6 blocks, in a 6x18 dungeon) there is
+		 * a 63% chance that a randomly chosen quadrant to start a GV on won't work.
+		 * To balance this, we give Greater Vaults an artificially high probability
+		 * of being attempted, and then in this function use a depth check to cancel
+		 * vault creation except at deep depths.
+		 *
+		 * The following code should make a greater vault with frequencies:
+		 * dlvl  freq
+		 * 100+  18.0%
+		 * 90-99 16.0 - 18.0%
+		 * 80-89 10.0 - 11.0%
+		 * 70-79  5.7 -  6.5%
+		 * 60-69  3.3 -  3.8%
+		 * 50-59  1.8 -  2.1%
+		 * 0-49   0.0 -  1.0%
+		 */
+		static bool build_greater_vault(Cave c, int y0, int x0) {
+			throw new NotImplementedException();
+			//int i;
+			//int numerator   = 2;
+			//int denominator = 3;
 	
-		//    /* Only try to build a GV as the first room. */
-		//    if (dun.cent_n > 0) return false;
+			///* Only try to build a GV as the first room. */
+			//if (dun.cent_n > 0) return false;
 
-		//    /* Level 90+ has a 2/3 chance, level 80-89 has 4/9, ... */
-		//    for(i = 90; i > c.depth; i -= 10) {
-		//        numerator *= 2;
-		//        denominator *= 3;
-		//    }
+			///* Level 90+ has a 2/3 chance, level 80-89 has 4/9, ... */
+			//for(i = 90; i > c.depth; i -= 10) {
+			//    numerator *= 2;
+			//    denominator *= 3;
+			//}
 
-		//    /* Attempt to pass the depth check and build a GV */
-		//    if (randint0(denominator) >= numerator) return false;
+			///* Attempt to pass the depth check and build a GV */
+			//if (randint0(denominator) >= numerator) return false;
 
-		//    return build_vault_type(c, y0, x0, 8, "Greater vault");
-		//}
+			//return build_vault_type(c, y0, x0, 8, "Greater vault");
+		}
 
 
-		///**
-		// * Constructs a tunnel between two points
-		// *
-		// * This function must be called BEFORE any streamers are created, since we use
-		// * the special "granite wall" sub-types to keep track of legal places for
-		// * corridors to pierce rooms.
-		// *
-		// * We queue the tunnel grids to prevent door creation along a corridor which
-		// * intersects itself.
-		// *
-		// * We queue the wall piercing grids to prevent a corridor from leaving
-		// * a room and then coming back in through the same entrance.
-		// *
-		// * We pierce grids which are outer walls of rooms, and when we do so, we change
-		// * all adjacent outer walls of rooms into solid walls so that no two corridors
-		// * may use adjacent grids for exits.
-		// *
-		// * The solid wall check prevents corridors from chopping the corners of rooms
-		// * off, as well as silly door placement, and excessively wide room entrances.
-		// */
-		//static void build_tunnel(Cave c, int row1, int col1, int row2, int col2) {
-		//    int i, y, x;
-		//    int tmp_row, tmp_col;
-		//    int row_dir, col_dir;
-		//    int start_row, start_col;
-		//    int main_loop_count = 0;
+		/**
+		 * Constructs a tunnel between two points
+		 *
+		 * This function must be called BEFORE any streamers are created, since we use
+		 * the special "granite wall" sub-types to keep track of legal places for
+		 * corridors to pierce rooms.
+		 *
+		 * We queue the tunnel grids to prevent door creation along a corridor which
+		 * intersects itself.
+		 *
+		 * We queue the wall piercing grids to prevent a corridor from leaving
+		 * a room and then coming back in through the same entrance.
+		 *
+		 * We pierce grids which are outer walls of rooms, and when we do so, we change
+		 * all adjacent outer walls of rooms into solid walls so that no two corridors
+		 * may use adjacent grids for exits.
+		 *
+		 * The solid wall check prevents corridors from chopping the corners of rooms
+		 * off, as well as silly door placement, and excessively wide room entrances.
+		 */
+		static void build_tunnel(Cave c, int row1, int col1, int row2, int col2) {
+			int i, y, x;
+			int tmp_row, tmp_col;
+			int row_dir = 0, col_dir = 0;
+			int start_row, start_col;
+			int main_loop_count = 0;
 
-		//    /* Used to prevent excessive door creation along overlapping corridors. */
-		//    bool door_flag = false;
+			/* Used to prevent excessive door creation along overlapping corridors. */
+			bool door_flag = false;
 	
-		//    /* Reset the arrays */
-		//    dun.tunn_n = 0;
-		//    dun.wall_n = 0;
+			/* Reset the arrays */
+			dun.tunn_n = 0;
+			dun.wall_n = 0;
 	
-		//    /* Save the starting location */
-		//    start_row = row1;
-		//    start_col = col1;
+			/* Save the starting location */
+			start_row = row1;
+			start_col = col1;
 
-		//    /* Start out in the correct direction */
-		//    correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
+			/* Start out in the correct direction */
+			correct_dir(ref row_dir, ref col_dir, row1, col1, row2, col2);
 
-		//    /* Keep going until done (or bored) */
-		//    while ((row1 != row2) || (col1 != col2)) {
-		//        /* Mega-Hack -- Paranoia -- prevent infinite loops */
-		//        if (main_loop_count++ > 2000) break;
+			/* Keep going until done (or bored) */
+			while ((row1 != row2) || (col1 != col2)) {
+			    /* Mega-Hack -- Paranoia -- prevent infinite loops */
+			    if (main_loop_count++ > 2000) break;
 
-		//        /* Allow bends in the tunnel */
-		//        if (randint0(100) < dun.profile.tun.chg) {
-		//            /* Get the correct direction */
-		//            correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
+			    /* Allow bends in the tunnel */
+			    if (Random.randint0(100) < dun.profile.tun.chg) {
+			        /* Get the correct direction */
+			        correct_dir(ref row_dir, ref col_dir, row1, col1, row2, col2);
 
-		//            /* Random direction */
-		//            if (randint0(100) < dun.profile.tun.rnd)
-		//                rand_dir(&row_dir, &col_dir);
-		//        }
+			        /* Random direction */
+			        if (Random.randint0(100) < dun.profile.tun.rnd)
+			            rand_dir(ref row_dir, ref col_dir);
+			    }
 
-		//        /* Get the next location */
-		//        tmp_row = row1 + row_dir;
-		//        tmp_col = col1 + col_dir;
+			    /* Get the next location */
+			    tmp_row = row1 + row_dir;
+			    tmp_col = col1 + col_dir;
 
-		//        while (!cave_in_bounds(c, tmp_row, tmp_col)) {
-		//            /* Get the correct direction */
-		//            correct_dir(&row_dir, &col_dir, row1, col1, row2, col2);
+			    while (!cave_in_bounds(c, tmp_row, tmp_col)) {
+			        /* Get the correct direction */
+			        correct_dir(ref row_dir, ref col_dir, row1, col1, row2, col2);
 
-		//            /* Random direction */
-		//            if (randint0(100) < dun.profile.tun.rnd)
-		//                rand_dir(&row_dir, &col_dir);
+			        /* Random direction */
+			        if (Random.randint0(100) < dun.profile.tun.rnd)
+			            rand_dir(ref row_dir, ref col_dir);
 
-		//            /* Get the next location */
-		//            tmp_row = row1 + row_dir;
-		//            tmp_col = col1 + col_dir;
-		//        }
-
-
-		//        /* Avoid the edge of the dungeon */
-		//        if (cave_isperm(c, tmp_row, tmp_col)) continue;
-
-		//        /* Avoid "solid" granite walls */
-		//        if (c.feat[tmp_row][tmp_col] == FEAT_WALL_SOLID) continue;
-
-		//        /* Pierce "outer" walls of rooms */
-		//        if (c.feat[tmp_row][tmp_col] == FEAT_WALL_OUTER) {
-		//            /* Get the "next" location */
-		//            y = tmp_row + row_dir;
-		//            x = tmp_col + col_dir;
-
-		//            /* Hack -- Avoid outer/solid permanent walls */
-		//            if (c.feat[y][x] == FEAT_PERM_SOLID) continue;
-		//            if (c.feat[y][x] == FEAT_PERM_OUTER) continue;
-
-		//            /* Hack -- Avoid outer/solid granite walls */
-		//            if (c.feat[y][x] == FEAT_WALL_OUTER) continue;
-		//            if (c.feat[y][x] == FEAT_WALL_SOLID) continue;
-
-		//            /* Accept this location */
-		//            row1 = tmp_row;
-		//            col1 = tmp_col;
-
-		//            /* Save the wall location */
-		//            if (dun.wall_n < WALL_MAX) {
-		//                dun.wall[dun.wall_n].y = row1;
-		//                dun.wall[dun.wall_n].x = col1;
-		//                dun.wall_n++;
-		//            }
-
-		//            /* Forbid re-entry near this piercing */
-		//            for (y = row1 - 1; y <= row1 + 1; y++)
-		//                for (x = col1 - 1; x <= col1 + 1; x++)
-		//                    if (c.feat[y][x] == FEAT_WALL_OUTER)
-		//                        cave_set_feat(c, y, x, FEAT_WALL_SOLID);
-
-		//        } else if (c.info[tmp_row][tmp_col] & (CAVE_ROOM)) {
-		//            /* Travel quickly through rooms */
-		//            /* Accept the location */
-		//            row1 = tmp_row;
-		//            col1 = tmp_col;
-
-		//        } else if (c.feat[tmp_row][tmp_col] >= FEAT_WALL_EXTRA) {
-		//            /* Tunnel through all other walls */
-		//            /* Accept this location */
-		//            row1 = tmp_row;
-		//            col1 = tmp_col;
-
-		//            /* Save the tunnel location */
-		//            if (dun.tunn_n < TUNN_MAX) {
-		//                dun.tunn[dun.tunn_n].y = row1;
-		//                dun.tunn[dun.tunn_n].x = col1;
-		//                dun.tunn_n++;
-		//            }
-
-		//            /* Allow door in next grid */
-		//            door_flag = false;
-
-		//        } else {
-		//            /* Handle corridor intersections or overlaps */
-		//            /* Accept the location */
-		//            row1 = tmp_row;
-		//            col1 = tmp_col;
-
-		//            /* Collect legal door locations */
-		//            if (!door_flag) {
-		//                /* Save the door location */
-		//                if (dun.door_n < DOOR_MAX) {
-		//                    dun.door[dun.door_n].y = row1;
-		//                    dun.door[dun.door_n].x = col1;
-		//                    dun.door_n++;
-		//                }
-
-		//                /* No door in next grid */
-		//                door_flag = true;
-		//            }
-
-		//            /* Hack -- allow pre-emptive tunnel termination */
-		//            if (randint0(100) >= dun.profile.tun.con) {
-		//                /* Distance between row1 and start_row */
-		//                tmp_row = row1 - start_row;
-		//                if (tmp_row < 0) tmp_row = (-tmp_row);
-
-		//                /* Distance between col1 and start_col */
-		//                tmp_col = col1 - start_col;
-		//                if (tmp_col < 0) tmp_col = (-tmp_col);
-
-		//                /* Terminate the tunnel */
-		//                if ((tmp_row > 10) || (tmp_col > 10)) break;
-		//            }
-		//        }
-		//    }
+			        /* Get the next location */
+			        tmp_row = row1 + row_dir;
+			        tmp_col = col1 + col_dir;
+			    }
 
 
-		//    /* Turn the tunnel into corridor */
-		//    for (i = 0; i < dun.tunn_n; i++) {
-		//        /* Get the grid */
-		//        y = dun.tunn[i].y;
-		//        x = dun.tunn[i].x;
+			    /* Avoid the edge of the dungeon */
+			    if (cave_isperm(c, tmp_row, tmp_col)) continue;
 
-		//        /* Clear previous contents, add a floor */
-		//        cave_set_feat(c, y, x, FEAT_FLOOR);
-		//    }
+			    /* Avoid "solid" granite walls */
+			    if (c.feat[tmp_row][tmp_col] == FEAT_WALL_SOLID) continue;
+
+			    /* Pierce "outer" walls of rooms */
+			    if (c.feat[tmp_row][tmp_col] == FEAT_WALL_OUTER) {
+			        /* Get the "next" location */
+			        y = tmp_row + row_dir;
+			        x = tmp_col + col_dir;
+
+			        /* Hack -- Avoid outer/solid permanent walls */
+			        if (c.feat[y][x] == FEAT_PERM_SOLID) continue;
+			        if (c.feat[y][x] == FEAT_PERM_OUTER) continue;
+
+			        /* Hack -- Avoid outer/solid granite walls */
+			        if (c.feat[y][x] == FEAT_WALL_OUTER) continue;
+			        if (c.feat[y][x] == FEAT_WALL_SOLID) continue;
+
+			        /* Accept this location */
+			        row1 = tmp_row;
+			        col1 = tmp_col;
+
+			        /* Save the wall location */
+			        if (dun.wall_n < WALL_MAX) {
+						dun.wall[dun.wall_n] = new Loc();
+			            dun.wall[dun.wall_n].y = row1;
+			            dun.wall[dun.wall_n].x = col1;
+			            dun.wall_n++;
+			        }
+
+			        /* Forbid re-entry near this piercing */
+			        for (y = row1 - 1; y <= row1 + 1; y++)
+			            for (x = col1 - 1; x <= col1 + 1; x++)
+			                if (c.feat[y][x] == FEAT_WALL_OUTER)
+			                    cave_set_feat(c, y, x, FEAT_WALL_SOLID);
+
+			    } else if ((c.info[tmp_row][tmp_col] & (CAVE_ROOM)) != 0) {
+			        /* Travel quickly through rooms */
+			        /* Accept the location */
+			        row1 = tmp_row;
+			        col1 = tmp_col;
+
+			    } else if (c.feat[tmp_row][tmp_col] >= FEAT_WALL_EXTRA) {
+			        /* Tunnel through all other walls */
+			        /* Accept this location */
+			        row1 = tmp_row;
+			        col1 = tmp_col;
+
+			        /* Save the tunnel location */
+			        if (dun.tunn_n < TUNN_MAX) {
+						dun.tunn[dun.tunn_n] = new Loc();
+			            dun.tunn[dun.tunn_n].y = row1;
+			            dun.tunn[dun.tunn_n].x = col1;
+			            dun.tunn_n++;
+			        }
+
+			        /* Allow door in next grid */
+			        door_flag = false;
+
+			    } else {
+			        /* Handle corridor intersections or overlaps */
+			        /* Accept the location */
+			        row1 = tmp_row;
+			        col1 = tmp_col;
+
+			        /* Collect legal door locations */
+			        if (!door_flag) {
+			            /* Save the door location */
+			            if (dun.door_n < DOOR_MAX) {
+							dun.door[dun.door_n] = new Loc();
+			                dun.door[dun.door_n].y = row1;
+			                dun.door[dun.door_n].x = col1;
+			                dun.door_n++;
+			            }
+
+			            /* No door in next grid */
+			            door_flag = true;
+			        }
+
+			        /* Hack -- allow pre-emptive tunnel termination */
+			        if (Random.randint0(100) >= dun.profile.tun.con) {
+			            /* Distance between row1 and start_row */
+			            tmp_row = row1 - start_row;
+			            if (tmp_row < 0) tmp_row = (-tmp_row);
+
+			            /* Distance between col1 and start_col */
+			            tmp_col = col1 - start_col;
+			            if (tmp_col < 0) tmp_col = (-tmp_col);
+
+			            /* Terminate the tunnel */
+			            if ((tmp_row > 10) || (tmp_col > 10)) break;
+			        }
+			    }
+			}
 
 
-		//    /* Apply the piercings that we found */
-		//    for (i = 0; i < dun.wall_n; i++) {
-		//        /* Get the grid */
-		//        y = dun.wall[i].y;
-		//        x = dun.wall[i].x;
+			/* Turn the tunnel into corridor */
+			for (i = 0; i < dun.tunn_n; i++) {
+			    /* Get the grid */
+			    y = dun.tunn[i].y;
+			    x = dun.tunn[i].x;
 
-		//        /* Convert to floor grid */
-		//        cave_set_feat(c, y, x, FEAT_FLOOR);
-
-		//        /* Place a random door */
-		//        if (randint0(100) < dun.profile.tun.pen)
-		//            place_random_door(c, y, x);
-		//    }
-		//}
-
-		///**
-		// * Count the number of corridor grids adjacent to the given grid.
-		// *
-		// * This routine currently only counts actual "empty floor" grids which are not
-		// * in rooms.
-		// *
-		// * TODO: count stairs, open doors, closed doors?
-		// */
-		//static int next_to_corr(Cave c, int y1, int x1) {
-		//    int i, k = 0;
-		//    assert(cave_in_bounds(c, y1, x1));
-
-		//    /* Scan adjacent grids */
-		//    for (i = 0; i < 4; i++) {
-		//        /* Extract the location */
-		//        int y = y1 + ddy_ddd[i];
-		//        int x = x1 + ddx_ddd[i];
-
-		//        /* Count only floors which aren't part of rooms */
-		//        if (cave_isfloor(c, y, x) && !cave_isroom(c, y, x)) k++;
-		//    }
-
-		//    /* Return the number of corridors */
-		//    return k;
-		//}
-
-		///**
-		// * Returns whether a doorway can be built in a space.
-		// *
-		// * To have a doorway, a space must be adjacent to at least two corridors and be
-		// * between two walls.
-		// */
-		//static bool possible_doorway(Cave c, int y, int x) {
-		//    assert(cave_in_bounds(c, y, x));
-
-		//    if (next_to_corr(c, y, x) < 2)
-		//        return false;
-
-		//    if (cave_isstrongwall(c, y - 1, x) && cave_isstrongwall(c, y + 1, x))
-		//        return true;
-
-		//    if (cave_isstrongwall(c, y, x - 1) && cave_isstrongwall(c, y, x + 1))
-		//        return true;
-
-		//    return false;
-		//}
+			    /* Clear previous contents, add a floor */
+			    cave_set_feat(c, y, x, FEAT_FLOOR);
+			}
 
 
-		///**
-		// * Places door at y, x position if at least 2 walls found
-		// */
-		//static void try_door(Cave c, int y, int x) {
-		//    assert(cave_in_bounds(c, y, x));
+			/* Apply the piercings that we found */
+			for (i = 0; i < dun.wall_n; i++) {
+			    /* Get the grid */
+			    y = dun.wall[i].y;
+			    x = dun.wall[i].x;
 
-		//    if (cave_isstrongwall(c, y, x)) return;
-		//    if (cave_isroom(c, y, x)) return;
+			    /* Convert to floor grid */
+			    cave_set_feat(c, y, x, FEAT_FLOOR);
 
-		//    if (randint0(100) < dun.profile.tun.jct && possible_doorway(c, y, x))
-		//        place_random_door(c, y, x);
-		//}
+			    /* Place a random door */
+			    if (Random.randint0(100) < dun.profile.tun.pen)
+			        place_random_door(c, y, x);
+			}
+		}
+
+		/**
+		 * Count the number of corridor grids adjacent to the given grid.
+		 *
+		 * This routine currently only counts actual "empty floor" grids which are not
+		 * in rooms.
+		 *
+		 * TODO: count stairs, open doors, closed doors?
+		 */
+		static int next_to_corr(Cave c, int y1, int x1) {
+		    int i, k = 0;
+		    Misc.assert(cave_in_bounds(c, y1, x1));
+
+		    /* Scan adjacent grids */
+		    for (i = 0; i < 4; i++) {
+		        /* Extract the location */
+		        int y = y1 + Misc.ddy_ddd[i];
+		        int x = x1 + Misc.ddx_ddd[i];
+
+		        /* Count only floors which aren't part of rooms */
+		        if (cave_isfloor(c, y, x) && !cave_isroom(c, y, x)) k++;
+		    }
+
+		    /* Return the number of corridors */
+		    return k;
+		}
+
+		/**
+		 * Returns whether a doorway can be built in a space.
+		 *
+		 * To have a doorway, a space must be adjacent to at least two corridors and be
+		 * between two walls.
+		 */
+		static bool possible_doorway(Cave c, int y, int x) {
+		    Misc.assert(cave_in_bounds(c, y, x));
+
+		    if (next_to_corr(c, y, x) < 2)
+		        return false;
+
+		    if (cave_isstrongwall(c, y - 1, x) && cave_isstrongwall(c, y + 1, x))
+		        return true;
+
+		    if (cave_isstrongwall(c, y, x - 1) && cave_isstrongwall(c, y, x + 1))
+		        return true;
+
+		    return false;
+		}
 
 
-		///**
-		// * Attempt to build a room of the given type at the given block
-		// *
-		// * Note that we restrict the number of "crowded" rooms to reduce
-		// * the chance of overflowing the monster list during level creation.
-		// */
-		//static bool room_build(Cave c, int by0, int bx0, struct room_profile profile) {
-		//    /* Extract blocks */
-		//    int by1 = by0;
-		//    int bx1 = bx0;
-		//    int by2 = by0 + profile.height;
-		//    int bx2 = bx0 + profile.width;
+		/**
+		 * Places door at y, x position if at least 2 walls found
+		 */
+		static void try_door(Cave c, int y, int x) {
+		    Misc.assert(cave_in_bounds(c, y, x));
 
-		//    int allocated;
-		//    int y, x;
-		//    int by, bx;
+		    if (cave_isstrongwall(c, y, x)) return;
+		    if (cave_isroom(c, y, x)) return;
 
-		//    /* Enforce the room profile's minimum depth */
-		//    if (c.depth < profile.level) return false;
+			if (Random.randint0(100) < dun.profile.tun.jct && possible_doorway(c, y, x))
+			    place_random_door(c, y, x);
+		}
 
-		//    /* Only allow one crowded room per level */
-		//    if (dun.crowded && profile.crowded) return false;
 
-		//    /* Never run off the screen */
-		//    if (by1 < 0 || by2 >= dun.row_rooms) return false;
-		//    if (bx1 < 0 || bx2 >= dun.col_rooms) return false;
+		/**
+		 * Attempt to build a room of the given type at the given block
+		 *
+		 * Note that we restrict the number of "crowded" rooms to reduce
+		 * the chance of overflowing the monster list during level creation.
+		 */
+		static bool room_build(Cave c, int by0, int bx0, room_profile profile) {
+			/* Extract blocks */
+			int by1 = by0;
+			int bx1 = bx0;
+			int by2 = by0 + profile.height;
+			int bx2 = bx0 + profile.width;
 
-		//    /* Verify open space */
-		//    for (by = by1; by <= by2; by++) {
-		//        for (bx = bx1; bx <= bx2; bx++) {
-		//            if (1) {
-		//                /* previous rooms prevent new ones */
-		//                if (dun.room_map[by][bx]) return false;
-		//            } else {
-		//                return false; /* XYZ */
-		//            }
-		//        }
-		//    }
+			int allocated;
+			int y, x;
+			int by, bx;
 
-		//    /* Get the location of the room */
-		//    y = ((by1 + by2 + 1) * BLOCK_HGT) / 2;
-		//    x = ((bx1 + bx2 + 1) * BLOCK_WID) / 2;
+			/* Enforce the room profile's minimum depth */
+			if (c.depth < profile.level) return false;
 
-		//    /* Try to build a room */
-		//    if (!profile.builder(c, y, x)) return false;
+			/* Only allow one crowded room per level */
+			if (dun.crowded && profile.crowded) return false;
 
-		//    /* Save the room location */
-		//    if (dun.cent_n < CENT_MAX) {
-		//        dun.cent[dun.cent_n].y = y;
-		//        dun.cent[dun.cent_n].x = x;
-		//        dun.cent_n++;
-		//    }
+			/* Never run off the screen */
+			if (by1 < 0 || by2 >= dun.row_rooms) return false;
+			if (bx1 < 0 || bx2 >= dun.col_rooms) return false;
 
-		//    /* Reserve some blocks */
-		//    allocated = 0;
-		//    for (by = by1; by < by2; by++) {
-		//        for (bx = bx1; bx < bx2; bx++) {
-		//            dun.room_map[by][bx] = true;
-		//            allocated++;
-		//        }
-		//    }
+			/* Verify open space */
+			for (by = by1; by <= by2; by++) {
+			    for (bx = bx1; bx <= bx2; bx++) {
+			        if (true) {
+			            /* previous rooms prevent new ones */
+			            if (dun.room_map[by, bx]) return false;
+			        } else {
+			            return false; /* XYZ */
+			        }
+			    }
+			}
 
-		//    /* Count "crowded" rooms */
-		//    if (profile.crowded) dun.crowded = true;
+			/* Get the location of the room */
+			y = ((by1 + by2 + 1) * BLOCK_HGT) / 2;
+			x = ((bx1 + bx2 + 1) * BLOCK_WID) / 2;
 
-		//    /* Success */
-		//    return true;
-		//}
+			/* Try to build a room */
+			if (!profile.builder(c, y, x)) return false;
+
+			/* Save the room location */
+			if (dun.cent_n < CENT_MAX) {
+				dun.cent[dun.cent_n] = new Loc();
+			    dun.cent[dun.cent_n].y = y;
+			    dun.cent[dun.cent_n].x = x;
+			    dun.cent_n++;
+			}
+
+			/* Reserve some blocks */
+			allocated = 0;
+			for (by = by1; by < by2; by++) {
+			    for (bx = bx1; bx < bx2; bx++) {
+			        dun.room_map[by, bx] = true;
+			        allocated++;
+			    }
+			}
+
+			/* Count "crowded" rooms */
+			if (profile.crowded) dun.crowded = true;
+
+			/* Success */
+			return true;
+		}
 
 		static void set_cave_dimensions(Cave c, int h, int w) {
 		    int i, n = h * w;
@@ -2413,233 +2440,232 @@ namespace CSAngband {
 		}
 
 
-		///**
-		// * Generate a new dungeon level.
-		// */
-		//#define DUN_AMT_ROOM 7 /* Number of objects for rooms */
-		//#define DUN_AMT_ITEM 2 /* Number of objects for rooms/corridors */
-		//#define DUN_AMT_GOLD 3 /* Amount of treasure for rooms/corridors */
-		//static bool default_gen(Cave c, Player.Player p) {
-		//    int i, j, k, y, x, y1, x1;
-		//    int by, bx = 0, tby, tbx, key, rarity, built;
-		//    int num_rooms, size_percent;
-		//    int dun_unusual = dun.profile.dun_unusual;
+		/**
+		 * Generate a new dungeon level.
+		 */
+		const int DUN_AMT_ROOM = 7; /* Number of objects for rooms */
+		const int DUN_AMT_ITEM = 2; /* Number of objects for rooms/corridors */
+		const int DUN_AMT_GOLD = 3; /* Amount of treasure for rooms/corridors */
+		static bool default_gen(Cave c, Player.Player p) {
+			int i, j, k, y, x, y1, x1;
+			int by, bx = 0, tby, tbx, key, rarity, built;
+			int num_rooms, size_percent;
+			int dun_unusual = dun.profile.dun_unusual;
 
-		//    bool blocks_tried[MAX_ROOMS_ROW][MAX_ROOMS_COL];
-		//    for (by = 0; by < MAX_ROOMS_ROW; by++) {
-		//        for (bx = 0; bx < MAX_ROOMS_COL; bx++) {
-		//            blocks_tried[by][bx] = false;
-		//        }
-		//    }
+			bool[,] blocks_tried = new bool[MAX_ROOMS_ROW, MAX_ROOMS_COL];
+			for (by = 0; by < MAX_ROOMS_ROW; by++) {
+			    for (bx = 0; bx < MAX_ROOMS_COL; bx++) {
+			        blocks_tried[by, bx] = false;
+			    }
+			}
 
-		//    /* Possibly generate fewer rooms in a smaller area via a scaling factor.
-		//     * Since we scale row_rooms and col_rooms by the same amount, DUN_ROOMS
-		//     * gives the same "room density" no matter what size the level turns out
-		//     * to be. TODO: vary room density slightly? */
+			/* Possibly generate fewer rooms in a smaller area via a scaling factor.
+			 * Since we scale row_rooms and col_rooms by the same amount, DUN_ROOMS
+			 * gives the same "room density" no matter what size the level turns out
+			 * to be. TODO: vary room density slightly? */
 
-		//    /* XXX: Until vault generation is improved, scaling variance is removed */
-		//    i = randint1(10) + c.depth / 24;
-		//    if (is_quest(c.depth)) size_percent = 100;
-		//    else if (i < 2) size_percent = 75;
-		//    else if (i < 3) size_percent = 80;
-		//    else if (i < 4) size_percent = 85;
-		//    else if (i < 5) size_percent = 90;
-		//    else if (i < 6) size_percent = 95;
-		//    else size_percent = 100;
+			/* XXX: Until vault generation is improved, scaling variance is removed */
+			i = Random.randint1(10) + c.depth / 24;
+			if (is_quest(c.depth)) size_percent = 100;
+			else if (i < 2) size_percent = 75;
+			else if (i < 3) size_percent = 80;
+			else if (i < 4) size_percent = 85;
+			else if (i < 5) size_percent = 90;
+			else if (i < 6) size_percent = 95;
+			else size_percent = 100;
 
-		//    /* scale the various generation variables */
-		//    num_rooms = (dun.profile.dun_rooms * size_percent) / 100;
-		//    set_cave_dimensions(c, DUNGEON_HGT, DUNGEON_WID);
-		//    //ROOM_LOG("height=%d  width=%d  nrooms=%d", c.height, c.width, num_rooms);
+			/* scale the various generation variables */
+			num_rooms = (dun.profile.dun_rooms * size_percent) / 100;
+			set_cave_dimensions(c, DUNGEON_HGT, DUNGEON_WID);
+			//ROOM_LOG("height=%d  width=%d  nrooms=%d", c.height, c.width, num_rooms);
 
-		//    /* Initially fill with basic granite */
-		//    fill_rectangle(c, 0, 0, DUNGEON_HGT - 1, DUNGEON_WID - 1, FEAT_WALL_EXTRA);
+			/* Initially fill with basic granite */
+			fill_rectangle(c, 0, 0, DUNGEON_HGT - 1, DUNGEON_WID - 1, FEAT_WALL_EXTRA);
 
-		//    /* Actual maximum number of rooms on this level */
-		//    dun.row_rooms = c.height / BLOCK_HGT;
-		//    dun.col_rooms = c.width / BLOCK_WID;
+			/* Actual maximum number of rooms on this level */
+			dun.row_rooms = c.height / BLOCK_HGT;
+			dun.col_rooms = c.width / BLOCK_WID;
 
-		//    /* Initialize the room table */
-		//    for (by = 0; by < dun.row_rooms; by++)
-		//        for (bx = 0; bx < dun.col_rooms; bx++)
-		//            dun.room_map[by][bx] = blocks_tried[by][bx]  = false;
+			/* Initialize the room table */
+			for (by = 0; by < dun.row_rooms; by++)
+			    for (bx = 0; bx < dun.col_rooms; bx++)
+			        dun.room_map[by, bx] = blocks_tried[by, bx]  = false;
 
-		//    /* No rooms yet, crowded or otherwise. */
-		//    dun.crowded = false;
-		//    dun.cent_n = 0;
+			/* No rooms yet, crowded or otherwise. */
+			dun.crowded = false;
+			dun.cent_n = 0;
 
-		//    /* Build some rooms */
-		//    built = 0;
-		//    while(built < num_rooms) {
+			/* Build some rooms */
+			built = 0;
+			while(built < num_rooms) {
+			    /* Count the room blocks we haven't tried yet. */
+			    j = 0;
+			    tby = 0;
+			    tbx = 0;
+			    for(by = 0; by < dun.row_rooms; by++) {
+			        for(bx = 0; bx < dun.col_rooms; bx++) {
+			            if (blocks_tried[by,bx]) continue;
+			            j++;
+			            if (Random.one_in_(j)) {
+			                tby = by;
+			                tbx = bx;
+			            }
+			        } 
+			    }
+			    bx = tbx;
+			    by = tby;
 
-		//        /* Count the room blocks we haven't tried yet. */
-		//        j = 0;
-		//        tby = 0;
-		//        tbx = 0;
-		//        for(by = 0; by < dun.row_rooms; by++) {
-		//            for(bx = 0; bx < dun.col_rooms; bx++) {
-		//                if (blocks_tried[by][bx]) continue;
-		//                j++;
-		//                if (one_in_(j)) {
-		//                    tby = by;
-		//                    tbx = bx;
-		//                }
-		//            } 
-		//        }
-		//        bx = tbx;
-		//        by = tby;
+			    /* If we've tried all blocks we're done. */
+			    if (j == 0) break;
 
-		//        /* If we've tried all blocks we're done. */
-		//        if (j == 0) break;
+			    if (blocks_tried[by, bx]) Utilities.quit("generation: inconsistent blocks");
 
-		//        if (blocks_tried[by][bx]) quit_fmt("generation: inconsistent blocks");
+			    /* Mark that we are trying this block. */
+			    blocks_tried[by, bx] = true;
 
-		//        /* Mark that we are trying this block. */
-		//        blocks_tried[by][bx] = true;
+			    /* Roll for random key (to be compared against a profile's cutoff) */
+			    key = Random.randint0(100);
 
-		//        /* Roll for random key (to be compared against a profile's cutoff) */
-		//        key = randint0(100);
+			    /* We generate a rarity number to figure out how exotic to make the
+			     * room. This number has a depth/DUN_UNUSUAL chance of being > 0,
+			     * a depth^2/DUN_UNUSUAL^2 chance of being > 1, up to MAX_RARITY. */
+			    i = 0;
+			    rarity = 0;
+			    while (i == rarity && i < dun.profile.max_rarity) {
+			        if (Random.randint0(dun_unusual) < c.depth) rarity++;
+			        i++;
+			    }
 
-		//        /* We generate a rarity number to figure out how exotic to make the
-		//         * room. This number has a depth/DUN_UNUSUAL chance of being > 0,
-		//         * a depth^2/DUN_UNUSUAL^2 chance of being > 1, up to MAX_RARITY. */
-		//        i = 0;
-		//        rarity = 0;
-		//        while (i == rarity && i < dun.profile.max_rarity) {
-		//            if (randint0(dun_unusual) < c.depth) rarity++;
-		//            i++;
-		//        }
-
-		//        /* Once we have a key and a rarity, we iterate through out list of
-		//         * room profiles looking for a match (whose cutoff > key and whose
-		//         * rarity > this rarity). We try building the room, and if it works
-		//         * then we are done with this iteration. We keep going until we find
-		//         * a room that we can build successfully or we exhaust the profiles. */
-		//        i = 0;
-		//        for (i = 0; i < dun.profile.n_room_profiles; i++) {
-		//            struct room_profile profile = dun.profile.room_profiles[i];
-		//            if (profile.rarity > rarity) continue;
-		//            if (profile.cutoff <= key) continue;
+			    /* Once we have a key and a rarity, we iterate through out list of
+			     * room profiles looking for a match (whose cutoff > key and whose
+			     * rarity > this rarity). We try building the room, and if it works
+			     * then we are done with this iteration. We keep going until we find
+			     * a room that we can build successfully or we exhaust the profiles. */
+			    i = 0;
+			    for (i = 0; i < dun.profile.n_room_profiles; i++) {
+			        room_profile profile = dun.profile.room_profiles[i];
+			        if (profile.rarity > rarity) continue;
+			        if (profile.cutoff <= key) continue;
 			
-		//            if (room_build(c, by, bx, profile)) {
-		//                built++;
-		//                break;
-		//            }
-		//        }
-		//    }
+			        if (room_build(c, by, bx, profile)) {
+			            built++;
+			            break;
+			        }
+			    }
+			}
 
-		//    /* Generate permanent walls around the edge of the dungeon */
-		//    draw_rectangle(c, 0, 0, DUNGEON_HGT - 1, DUNGEON_WID - 1, FEAT_PERM_SOLID);
+			/* Generate permanent walls around the edge of the dungeon */
+			draw_rectangle(c, 0, 0, DUNGEON_HGT - 1, DUNGEON_WID - 1, FEAT_PERM_SOLID);
 
-		//    /* Hack -- Scramble the room order */
-		//    for (i = 0; i < dun.cent_n; i++) {
-		//        int pick1 = randint0(dun.cent_n);
-		//        int pick2 = randint0(dun.cent_n);
-		//        y1 = dun.cent[pick1].y;
-		//        x1 = dun.cent[pick1].x;
-		//        dun.cent[pick1].y = dun.cent[pick2].y;
-		//        dun.cent[pick1].x = dun.cent[pick2].x;
-		//        dun.cent[pick2].y = y1;
-		//        dun.cent[pick2].x = x1;
-		//    }
+			/* Hack -- Scramble the room order */
+			for (i = 0; i < dun.cent_n; i++) {
+			    int pick1 = Random.randint0(dun.cent_n);
+			    int pick2 = Random.randint0(dun.cent_n);
+			    y1 = dun.cent[pick1].y;
+			    x1 = dun.cent[pick1].x;
+			    dun.cent[pick1].y = dun.cent[pick2].y;
+			    dun.cent[pick1].x = dun.cent[pick2].x;
+			    dun.cent[pick2].y = y1;
+			    dun.cent[pick2].x = x1;
+			}
 
-		//    /* Start with no tunnel doors */
-		//    dun.door_n = 0;
+			/* Start with no tunnel doors */
+			dun.door_n = 0;
 
-		//    /* Hack -- connect the first room to the last room */
-		//    y = dun.cent[dun.cent_n-1].y;
-		//    x = dun.cent[dun.cent_n-1].x;
+			/* Hack -- connect the first room to the last room */
+			y = dun.cent[dun.cent_n-1].y;
+			x = dun.cent[dun.cent_n-1].x;
 
-		//    /* Connect all the rooms together */
-		//    for (i = 0; i < dun.cent_n; i++) {
-		//        /* Connect the room to the previous room */
-		//        build_tunnel(c, dun.cent[i].y, dun.cent[i].x, y, x);
+			/* Connect all the rooms together */
+			for (i = 0; i < dun.cent_n; i++) {
+			    /* Connect the room to the previous room */
+			    build_tunnel(c, dun.cent[i].y, dun.cent[i].x, y, x);
 
-		//        /* Remember the "previous" room */
-		//        y = dun.cent[i].y;
-		//        x = dun.cent[i].x;
-		//    }
+			    /* Remember the "previous" room */
+			    y = dun.cent[i].y;
+			    x = dun.cent[i].x;
+			}
 
-		//    /* Place intersection doors */
-		//    for (i = 0; i < dun.door_n; i++) {
-		//        /* Extract junction location */
-		//        y = dun.door[i].y;
-		//        x = dun.door[i].x;
+			/* Place intersection doors */
+			for (i = 0; i < dun.door_n; i++) {
+			    /* Extract junction location */
+			    y = dun.door[i].y;
+			    x = dun.door[i].x;
 
-		//        /* Try placing doors */
-		//        try_door(c, y, x - 1);
-		//        try_door(c, y, x + 1);
-		//        try_door(c, y - 1, x);
-		//        try_door(c, y + 1, x);
-		//    }
+			    /* Try placing doors */
+			    try_door(c, y, x - 1);
+			    try_door(c, y, x + 1);
+			    try_door(c, y - 1, x);
+			    try_door(c, y + 1, x);
+			}
 
-		//    ensure_connectedness(c);
+			ensure_connectedness(c);
 
-		//    /* Add some magma streamers */
-		//    for (i = 0; i < dun.profile.str.mag; i++)
-		//        build_streamer(c, FEAT_MAGMA, dun.profile.str.mc);
+			/* Add some magma streamers */
+			for (i = 0; i < dun.profile.str.mag; i++)
+			    build_streamer(c, FEAT_MAGMA, dun.profile.str.mc);
 
-		//    /* Add some quartz streamers */
-		//    for (i = 0; i < dun.profile.str.qua; i++)
-		//        build_streamer(c, FEAT_QUARTZ, dun.profile.str.qc);
+			/* Add some quartz streamers */
+			for (i = 0; i < dun.profile.str.qua; i++)
+			    build_streamer(c, FEAT_QUARTZ, dun.profile.str.qc);
 
-		//    /* Place 3 or 4 down stairs near some walls */
-		//    alloc_stairs(c, FEAT_MORE, rand_range(3, 4), 3);
+			/* Place 3 or 4 down stairs near some walls */
+			alloc_stairs(c, FEAT_MORE, Random.rand_range(3, 4), 3);
 
-		//    /* Place 1 or 2 up stairs near some walls */
-		//    alloc_stairs(c, FEAT_LESS, rand_range(1, 2), 3);
+			/* Place 1 or 2 up stairs near some walls */
+			alloc_stairs(c, FEAT_LESS, Random.rand_range(1, 2), 3);
 
-		//    /* General amount of rubble, traps and monsters */
-		//    k = MAX(MIN(c.depth / 3, 10), 2);
+			/* General amount of rubble, traps and monsters */
+			k = Math.Max(Math.Min(c.depth / 3, 10), 2);
 
-		//    /* Put some rubble in corridors */
-		//    alloc_objects(c, SET_CORR, TYP_RUBBLE, randint1(k), c.depth, 0);
+			/* Put some rubble in corridors */
+			alloc_objects(c, SET_CORR, TYP_RUBBLE, Random.randint1(k), c.depth, 0);
 
-		//    /* Place some traps in the dungeon */
-		//    alloc_objects(c, SET_BOTH, TYP_TRAP, randint1(k), c.depth, 0);
+			/* Place some traps in the dungeon */
+			alloc_objects(c, SET_BOTH, TYP_TRAP, Random.randint1(k), c.depth, 0);
 
-		//    /* Determine the character location */
-		//    new_player_spot(c, p);
+			/* Determine the character location */
+			new_player_spot(c, p);
 
-		//    /* Pick a base number of monsters */
-		//    i = MIN_M_ALLOC_LEVEL + randint1(8) + k;
+			/* Pick a base number of monsters */
+			i = Misc.MIN_M_ALLOC_LEVEL + Random.randint1(8) + k;
 
-		//    /* Put some monsters in the dungeon */
-		//    for (; i > 0; i--)
-		//        pick_and_place_distant_monster(c, loc(p.px, p.py), 0, true, c.depth);
+			/* Put some monsters in the dungeon */
+			for (; i > 0; i--)
+			    Monster_Make.pick_and_place_distant_monster(c, new Loc(p.px, p.py), 0, true, c.depth);
 
-		//    /* Put some objects in rooms */
-		//    alloc_objects(c, SET_ROOM, TYP_OBJECT, Rand_normal(DUN_AMT_ROOM, 3),
-		//        c.depth, ORIGIN_FLOOR);
+			/* Put some objects in rooms */
+			alloc_objects(c, SET_ROOM, TYP_OBJECT, Random.Rand_normal(DUN_AMT_ROOM, 3),
+			    c.depth, Origin.FLOOR);
 
-		//    /* Put some objects/gold in the dungeon */
-		//    alloc_objects(c, SET_BOTH, TYP_OBJECT, Rand_normal(DUN_AMT_ITEM, 3),
-		//        c.depth, ORIGIN_FLOOR);
-		//    alloc_objects(c, SET_BOTH, TYP_GOLD, Rand_normal(DUN_AMT_GOLD, 3),
-		//        c.depth, ORIGIN_FLOOR);
+			/* Put some objects/gold in the dungeon */
+			alloc_objects(c, SET_BOTH, TYP_OBJECT, Random.Rand_normal(DUN_AMT_ITEM, 3),
+			    c.depth, Origin.FLOOR);
+			alloc_objects(c, SET_BOTH, TYP_GOLD, Random.Rand_normal(DUN_AMT_GOLD, 3),
+			    c.depth, Origin.FLOOR);
 
-		//    return true;
-		//}
+			return true;
+		}
 
 
-		///*
-		// * ------------------ LABYRINTH ----------------
-		// */
+		/*
+		 * ------------------ LABYRINTH ----------------
+		 */
 
-		///**
-		// * Used to convert (x, y) into an array index (i) in labyrinth_gen().
-		// */
-		//static int lab_toi(int y, int x, int w) {
-		//    return y * w + x;
-		//}
+		/**
+		 * Used to convert (x, y) into an array index (i) in labyrinth_gen().
+		 */
+		static int lab_toi(int y, int x, int w) {
+		    return y * w + x;
+		}
 
-		///**
-		// * Used to convert an array index (i) into (x, y) in labyrinth_gen().
-		// */
-		//static void lab_toyx(int i, int w, int *y, int *x) {
-		//    *y = i / w;
-		//    *x = i % w;
-		//}
+		/**
+		 * Used to convert an array index (i) into (x, y) in labyrinth_gen().
+		 */
+		static void lab_toyx(int i, int w, out int y, out int x) {
+		    y = i / w;
+		    x = i % w;
+		}
 
 		///**
 		// * Given an adjoining wall (a wall which separates two labyrinth cells)
@@ -2679,202 +2705,204 @@ namespace CSAngband {
 		//}
 
 
-		///**
-		// * Build a labyrinth level.
-		// *
-		// * Note that if the function returns false, a level wasn't generated.
-		// * Labyrinths use the dungeon level's number to determine whether to generate
-		// * themselves (which means certain level numbers are more likely to generate
-		// * labyrinths than others).
-		// */
-		//static bool labyrinth_gen(Cave c, Player.Player p) {
-		//    int i, j, k, y, x;
+		/**
+		 * Build a labyrinth level.
+		 *
+		 * Note that if the function returns false, a level wasn't generated.
+		 * Labyrinths use the dungeon level's number to determine whether to generate
+		 * themselves (which means certain level numbers are more likely to generate
+		 * labyrinths than others).
+		 */
+		static bool labyrinth_gen(Cave c, Player.Player p) {
+			int i, j, k, y, x;
+			
+			/* Size of the actual labyrinth part must be odd. */
+			/* NOTE: these are not the actual dungeon size, but rather the size of the
+			 * area we're genearting a labyrinth in (which doesn't count theh enclosing
+			 * outer walls. */
+			int h = 15 + Random.randint0(c.depth / 10) * 2;
+			int w = 51 + Random.randint0(c.depth / 10) * 2;
 
-		//    /* Size of the actual labyrinth part must be odd. */
-		//    /* NOTE: these are not the actual dungeon size, but rather the size of the
-		//     * area we're genearting a labyrinth in (which doesn't count theh enclosing
-		//     * outer walls. */
-		//    int h = 15 + randint0(c.depth / 10) * 2;
-		//    int w = 51 + randint0(c.depth / 10) * 2;
+			/* This is the number of squares in the labyrinth */
+			int n = h * w;
 
-		//    /* This is the number of squares in the labyrinth */
-		//    int n = h * w;
+			/* NOTE: 'sets' and 'walls' are too large... we only need to use about
+			 * 1/4 as much memory. However, in that case, the addressing math becomes
+			 * a lot more complicated, so let's just stick with this because it's
+			 * easier to read. */
 
-		//    /* NOTE: 'sets' and 'walls' are too large... we only need to use about
-		//     * 1/4 as much memory. However, in that case, the addressing math becomes
-		//     * a lot more complicated, so let's just stick with this because it's
-		//     * easier to read. */
+			/* 'sets' tracks connectedness; if sets[i] == sets[j] then cells i and j
+			 * are connected to each other in the maze. */
+			int[] sets;
 
-		//    /* 'sets' tracks connectedness; if sets[i] == sets[j] then cells i and j
-		//     * are connected to each other in the maze. */
-		//    int *sets;
+			/* 'walls' is a list of wall coordinates which we will randomize */
+			int[] walls;
 
-		//    /* 'walls' is a list of wall coordinates which we will randomize */
-		//    int *walls;
+			/* Most labyrinths are lit */
+			bool lit = Random.randint0(c.depth) < 25 || Random.randint0(2) < 1;
 
-		//    /* Most labyrinths are lit */
-		//    bool lit = randint0(c.depth) < 25 || randint0(2) < 1;
+			/* Many labyrinths are known */
+			bool known = lit && Random.randint0(c.depth) < 25;
 
-		//    /* Many labyrinths are known */
-		//    bool known = lit && randint0(c.depth) < 25;
+			/* Most labyrinths have soft (diggable) walls */
+			bool soft = Random.randint0(c.depth) < 35 || Random.randint0(3) < 2;
 
-		//    /* Most labyrinths have soft (diggable) walls */
-		//    bool soft = randint0(c.depth) < 35 || randint0(3) < 2;
+			/* There's a base 1 in 100 to accept the labyrinth */
+			int chance = 1;
 
-		//    /* There's a base 1 in 100 to accept the labyrinth */
-		//    int chance = 1;
+			/* If we're too shallow then don't do it */
+			if (c.depth < 13) return false;
 
-		//    /* If we're too shallow then don't do it */
-		//    if (c.depth < 13) return false;
+			/* Don't try this on quest levels, kids... */
+			if (is_quest(c.depth)) return false;
 
-		//    /* Don't try this on quest levels, kids... */
-		//    if (is_quest(c.depth)) return false;
+			/* Certain numbers increase the chance of having a labyrinth */
+			if (c.depth % 3 == 0) chance += 1;
+			if (c.depth % 5 == 0) chance += 1;
+			if (c.depth % 7 == 0) chance += 1;
+			if (c.depth % 11 == 0) chance += 1;
+			if (c.depth % 13 == 0) chance += 1;
 
-		//    /* Certain numbers increase the chance of having a labyrinth */
-		//    if (c.depth % 3 == 0) chance += 1;
-		//    if (c.depth % 5 == 0) chance += 1;
-		//    if (c.depth % 7 == 0) chance += 1;
-		//    if (c.depth % 11 == 0) chance += 1;
-		//    if (c.depth % 13 == 0) chance += 1;
+			/* Only generate the level if we pass a check */
+			/* NOTE: This test gets performed after we pass the test to use the
+			 * labyrinth cave profile. */
+			if (Random.randint0(100) >= chance) return false;
 
-		//    /* Only generate the level if we pass a check */
-		//    /* NOTE: This test gets performed after we pass the test to use the
-		//     * labyrinth cave profile. */
-		//    if (randint0(100) >= chance) return false;
+			/* allocate our arrays */
+			sets = new int[n];
+			walls = new int[n];
 
-		//    /* allocate our arrays */
-		//    sets = C_ZNEW(n, int);
-		//    walls = C_ZNEW(n, int);
+			/* This is the dungeon size, which does include the enclosing walls */
+			set_cave_dimensions(c, h + 2, w + 2);
 
-		//    /* This is the dungeon size, which does include the enclosing walls */
-		//    set_cave_dimensions(c, h + 2, w + 2);
+			/* Fill whole level with perma-rock */
+			fill_rectangle(c, 0, 0, DUNGEON_HGT - 1, DUNGEON_WID - 1, FEAT_PERM_SOLID);
 
-		//    /* Fill whole level with perma-rock */
-		//    fill_rectangle(c, 0, 0, DUNGEON_HGT - 1, DUNGEON_WID - 1, FEAT_PERM_SOLID);
+			/* Fill the labyrinth area with rock */
+			fill_rectangle(c, 1, 1, h, w, soft ? FEAT_WALL_SOLID : FEAT_PERM_SOLID);
 
-		//    /* Fill the labyrinth area with rock */
-		//    fill_rectangle(c, 1, 1, h, w, soft ? FEAT_WALL_SOLID : FEAT_PERM_SOLID);
+			/* Initialize each wall. */
+			for (i = 0; i < n; i++) {
+			    walls[i] = i;
+			    sets[i] = -1;
+			}
 
-		//    /* Initialize each wall. */
-		//    for (i = 0; i < n; i++) {
-		//        walls[i] = i;
-		//        sets[i] = -1;
-		//    }
+			/* Cut out a grid of 1x1 rooms which we will call "cells" */
+			for (y = 0; y < h; y += 2) {
+			    for (x = 0; x < w; x += 2) {
+			        int k2 = lab_toi(y, x, w);
+			        sets[k2] = k2;
+			        cave_set_feat(c, y + 1, x + 1, FEAT_FLOOR);
+			        if (lit) c.info[y + 1][x + 1] |= CAVE_GLOW;
+			    }
+			}
 
-		//    /* Cut out a grid of 1x1 rooms which we will call "cells" */
-		//    for (y = 0; y < h; y += 2) {
-		//        for (x = 0; x < w; x += 2) {
-		//            int k = lab_toi(y, x, w);
-		//            sets[k] = k;
-		//            cave_set_feat(c, y + 1, x + 1, FEAT_FLOOR);
-		//            if (lit) c.info[y + 1][x + 1] |= CAVE_GLOW;
-		//        }
-		//    }
+			throw new NotImplementedException();
 
-		//    /* Shuffle the walls, using Knuth's shuffle. */
-		//    shuffle(walls, n);
+			///* Shuffle the walls, using Knuth's shuffle. */
+			//shuffle(walls, n);
 
-		//    /* For each adjoining wall, look at the cells it divides. If they aren't
-		//     * in the same set, remove the wall and join their sets.
-		//     *
-		//     * This is a randomized version of Kruskal's algorithm. */
-		//    for (i = 0; i < n; i++) {
-		//        int a, b, x, y;
+			///* For each adjoining wall, look at the cells it divides. If they aren't
+			// * in the same set, remove the wall and join their sets.
+			// *
+			// * This is a randomized version of Kruskal's algorithm. */
+			//for (i = 0; i < n; i++) {
+			//    int a, b, x, y;
 
-		//        j = walls[i];
+			//    j = walls[i];
 
-		//        /* If this cell isn't an adjoining wall, skip it */
-		//        lab_toyx(j, w, &y, &x);
-		//        if ((x < 1 && y < 1) || (x > w - 2 && y > h - 2)) continue;
-		//        if (x % 2 == y % 2) continue;
+			//    /* If this cell isn't an adjoining wall, skip it */
+			//    lab_toyx(j, w, &y, &x);
+			//    if ((x < 1 && y < 1) || (x > w - 2 && y > h - 2)) continue;
+			//    if (x % 2 == y % 2) continue;
 
-		//        /* Figure out which cells are separated by this wall */
-		//        lab_get_adjoin(j, w, &a, &b);
+			//    /* Figure out which cells are separated by this wall */
+			//    lab_get_adjoin(j, w, &a, &b);
 
-		//        /* If the cells aren't connected, kill the wall and join the sets */
-		//        if (sets[a] != sets[b]) {
-		//            int sa = sets[a];
-		//            int sb = sets[b];
-		//            cave_set_feat(c, y + 1, x + 1, FEAT_FLOOR);
-		//            if (lit) c.info[y + 1][x + 1] |= CAVE_GLOW;
+			//    /* If the cells aren't connected, kill the wall and join the sets */
+			//    if (sets[a] != sets[b]) {
+			//        int sa = sets[a];
+			//        int sb = sets[b];
+			//        cave_set_feat(c, y + 1, x + 1, FEAT_FLOOR);
+			//        if (lit) c.info[y + 1][x + 1] |= CAVE_GLOW;
 
-		//            for (k = 0; k < n; k++) {
-		//                if (sets[k] == sb) sets[k] = sa;
-		//            }
-		//        }
-		//    }
+			//        for (k = 0; k < n; k++) {
+			//            if (sets[k] == sb) sets[k] = sa;
+			//        }
+			//    }
+			//}
 
-		//    /* Determine the character location */
-		//    new_player_spot(c, p);
+			///* Determine the character location */
+			//new_player_spot(c, p);
 
-		//    /* The level should have exactly one down and one up staircase */
-		//    if (OPT(birth_no_stairs)) {
-		//        /* new_player_spot() won't have created stairs, so make both*/
-		//        alloc_stairs(c, FEAT_MORE, 1, 3);
-		//        alloc_stairs(c, FEAT_LESS, 1, 3);
-		//    } else if (p.create_down_stair) {
-		//        /* new_player_spot() will have created down, so only create up */
-		//        alloc_stairs(c, FEAT_LESS, 1, 3);
-		//    } else {
-		//        /* new_player_spot() will have created up, so only create down */
-		//        alloc_stairs(c, FEAT_MORE, 1, 3);
-		//    }
+			///* The level should have exactly one down and one up staircase */
+			//if (OPT(birth_no_stairs)) {
+			//    /* new_player_spot() won't have created stairs, so make both*/
+			//    alloc_stairs(c, FEAT_MORE, 1, 3);
+			//    alloc_stairs(c, FEAT_LESS, 1, 3);
+			//} else if (p.create_down_stair) {
+			//    /* new_player_spot() will have created down, so only create up */
+			//    alloc_stairs(c, FEAT_LESS, 1, 3);
+			//} else {
+			//    /* new_player_spot() will have created up, so only create down */
+			//    alloc_stairs(c, FEAT_MORE, 1, 3);
+			//}
 
-		//    /* Generate a door for every 100 squares in the labyrinth */
-		//    for (i = n / 100; i > 0; i--) {
-		//        /* Try 10 times to find a useful place for a door, then place it */
-		//        for (j = 0; j < 10; j++) {
-		//            find_empty(c, &y, &x);
-		//            if (lab_is_tunnel(c, y, x)) break;
+			///* Generate a door for every 100 squares in the labyrinth */
+			//for (i = n / 100; i > 0; i--) {
+			//    /* Try 10 times to find a useful place for a door, then place it */
+			//    for (j = 0; j < 10; j++) {
+			//        find_empty(c, &y, &x);
+			//        if (lab_is_tunnel(c, y, x)) break;
 
-		//        }
+			//    }
 
-		//        place_closed_door(c, y, x);
-		//    }
+			//    place_closed_door(c, y, x);
+			//}
 
-		//    /* General some rubble, traps and monsters */
-		//    k = MAX(MIN(c.depth / 3, 10), 2);
+			///* General some rubble, traps and monsters */
+			//k = MAX(MIN(c.depth / 3, 10), 2);
 
-		//    /* Scale number of monsters items by labyrinth size */
-		//    k = (3 * k * (h * w)) / (DUNGEON_HGT * DUNGEON_WID);
+			///* Scale number of monsters items by labyrinth size */
+			//k = (3 * k * (h * w)) / (DUNGEON_HGT * DUNGEON_WID);
 
-		//    /* Put some rubble in corridors */
-		//    alloc_objects(c, SET_BOTH, TYP_RUBBLE, randint1(k), c.depth, 0);
+			///* Put some rubble in corridors */
+			//alloc_objects(c, SET_BOTH, TYP_RUBBLE, randint1(k), c.depth, 0);
 
-		//    /* Place some traps in the dungeon */
-		//    alloc_objects(c, SET_BOTH, TYP_TRAP, randint1(k), c.depth, 0);
+			///* Place some traps in the dungeon */
+			//alloc_objects(c, SET_BOTH, TYP_TRAP, randint1(k), c.depth, 0);
 
-		//    /* Put some monsters in the dungeon */
-		//    for (i = MIN_M_ALLOC_LEVEL + randint1(8) + k; i > 0; i--)
-		//        pick_and_place_distant_monster(c, loc(p.px, p.py), 0, true, c.depth);
+			///* Put some monsters in the dungeon */
+			//for (i = MIN_M_ALLOC_LEVEL + randint1(8) + k; i > 0; i--)
+			//    pick_and_place_distant_monster(c, loc(p.px, p.py), 0, true, c.depth);
 
-		//    /* Put some objects/gold in the dungeon */
-		//    alloc_objects(c, SET_BOTH, TYP_OBJECT, Rand_normal(6, 3), c.depth,
-		//        ORIGIN_LABYRINTH);
-		//    alloc_objects(c, SET_BOTH, TYP_GOLD, Rand_normal(6, 3), c.depth,
-		//        ORIGIN_LABYRINTH);
-		//    alloc_objects(c, SET_BOTH, TYP_GOOD, randint0(2), c.depth,
-		//        ORIGIN_LABYRINTH);
+			///* Put some objects/gold in the dungeon */
+			//alloc_objects(c, SET_BOTH, TYP_OBJECT, Rand_normal(6, 3), c.depth,
+			//    ORIGIN_LABYRINTH);
+			//alloc_objects(c, SET_BOTH, TYP_GOLD, Rand_normal(6, 3), c.depth,
+			//    ORIGIN_LABYRINTH);
+			//alloc_objects(c, SET_BOTH, TYP_GOOD, randint0(2), c.depth,
+			//    ORIGIN_LABYRINTH);
 
-		//    /* Unlit labyrinths will have some good items */
-		//    if (!lit)
-		//        alloc_objects(c, SET_BOTH, TYP_GOOD, Rand_normal(3, 2), c.depth,
-		//            ORIGIN_LABYRINTH);
+			///* Unlit labyrinths will have some good items */
+			//if (!lit)
+			//    alloc_objects(c, SET_BOTH, TYP_GOOD, Rand_normal(3, 2), c.depth,
+			//        ORIGIN_LABYRINTH);
 
-		//    /* Hard (non-diggable) labyrinths will have some great items */
-		//    if (!soft)
-		//        alloc_objects(c, SET_BOTH, TYP_GREAT, Rand_normal(2, 1), c.depth,
-		//            ORIGIN_LABYRINTH);
+			///* Hard (non-diggable) labyrinths will have some great items */
+			//if (!soft)
+			//    alloc_objects(c, SET_BOTH, TYP_GREAT, Rand_normal(2, 1), c.depth,
+			//        ORIGIN_LABYRINTH);
 
-		//    /* If we want the players to see the maze layout, do that now */
-		//    if (known) wiz_light();
+			///* If we want the players to see the maze layout, do that now */
+			//if (known) wiz_light();
 
-		//    /* Deallocate our lists */
-		//    FREE(sets);
-		//    FREE(walls);
+			///* Deallocate our lists */
+			//FREE(sets);
+			//FREE(walls);
 
-		//    return true;
-		//}
+			//return true;
+		}
 
 
 		///*
@@ -2962,25 +2990,25 @@ namespace CSAngband {
 		//    for (i = 0; i < size; i++) data[i] = value;
 		//}
 
-		///**
-		// * Determine if we need to worry about coloring a point, or can ignore it.
-		// */
-		//static int ignore_point(Cave c, int colors[], int y, int x) {
-		//    int h = c.height;
-		//    int w = c.width;
-		//    int n = lab_toi(y, x, w);
+		/**
+		 * Determine if we need to worry about coloring a point, or can ignore it.
+		 */
+		static bool ignore_point(Cave c, int[] colors, int y, int x) {
+		    int h = c.height;
+		    int w = c.width;
+		    int n = lab_toi(y, x, w);
 
-		//    if (y < 0 || x < 0 || y >= h || x >= w) return true;
-		//    if (colors[n]) return true;
-		//    //if (cave_isvault(c, y, x)) return true;
-		//    if (cave_isvault(c, y, x)) return false;
-		//    if (cave_ispassable(c, y, x)) return false;
-		//    if (cave_isdoor(c, y, x)) return false;
-		//    return true;
-		//}
+		    if (y < 0 || x < 0 || y >= h || x >= w) return true;
+		    if (colors[n] != 0) return true;
+		    //if (cave_isvault(c, y, x)) return true;
+		    if (cave_isvault(c, y, x)) return false;
+		    if (cave_ispassable(c, y, x)) return false;
+		    if (cave_isdoor(c, y, x)) return false;
+		    return true;
+		}
 
-		//static int xds[] = {0, 0, 1, -1, -1, -1, 1, 1};
-		//static int yds[] = {1, -1, 0, 0, -1, 1, -1, 1};
+		static int[] xds = {0, 0, 1, -1, -1, -1, 1, 1};
+		static int[] yds = {1, -1, 0, 0, -1, 1, -1, 1};
 
 		//#if 0 /* XXX d_m - is this meant to be in use? */
 		//static void glow_point(Cave c, int y, int x) {
@@ -2991,70 +3019,74 @@ namespace CSAngband {
 		//}
 		//#endif
 
-		///**
-		// * Color a particular point, and all adjacent points.
-		// */
-		//static void build_color_point(Cave c, int colors[], int counts[], int y, int x, int color, bool diagonal) {
-		//    int h = c.height;
-		//    int w = c.width;
-		//    int size = h * w;
-		//    struct queue *queue = q_new(size);
+		/**
+		 * Color a particular point, and all adjacent points.
+		 */
+		static void build_color_point(Cave c, int[] colors, int[] counts, int y, int x, int color, bool diagonal) {
+			int h = c.height;
+			int w = c.width;
+			int size = h * w;
+			//struct queue *queue = q_new(size);
+			Queue<int> queue = new Queue<int>();
 
-		//    int dslimit = diagonal ? 8 : 4;
+			int dslimit = diagonal ? 8 : 4;
 
-		//    int *added = C_ZNEW(size, int);
-		//    array_filler(added, 0, size);
+			int[] added = new int[size];//C_ZNEW(size, int);
+			for(int i = 0; i < added.Length; i++) {
+				added[i] = 0;
+			}
+			//array_filler(added, 0, size);
 
-		//    q_push_int(queue, lab_toi(y, x, w));
+			queue.Enqueue(lab_toi(y, x, w));
 
-		//    counts[color] = 0;
+			counts[color] = 0;
 
-		//    while (q_len(queue) > 0) {
-		//        int i, y2, x2;
-		//        int n2 = q_pop_int(queue);
+			while (queue.Count() > 0) {
+			    int i, y2, x2;
+				int n2 = queue.Dequeue();
 
-		//        lab_toyx(n2, w, &y2, &x2);
+			    lab_toyx(n2, w, out y2, out x2);
 
-		//        if (ignore_point(cave, colors, y2, x2)) continue;
+			    if (ignore_point(cave, colors, y2, x2)) continue;
 
-		//        colors[n2] = color;
-		//        counts[color]++;
+			    colors[n2] = color;
+			    counts[color]++;
 
-		//        /*if (lit) glow_point(c, y2, x2);*/
+			    /*if (lit) glow_point(c, y2, x2);*/
 
-		//        for (i = 0; i < dslimit; i++) {
-		//            int y3 = y2 + yds[i];
-		//            int x3 = x2 + xds[i];
-		//            int n3 = lab_toi(y3, x3, w);
-		//            if (ignore_point(cave, colors, y3, x3)) continue;
-		//            if (added[n3]) continue;
+			    for (i = 0; i < dslimit; i++) {
+			        int y3 = y2 + yds[i];
+			        int x3 = x2 + xds[i];
+			        int n3 = lab_toi(y3, x3, w);
+			        if (ignore_point(cave, colors, y3, x3)) continue;
+			        if (added[n3] != 0) continue;
 
-		//            q_push_int(queue, n3);
-		//            added[n3] = 1;
-		//        }
-		//    }
+					queue.Enqueue(n3);
+					added[n3] = 1;
+			    }
+			}
 
-		//    FREE(added);
-		//    q_free(queue);
-		//}
+			//FREE(added);
+			//q_free(queue);
+		}
 
-		///**
-		// * Create a color for each "NESW contiguous" region of the dungeon.
-		// */
-		//static void build_colors(Cave c, int colors[], int counts[], bool diagonal) {
-		//    int y, x;
-		//    int h = c.height;
-		//    int w = c.width;
-		//    int color = 1;
+		/**
+		 * Create a color for each "NESW contiguous" region of the dungeon.
+		 */
+		static void build_colors(Cave c, int[] colors, int[] counts, bool diagonal) {
+		    int y, x;
+		    int h = c.height;
+		    int w = c.width;
+		    int color = 1;
 
-		//    for (y = 0; y < h; y++) {
-		//        for (x = 0; x < w; x++) {
-		//            if (ignore_point(cave, colors, y, x)) continue;
-		//            build_color_point(cave, colors, counts, y, x, color, diagonal);
-		//            color++;
-		//        }
-		//    }
-		//}
+		    for (y = 0; y < h; y++) {
+		        for (x = 0; x < w; x++) {
+		            if (ignore_point(cave, colors, y, x)) continue;
+		            build_color_point(cave, colors, counts, y, x, color, diagonal);
+		            color++;
+		        }
+		    }
+		}
 
 		///**
 		// * Find and delete all small (<9 square) open regions.
@@ -3088,116 +3120,119 @@ namespace CSAngband {
 		//    FREE(deleted);
 		//}
 
-		///**
-		// * Return the number of colors which have active cells.
-		// */
-		//static int count_colors(int counts[], int size) {
-		//    int i;
-		//    int num = 0;
-		//    for (i = 0; i < size; i++) if (counts[i] > 0) num++;
-		//    return num;
-		//}
+		/**
+		 * Return the number of colors which have active cells.
+		 */
+		static int count_colors(int[] counts, int size) {
+		    int i;
+		    int num = 0;
+		    for (i = 0; i < size; i++) if (counts[i] > 0) num++;
+		    return num;
+		}
 
-		///**
-		// * Return the first color which has one or more active cells.
-		// */
-		//static int first_color(int counts[], int size) {
-		//    int i;
-		//    for (i = 0; i < size; i++) if (counts[i] > 0) return i;
-		//    return -1;
-		//}
+		/**
+		 * Return the first color which has one or more active cells.
+		 */
+		static int first_color(int[] counts, int size) {
+		    int i;
+		    for (i = 0; i < size; i++) if (counts[i] > 0) return i;
+		    return -1;
+		}
 
-		///**
-		// * Find all cells of 'fromcolor' and repaint them to 'tocolor'.
-		// */
-		//static void fix_colors(int colors[], int counts[], int from, int to, int size) {
-		//    int i;
-		//    for (i = 0; i < size; i++) if (colors[i] == from) colors[i] = to;
-		//    counts[to] += counts[from];
-		//    counts[from] = 0;
-		//}
+		/**
+		 * Find all cells of 'fromcolor' and repaint them to 'tocolor'.
+		 */
+		static void fix_colors(int[] colors, int[] counts, int from, int to, int size) {
+		    int i;
+		    for (i = 0; i < size; i++) if (colors[i] == from) colors[i] = to;
+		    counts[to] += counts[from];
+		    counts[from] = 0;
+		}
 
-		///**
-		// * Create a tunnel connecting a region to one of its nearest neighbors.
-		// */
-		//static void join_region(Cave c, int colors[], int counts[], int color) {
-		//    int i;
-		//    int h = c.height;
-		//    int w = c.width;
-		//    int size = h * w;
+		/**
+		 * Create a tunnel connecting a region to one of its nearest neighbors.
+		 */
+		static void join_region(Cave c, int[] colors, int[] counts, int color) {
+		    int i;
+		    int h = c.height;
+		    int w = c.width;
+		    int size = h * w;
 
-		//    struct queue *queue = q_new(size);
+		    //struct queue *queue = q_new(size);
+			Queue<int> queue = new Queue<int>();
 
-		//    int *previous = C_ZNEW(size, int);
-		//    array_filler(previous, -1, size);
+		    int[] previous = new int[size];//C_ZNEW(size, int);
+		    //array_filler(previous, -1, size);
 
-		//    for (i = 0; i < size; i++) {
-		//        if (colors[i] == color) {
-		//            q_push_int(queue, i);
-		//            previous[i] = i;
-		//        }
-		//    }
+		    for (i = 0; i < size; i++) {
+				previous[i] = -1;
+		        if (colors[i] == color) {
+					queue.Enqueue(i);
+		            previous[i] = i;
+		        }
+		    }
 
-		//    while (q_len(queue) > 0) {
-		//        int n = q_pop_int(queue);
+		    while (queue.Count() > 0) {
+				int n = queue.Dequeue();
 
-		//        int color2 = colors[n];
-		//        if (color2 && color2 != color) {
-		//            while (colors[n] != color) {
-		//                int x, y;
-		//                lab_toyx(n, w, &y, &x);
-		//                colors[n] = color;
-		//                if (!cave_isperm(c, y, x) && !cave_isvault(c, y, x)) {
-		//                    cave_set_feat(c, y, x, FEAT_FLOOR);
-		//                }
-		//                n = previous[n];
-		//            }
-		//            fix_colors(colors, counts, color2, color, size);
-		//            break;
-		//        }
+		        int color2 = colors[n];
+		        if (color2 != 0 && color2 != color) {
+		            while (colors[n] != color) {
+		                int x, y;
+		                lab_toyx(n, w, out y, out x);
+		                colors[n] = color;
+		                if (!cave_isperm(c, y, x) && !cave_isvault(c, y, x)) {
+		                    cave_set_feat(c, y, x, FEAT_FLOOR);
+		                }
+		                n = previous[n];
+		            }
+		            fix_colors(colors, counts, color2, color, size);
+		            break;
+		        }
 
-		//        for (i = 0; i < 4; i++) {
-		//            int y, x, y2, x2, n2;
-		//            lab_toyx(n, w, &y, &x);
+		        for (i = 0; i < 4; i++) {
+		            int y, x, y2, x2, n2;
+		            lab_toyx(n, w, out y, out x);
 
-		//            y2 = y + yds[i];
-		//            x2 = x + xds[i];
+		            y2 = y + yds[i];
+		            x2 = x + xds[i];
 
-		//            /* make sure we stay inside the boundaries */
-		//            if (y2 < 0 || y2 >= h) continue;
-		//            if (x2 < 0 || x2 >= w) continue;
+		            /* make sure we stay inside the boundaries */
+		            if (y2 < 0 || y2 >= h) continue;
+		            if (x2 < 0 || x2 >= w) continue;
 
-		//            /* permanent walls and vault squares should not be handled */
-		//            //if (cave_isperm(c, y2, x2)) continue;
-		//            //if (cave_isvault(c, y2, x2)) continue;
+		            /* permanent walls and vault squares should not be handled */
+					//Nick: the below two were commented out... Did I do that?
+		            if (cave_isperm(c, y2, x2)) continue;
+		            if (cave_isvault(c, y2, x2)) continue;
 
-		//            n2 = lab_toi(y2, x2, w);
-		//            if (previous[n2] >= 0) continue;
+		            n2 = lab_toi(y2, x2, w);
+		            if (previous[n2] >= 0) continue;
 
-		//            q_push_int(queue, n2);
-		//            previous[n2] = n;
-		//        }
-		//    }
+					queue.Enqueue(n2);
+		            previous[n2] = n;
+		        }
+		    }
 
-		//    q_free(queue);
-		//    FREE(previous);
-		//}
+		    //q_free(queue);
+		    //FREE(previous);
+		}
 
-		///**
-		// * Start connecting regions, stopping when the cave is entirely connected.
-		// */
-		//static void join_regions(Cave c, int colors[], int counts[]) {
-		//    int h = c.height;
-		//    int w = c.width;
-		//    int size = h * w;
-		//    int num = count_colors(counts, size);
+		/**
+		 * Start connecting regions, stopping when the cave is entirely connected.
+		 */
+		static void join_regions(Cave c, int[] colors, int[] counts) {
+			int h = c.height;
+			int w = c.width;
+			int size = h * w;
+			int num = count_colors(counts, size);
 
-		//    while (num > 1) {
-		//        int color = first_color(counts, size);
-		//        join_region(c, colors, counts, color);
-		//        num--;
-		//    }
-		//}
+			while (num > 1) {
+			    int color = first_color(counts, size);
+			    join_region(c, colors, counts, color);
+			    num--;
+			}
+		}
 
 
 		//static int open_count(Cave c) {
@@ -3212,115 +3247,117 @@ namespace CSAngband {
 		//}
 
 
-		//void ensure_connectedness(Cave c) {
-		//    int size = c.height * c.width;
-		//    int *colors = C_ZNEW(size, int);
-		//    int *counts = C_ZNEW(size, int);
+		static void ensure_connectedness(Cave c) {
+			int size = c.height * c.width;
+			int[] colors = new int[size];// C_ZNEW(size, int);
+			int[] counts = new int[size];// C_ZNEW(size, int);
 
-		//    build_colors(c, colors, counts, true);
-		//    join_regions(c, colors, counts);
+			build_colors(c, colors, counts, true);
+			join_regions(c, colors, counts);
 
-		//    FREE(colors);
-		//    FREE(counts);
-		//}
+			//FREE(colors);
+			//FREE(counts);
+		}
 
 
-		//#define MAX_CAVERN_TRIES 10
-		///**
-		// * The program's main function.
-		// */
-		//bool cavern_gen(Cave c, Player.Player p) {
-		//    int i, k, openc;
+		static int MAX_CAVERN_TRIES = 10;
+		/**
+		 * The program's main function.
+		 */
+		static bool cavern_gen(Cave c, Player.Player p) {
+			int i, k, openc;
 
-		//    int h = rand_range(DUNGEON_HGT / 2, (DUNGEON_HGT * 3) / 4);
-		//    int w = rand_range(DUNGEON_WID / 2, (DUNGEON_WID * 3) / 4);
-		//    int size = h * w;
-		//    int limit = size / 13;
+			int h = Random.rand_range(DUNGEON_HGT / 2, (DUNGEON_HGT * 3) / 4);
+			int w = Random.rand_range(DUNGEON_WID / 2, (DUNGEON_WID * 3) / 4);
+			int size = h * w;
+			int limit = size / 13;
 
-		//    int density = rand_range(25, 30);
-		//    int times = rand_range(3, 6);
+			int density = Random.rand_range(25, 30);
+			int times = Random.rand_range(3, 6);
 
-		//    int *colors = C_ZNEW(size, int);
-		//    int *counts = C_ZNEW(size, int);
+			int[] colors = new int[size];
+			int[] counts = new int[size];
 
-		//    int tries = 0;
+			int tries = 0;
 
-		//    bool ok = true;
+			bool ok = true;
 
-		//    set_cave_dimensions(c, h, w);
-		//    ROOM_LOG("cavern h=%d w=%d size=%d density=%d times=%d", h, w, size, density, times);
+			set_cave_dimensions(c, h, w);
+			ROOM_LOG("cavern h={0} w={1} size={2} density={3} times={4}", h, w, size, density, times);
 
-		//    if (c.depth < 15) {
-		//        /* If we're too shallow then don't do it */
-		//        ok = false;
+			if (c.depth < 15) {
+			    /* If we're too shallow then don't do it */
+			    ok = false;
 
-		//    } else {
-		//        /* Start trying to build caverns */
-		//        array_filler(colors, 0, size);
-		//        array_filler(counts, 0, size);
+			} else {
+				throw new NotImplementedException();
+				///* Start trying to build caverns */
+				//array_filler(colors, 0, size);
+				//array_filler(counts, 0, size);
 	
-		//        for (tries = 0; tries < MAX_CAVERN_TRIES; tries++) {
-		//            /* Build a random cavern and mutate it a number of times */
-		//            init_cavern(c, p, density);
-		//            for (i = 0; i < times; i++) mutate_cavern(c);
+				//for (tries = 0; tries < MAX_CAVERN_TRIES; tries++) {
+				//    /* Build a random cavern and mutate it a number of times */
+				//    init_cavern(c, p, density);
+				//    for (i = 0; i < times; i++) mutate_cavern(c);
 	
-		//            /* If there are enough open squares then we're done */
-		//            openc = open_count(c);
-		//            if (openc >= limit) {
-		//                ROOM_LOG("cavern ok (%d vs %d)", openc, limit);
-		//                break;
-		//            }
-		//            ROOM_LOG("cavern failed--try again (%d vs %d)", openc, limit);
-		//        }
+				//    /* If there are enough open squares then we're done */
+				//    openc = open_count(c);
+				//    if (openc >= limit) {
+				//        ROOM_LOG("cavern ok (%d vs %d)", openc, limit);
+				//        break;
+				//    }
+				//    ROOM_LOG("cavern failed--try again (%d vs %d)", openc, limit);
+				//}
 
-		//        /* If we couldn't make a big enough cavern then fail */
-		//        if (tries == MAX_CAVERN_TRIES) ok = false;
-		//    }
+				///* If we couldn't make a big enough cavern then fail */
+				//if (tries == MAX_CAVERN_TRIES) ok = false;
+			}
 
-		//    if (ok) {
-		//        build_colors(c, colors, counts, false);
-		//        clear_small_regions(c, colors, counts);
-		//        join_regions(c, colors, counts);
+			if (ok) {
+				throw new NotImplementedException();
+				//build_colors(c, colors, counts, false);
+				//clear_small_regions(c, colors, counts);
+				//join_regions(c, colors, counts);
 	
-		//        /* Place 2-3 down stairs near some walls */
-		//        alloc_stairs(c, FEAT_MORE, rand_range(1, 3), 3);
+				///* Place 2-3 down stairs near some walls */
+				//alloc_stairs(c, FEAT_MORE, rand_range(1, 3), 3);
 	
-		//        /* Place 1-2 up stairs near some walls */
-		//        alloc_stairs(c, FEAT_LESS, rand_range(1, 2), 3);
+				///* Place 1-2 up stairs near some walls */
+				//alloc_stairs(c, FEAT_LESS, rand_range(1, 2), 3);
 	
-		//        /* General some rubble, traps and monsters */
-		//        k = MAX(MIN(c.depth / 3, 10), 2);
+				///* General some rubble, traps and monsters */
+				//k = MAX(MIN(c.depth / 3, 10), 2);
 	
-		//        /* Scale number of monsters items by cavern size */
-		//        k = (2 * k * (h *  w)) / (DUNGEON_HGT * DUNGEON_WID);
+				///* Scale number of monsters items by cavern size */
+				//k = (2 * k * (h *  w)) / (DUNGEON_HGT * DUNGEON_WID);
 	
-		//        /* Put some rubble in corridors */
-		//        alloc_objects(c, SET_BOTH, TYP_RUBBLE, randint1(k), c.depth, 0);
+				///* Put some rubble in corridors */
+				//alloc_objects(c, SET_BOTH, TYP_RUBBLE, randint1(k), c.depth, 0);
 	
-		//        /* Place some traps in the dungeon */
-		//        alloc_objects(c, SET_BOTH, TYP_TRAP, randint1(k), c.depth, 0);
+				///* Place some traps in the dungeon */
+				//alloc_objects(c, SET_BOTH, TYP_TRAP, randint1(k), c.depth, 0);
 	
-		//        /* Determine the character location */
-		//        new_player_spot(c, p);
+				///* Determine the character location */
+				//new_player_spot(c, p);
 	
-		//        /* Put some monsters in the dungeon */
-		//        for (i = MIN_M_ALLOC_LEVEL + randint1(8) + k; i > 0; i--)
-		//            pick_and_place_distant_monster(c, loc(p.px, p.py), 0, true, c.depth);
+				///* Put some monsters in the dungeon */
+				//for (i = MIN_M_ALLOC_LEVEL + randint1(8) + k; i > 0; i--)
+				//    pick_and_place_distant_monster(c, loc(p.px, p.py), 0, true, c.depth);
 	
-		//        /* Put some objects/gold in the dungeon */
-		//        alloc_objects(c, SET_BOTH, TYP_OBJECT, Rand_normal(6, 3), c.depth,
-		//            ORIGIN_CAVERN);
-		//        alloc_objects(c, SET_BOTH, TYP_GOLD, Rand_normal(6, 3), c.depth,
-		//            ORIGIN_CAVERN);
-		//        alloc_objects(c, SET_BOTH, TYP_GOOD, randint0(2), c.depth,
-		//            ORIGIN_CAVERN);
-		//    }
+				///* Put some objects/gold in the dungeon */
+				//alloc_objects(c, SET_BOTH, TYP_OBJECT, Rand_normal(6, 3), c.depth,
+				//    ORIGIN_CAVERN);
+				//alloc_objects(c, SET_BOTH, TYP_GOLD, Rand_normal(6, 3), c.depth,
+				//    ORIGIN_CAVERN);
+				//alloc_objects(c, SET_BOTH, TYP_GOOD, randint0(2), c.depth,
+				//    ORIGIN_CAVERN);
+			}
 
-		//    FREE(colors);
-		//    FREE(counts);
+			//FREE(colors);
+			//FREE(counts);
 
-		//    return ok;
-		//}
+			return ok;
+		}
 
 		///*
 		// * ------------------ TOWN ----------------
@@ -3623,20 +3660,19 @@ namespace CSAngband {
 		            dun.profile = town_profile;
 		            dun.profile.builder(c, p);
 		        } else {
-					throw new NotImplementedException();
-					//int perc = randint0(100);
-					//int last = NUM_CAVE_PROFILES - 1;
-					//int i;
-					//for (i = 0; i < NUM_CAVE_PROFILES; i++) {
-					//    bool ok;
-					//    cave_profile profile;
+					int perc = Random.randint0(100);
+					int last = Cave.NUM_CAVE_PROFILES - 1;
+					int i;
+					for (i = 0; i < NUM_CAVE_PROFILES; i++) {
+					    bool ok;
+					    cave_profile profile;
 
-					//    profile = dun.profile = &cave_profiles[i];
-					//    if (i < last && profile.cutoff < perc) continue;
+					    profile = dun.profile = cave_profiles[i];
+					    if (i < last && profile.cutoff < perc) continue;
 
-					//    ok = dun.profile.builder(c, p);
-					//    if (ok) break;
-					//}
+					    ok = dun.profile.builder(c, p);
+					    if (ok) break;
+					}
 		        }
 
 		        /* Ensure quest monsters */
