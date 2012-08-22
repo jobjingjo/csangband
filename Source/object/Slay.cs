@@ -25,6 +25,8 @@ namespace CSAngband.Object {
 			this.active_verb = active_verb;
 			this.desc = desc;
 			this.brand = brand;
+
+			list.Add(this);
 		}
 
 		int value;					/* Numerical index */
@@ -70,7 +72,7 @@ namespace CSAngband.Object {
 		public static Slay DRAGON5 =new Slay("DRAGON5" , 	Object_Flag.KILL_DRAGON, Monster_Flag.DRAGON, Monster_Flag.NONE,	5,	"deeply pierces", 	"fiercely smite", 	"glows brightly", 	"dragons", 									null);
 		public static Slay DEMON5 = new Slay("DEMON5" , 	Object_Flag.KILL_DEMON,  Monster_Flag.DEMON,  Monster_Flag.NONE,	5,	"deeply pierces", 	"fiercely smite", 	"glows brightly", 	"demons", 									null);
 		public static Slay UNDEAD5 =new Slay("UNDEAD5" , 	Object_Flag.KILL_UNDEAD, Monster_Flag.UNDEAD, Monster_Flag.NONE,	5,	"deeply pierces", 	"fiercely smite", 	"glows brightly", 	"undead", 									null);
-
+		public static Slay MAX= new Slay("MAX", Object_Flag.NONE, Monster_Flag.NONE, Monster_Flag.NONE, 0, null, null, null, null, null);
 
 		/*
 		 * Slay cache. Used for looking up slay values in obj-power.c
@@ -263,7 +265,7 @@ namespace CSAngband.Object {
 		 */
 		//mask was size: Object_Flag.SIZE. It might not even be an array, but just a bitflag with that size...
 		//It might end up being an out parameter...
-		public static void object_notice_slays(Object o_ptr, Bitflag[] mask)
+		public static void object_notice_slays(Object o_ptr, Bitflag mask)
 		{
 			throw new NotImplementedException();
 			//bool learned;
@@ -308,51 +310,50 @@ namespace CSAngband.Object {
 		public static void improve_attack_modifier(Object o_ptr, Monster.Monster m_ptr, 
 			ref Slay best_s_ptr, bool real, bool known_only)
 		{
-			throw new NotImplementedException();
-			//monster_race *r_ptr = &r_info[m_ptr.r_idx];
-			//monster_lore *l_ptr = &l_list[m_ptr.r_idx];
-			//bitflag f[Object_Flag.SIZE], known_f[Object_Flag.SIZE], note_f[Object_Flag.SIZE];
-			//int i;
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+			Monster_Lore l_ptr = Misc.l_list[m_ptr.r_idx];
+			Bitflag f = new Bitflag(Object_Flag.SIZE);
+			Bitflag known_f = new Bitflag(Object_Flag.SIZE);
+			Bitflag note_f = new Bitflag(Object_Flag.SIZE);
+			int i;
 
-			//object_flags(o_ptr, f);
-			//object_flags_known(o_ptr, known_f);
+			o_ptr.object_flags(ref f);
+			o_ptr.object_flags_known(ref known_f);
 
-			//for (i = 0; i < SL_MAX; i++) {
-			//    const struct slay *s_ptr = &slay_table[i];
-			//    if ((known_only && !Object_Flag.has(known_f, s_ptr.object_flag)) ||
-			//            (!known_only && !Object_Flag.has(f, s_ptr.object_flag))) continue;
+			for (i = 0; i < Slay.MAX.value; i++) {
+			    Slay s_ptr = list[i];
+			    if ((known_only && !known_f.has(s_ptr.object_flag.value)) || (!known_only && !f.has(s_ptr.object_flag.value))) 
+					continue;
 
-			//    /* In a real attack, learn about monster resistance or slay match if:
-			//     * EITHER the slay flag on the object is known,
-			//     * OR the monster is vulnerable to the slay/brand
-			//     */
-			//    if (real && (Object_Flag.has(known_f, s_ptr.object_flag) || (s_ptr.monster_flag
-			//            && Monster_Flag.has(r_ptr.flags,	s_ptr.monster_flag)) ||
-			//            (s_ptr.resist_flag && !Monster_Flag.has(r_ptr.flags,
-			//            s_ptr.resist_flag)))) {
+			    /* In a real attack, learn about monster resistance or slay match if:
+			     * EITHER the slay flag on the object is known,
+			     * OR the monster is vulnerable to the slay/brand
+			     */
+			    if (real && (known_f.has(s_ptr.object_flag.value) || (s_ptr.monster_flag != Monster_Flag.NONE
+			            && r_ptr.flags.has(s_ptr.monster_flag.value)) ||
+			            (s_ptr.resist_flag != Monster_Flag.NONE && !r_ptr.flags.has(s_ptr.resist_flag.value)))) {
 
-			//        /* notice any brand or slay that would affect monster */
-			//        Object_Flag.wipe(note_f);
-			//        Object_Flag.on(note_f, s_ptr.object_flag);
-			//        object_notice_slays(o_ptr, note_f);
+			        /* notice any brand or slay that would affect monster */
+			        note_f.wipe();
+			        note_f.on(s_ptr.object_flag.value);
+			        object_notice_slays(o_ptr, note_f);
 
-			//        if (m_ptr.ml && s_ptr.monster_flag)
-			//            Monster_Flag.on(l_ptr.flags, s_ptr.monster_flag);
+			        if (m_ptr.ml && s_ptr.monster_flag != Monster_Flag.NONE)
+			            l_ptr.flags.on(s_ptr.monster_flag.value);
 
-			//        if (m_ptr.ml && s_ptr.resist_flag)
-			//            Monster_Flag.on(l_ptr.flags, s_ptr.resist_flag);
-			//    }
+			        if (m_ptr.ml && s_ptr.resist_flag != Monster_Flag.NONE)
+			            l_ptr.flags.on(s_ptr.resist_flag.value);
+			    }
 
-			//    /* If the monster doesn't resist or the slay flag matches */
-			//    if ((s_ptr.brand && !Monster_Flag.has(r_ptr.flags, s_ptr.resist_flag)) ||
-			//            (s_ptr.monster_flag && Monster_Flag.has(r_ptr.flags,
-			//            s_ptr.monster_flag))) {
+			    /* If the monster doesn't resist or the slay flag matches */
+			    if ((s_ptr.brand != null && s_ptr.brand.Length != 0 && !r_ptr.flags.has(s_ptr.resist_flag.value)) ||
+			            (s_ptr.monster_flag != Monster_Flag.NONE && r_ptr.flags.has(s_ptr.monster_flag.value))) {
 
-			//        /* compare multipliers to determine best attack */
-			//        if ((*best_s_ptr == null) || ((*best_s_ptr).mult < s_ptr.mult))
-			//            *best_s_ptr = s_ptr;
-			//    }
-			//}
+			        /* compare multipliers to determine best attack */
+			        if ((best_s_ptr == null) || ((best_s_ptr).mult < s_ptr.mult))
+			            best_s_ptr = s_ptr;
+			    }
+			}
 		}
 
 

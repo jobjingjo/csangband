@@ -183,34 +183,33 @@ namespace CSAngband {
 		 * Factor in weapon weight, total plusses, player level.
 		 */
 		static int critical_norm(int weight, int plus, int dam, ref Message_Type msg_type) {
-			throw new NotImplementedException();
-			//int chance = weight + (p_ptr.state.to_h + plus) * 5 + p_ptr.lev * 3;
-			//int power = weight + randint1(650);
+			int chance = weight + (Misc.p_ptr.state.to_h + plus) * 5 + Misc.p_ptr.lev * 3;
+			int power = weight + Random.randint1(650);
 
-			//if (randint1(5000) > chance) {
-			//    *msg_type = MSG_HIT;
-			//    return dam;
+			if (Random.randint1(5000) > chance) {
+			    msg_type = Message_Type.MSG_HIT;
+			    return dam;
 
-			//} else if (power < 400) {
-			//    *msg_type = MSG_HIT_GOOD;
-			//    return 2 * dam + 5;
+			} else if (power < 400) {
+			    msg_type = Message_Type.MSG_HIT_GOOD;
+			    return 2 * dam + 5;
 
-			//} else if (power < 700) {
-			//    *msg_type = MSG_HIT_GREAT;
-			//    return 2 * dam + 10;
+			} else if (power < 700) {
+			    msg_type = Message_Type.MSG_HIT_GREAT;
+			    return 2 * dam + 10;
 
-			//} else if (power < 900) {
-			//    *msg_type = MSG_HIT_SUPERB;
-			//    return 3 * dam + 15;
+			} else if (power < 900) {
+			    msg_type = Message_Type.MSG_HIT_SUPERB;
+			    return 3 * dam + 15;
 
-			//} else if (power < 1300) {
-			//    *msg_type = MSG_HIT_HI_GREAT;
-			//    return 3 * dam + 20;
+			} else if (power < 1300) {
+			    msg_type = Message_Type.MSG_HIT_HI_GREAT;
+			    return 3 * dam + 20;
 
-			//} else {
-			//    *msg_type = MSG_HIT_HI_SUPERB;
-			//    return 4 * dam + 20;
-			//}
+			} else {
+			    msg_type = Message_Type.MSG_HIT_HI_SUPERB;
+			    return 4 * dam + 20;
+			}
 		}
 
 
