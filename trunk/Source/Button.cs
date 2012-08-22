@@ -203,10 +203,9 @@ namespace CSAngband {
 		 */
 		public static int button_kill(char keypress)
 		{
-			throw new NotImplementedException();
-			//if (!button_kill_hook) return 0;
-			//else
-			//    return (*button_kill_hook) (keypress);
+			if (button_kill_hook == null) return 0;
+			else
+			    return button_kill_hook(keypress);
 		}
 
 		/*

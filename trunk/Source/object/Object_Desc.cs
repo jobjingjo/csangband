@@ -195,7 +195,7 @@ namespace CSAngband.Object {
 			if(o_ptr.number <= 0)
 				buf = buf + "no more ";
 			else if(o_ptr.number > 1)
-				buf = buf + o_ptr.number.ToString();
+				buf = buf + o_ptr.number.ToString() + " ";
 			else if((o_ptr.name_is_visible() || known) && o_ptr.artifact != null)
 				buf += "the ";
 
@@ -588,7 +588,7 @@ namespace CSAngband.Object {
 			    /* Artifacts, single rods */
 			    else if (!(o_ptr.tval == TVal.TV_LIGHT && o_ptr.artifact == null))
 			    {
-					buf = " (charging)";
+					buf = buf + " (charging)";
 			    }
 			}
 

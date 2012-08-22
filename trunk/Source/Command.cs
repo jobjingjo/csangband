@@ -117,20 +117,16 @@ namespace CSAngband {
 			}
 		}
 
-		public static byte lookup_key(Command_Code lookup_cmd)
+		public static char lookup_key(Command_Code lookup_cmd)
 		{
-			throw new NotImplementedException();
-			/*
-			unsigned int i;
+			for (int i = 0; i < converted_list.Length; i++) {
+				Command_Info cmd = converted_list[i];
 
-			for (i = 0; i < N_ELEMENTS(converted_list); i++) {
-				struct cmd_info *cmd = converted_list[i];
-
-				if (cmd && cmd.cmd == lookup_cmd)
+				if (cmd != null && cmd.cmd == lookup_cmd)
 					return cmd.key;
 			}
 
-			return 0;*/
+			return '\0';
 		}
 
 		public static Command_Code lookup(char key)

@@ -70,10 +70,9 @@ namespace CSAngband {
 		 * Simple command to "search" for one turn
 		 */
 		public static void search(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			///* Only take a turn if attempted */
-			//if (search(true))
-			//    p_ptr.energy_use = 100;
+			/* Only take a turn if attempted */
+			if (Command.search(true))
+			    Misc.p_ptr.energy_use = 100;
 		}
 
 

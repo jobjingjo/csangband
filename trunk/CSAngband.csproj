@@ -280,7 +280,6 @@
     <Content Include="Source\Object\identify.c" />
     <Content Include="Source\Object\obj-info.c" />
     <Content Include="Source\Object\obj-make.c" />
-    <Content Include="Source\Object\obj-ui.c" />
     <Content Include="Source\Object\obj-util.c" />
     <Content Include="Source\Object\object.h" />
     <Content Include="Source\Object\pval.c" />
