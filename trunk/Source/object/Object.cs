@@ -74,7 +74,9 @@ namespace CSAngband.Object
 				for (flag = flags.next(Bitflag.FLAG_START); flag != Bitflag.FLAG_null; flag = flags.next(flag + 1))
 					add_pval(x, flag);
 			}
-			flags.copy(k.Base.flags);
+			if(k.Base != null) {
+				flags.copy(k.Base.flags);
+			}
 			flags.union(k.flags);
 
 			// Assign charges (wands/staves only)

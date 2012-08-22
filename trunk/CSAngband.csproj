@@ -218,6 +218,7 @@
     <Compile Include="Source\Tests\Test.cs" />
     <Compile Include="Source\Tests\trivial\Trivial_Test.cs" />
     <Compile Include="Source\Tests\UnitTest_Main.cs" />
+    <Compile Include="Source\Trap.cs" />
     <Compile Include="Source\Type_Union.cs" />
     <Compile Include="Source\UIBirth.cs" />
     <Compile Include="Source\UIEvent.cs" />
@@ -226,18 +227,15 @@
     <Compile Include="Source\Xtra2.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Source\angband.man" />
     <None Include="Source\Tests\README" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Source\angband.h" />
     <Content Include="Source\attack.c" />
-    <Content Include="Source\birth.c" />
     <Content Include="Source\birth.h" />
     <Content Include="Source\buildid.c" />
     <Content Include="Source\buildid.h" />
     <Content Include="Source\cmd-obj.c" />
-    <Content Include="Source\cmd0.c" />
     <Content Include="Source\cmd1.c" />
     <Content Include="Source\cmd2.c" />
     <Content Include="Source\cmds.h" />
@@ -282,14 +280,12 @@
     <Content Include="Source\Object\identify.c" />
     <Content Include="Source\Object\obj-info.c" />
     <Content Include="Source\Object\obj-make.c" />
-    <Content Include="Source\Object\obj-power.c" />
     <Content Include="Source\Object\obj-ui.c" />
     <Content Include="Source\Object\obj-util.c" />
     <Content Include="Source\Object\object.h" />
     <Content Include="Source\Object\pval.c" />
     <Content Include="Source\Object\pval.h" />
     <Content Include="Source\Object\randart.c" />
-    <Content Include="Source\Object\slays.c" />
     <Content Include="Source\parser.c" />
     <Content Include="Source\parser.h" />
     <Content Include="Source\pathfind.c" />
@@ -303,7 +299,6 @@
     <Content Include="Source\savefile.c" />
     <Content Include="Source\savefile.h" />
     <Content Include="Source\score.c" />
-    <Content Include="Source\signals.c" />
     <Content Include="Source\snd-sdl.c" />
     <Content Include="Source\spells.h" />
     <Content Include="Source\spells1.c" />

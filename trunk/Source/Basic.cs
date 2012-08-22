@@ -27,5 +27,9 @@ namespace CSAngband {
 		public static char I2D(int X){
 			return (char)((X) + '0');
 		}
+
+		public static int CMP(int a, int b) {
+			return ((a) < (b) ? -1 : ((b) < (a) ? 1 : 0));
+		}
 	}
 }

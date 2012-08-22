@@ -844,5 +844,10 @@ namespace CSAngband {
 		 * "show_inven()" and "show_equip()", and the choice window routines.
 		 */
 		public static byte item_tester_tval;
+
+		/*
+		 * Normal levels get at least 14 monsters
+		 */
+		public const int MIN_M_ALLOC_LEVEL = 14;
 	}
 }
