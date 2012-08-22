@@ -285,37 +285,34 @@ namespace CSAngband.Object {
 
 		public void notice_attack_plusses()
 		{
-			throw new NotImplementedException();
-			//assert(o_ptr && o_ptr.kind);
+			Misc.assert(kind != null);
 
-			//if (object_attack_plusses_are_visible(o_ptr))
-			//    return;
+			if (attack_plusses_are_visible())
+			    return;
 
-			//if (object_add_ident_flags(o_ptr, IDENT_ATTACK))
-			//    object_check_for_ident(o_ptr);
+			if (add_ident_flags(IDENT_ATTACK))
+			    check_for_ident();
 
 
-			//if (wield_slot(o_ptr) == INVEN_WIELD)
-			//{
-			//    char o_name[80];
+			if (wield_slot() == Misc.INVEN_WIELD)
+			{
+			    //char o_name[80];
+				string o_name = object_desc(Detail.BASE);
+			    Utilities.msgt(Message_Type.MSG_PSEUDOID,
+			            "You know more about the %s you are using.",
+			            o_name);
+			}
+			else if ((to_d != 0 || to_h != 0) &&
+			        !((tval == TVal.TV_HARD_ARMOR || tval == TVal.TV_SOFT_ARMOR) && (to_h < 0)))
+			{
+			    //char o_name[80];
+				string o_name = object_desc(Detail.BASE);
+			    Utilities.msgt(Message_Type.MSG_PSEUDOID, "Your {0} glows.", o_name);
+			}
 
-			//    object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
-			//    msgt(MSG_PSEUDOID,
-			//            "You know more about the %s you are using.",
-			//            o_name);
-			//}
-			//else if ((o_ptr.to_d || o_ptr.to_h) &&
-			//        !((o_ptr.tval == TV_HARD_ARMOR || o_ptr.tval == TV_SOFT_ARMOR) && (o_ptr.to_h < 0)))
-			//{
-			//    char o_name[80];
-
-			//    object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
-			//    msgt(MSG_PSEUDOID, "Your %s glows.", o_name);
-			//}
-
-			//p_ptr.update |= (PU_BONUS);
-			//event_signal(EVENT_INVENTORY);
-			//event_signal(EVENT_EQUIPMENT);
+			Misc.p_ptr.update |= (Misc.PU_BONUS);
+			Game_Event.signal(Game_Event.Event_Type.INVENTORY);
+			Game_Event.signal(Game_Event.Event_Type.EQUIPMENT);
 		}
 
 		/**
