@@ -810,30 +810,99 @@ namespace CSAngband {
 		/* Examine an object */
 		public static void obj_examine() {
 			throw new NotImplementedException();
-			/*
-			char header[120];
+			////char header[120];
+			//string header;
 
-			textblock *tb;
-			region area = { 0, 0, 0, 0 };
+			//Textblock tb;
+			//Region area = new Region( 0, 0, 0, 0 );
 
-			object_type *o_ptr;
-			int item;
+			//Object.Object o_ptr;
+			//int item;
 
-			// Select item 
-			if (!get_item(&item, "Examine which item?", "You have nothing to examine.",
-					CMD_null, (USE_EQUIP | USE_INVEN | USE_FLOOR | IS_HARMLESS)))
-				return;
+			//// Select item 
+			//if (!get_item(ref item, "Examine which item?", "You have nothing to examine.",
+			//        Command_Code.NULL, (Misc.USE_EQUIP | Misc.USE_INVEN | Misc.USE_FLOOR | Misc.IS_HARMLESS)))
+			//    return;
 
-			// Track object for object recall
-			track_object(item);
+			//// Track object for object recall
+			//Cave.track_object(item);
 
-			// Display info
-			o_ptr = object_from_item_idx(item);
-			tb = object_info(o_ptr, OINFO_NONE);
-			object_desc(header, sizeof(header), o_ptr, ODESC_PREFIX | ODESC_FULL);
+			//// Display info
+			//o_ptr = Object.Object.object_from_item_idx(item);
+			//tb = o_ptr.object_info(OINFO_NONE);
+			//header = o_ptr.object_desc(ODESC_PREFIX | ODESC_FULL);
 
-			textui_textblock_show(tb, area, format("%^s", header));
-			textblock_free(tb);*/
+			//tb.textblock_show(area, format("%^s", header));
+			//textblock_free(tb);
+		}
+
+		void textui_textblock_show(Region orig_area, string header)
+		{
+			throw new NotImplementedException();
+			//const char *text = textblock_text(tb);
+			//const byte *attrs = textblock_attrs(tb);
+
+			///* xxx on resize this should be recalculated */
+			//region area = region_calculate(orig_area);
+
+			//size_t *line_starts = null, *line_lengths = null;
+			//size_t n_lines;
+
+			//n_lines = textblock_calculate_lines(tb,
+			//        &line_starts, &line_lengths, area.width);
+
+			//screen_save();
+
+			///* make room for the header & footer */
+			//area.page_rows -= 3;
+
+			//c_prt(TERM_L_BLUE, header, area.row, area.col);
+			//area.row++;
+
+			//if (n_lines > (size_t) area.page_rows) {
+			//    int start_line = 0;
+
+			//    c_prt(TERM_WHITE, "", area.row + area.page_rows, area.col);
+			//    c_prt(TERM_L_BLUE, "(Up/down or ESCAPE to exit.)",
+			//            area.row + area.page_rows + 1, area.col);
+
+			//    /* Pager mode */
+			//    while (1) {
+			//        struct keypress ch;
+
+			//        display_area(text, attrs, line_starts, line_lengths, n_lines,
+			//                area, start_line);
+
+			//        ch = inkey();
+			//        if (ch.code == ARROW_UP)
+			//            start_line--;
+			//        else if (ch.code== ESCAPE || ch.code == 'q')
+			//            break;
+			//        else if (ch.code == ARROW_DOWN)
+			//            start_line++;
+			//        else if (ch.code == ' ')
+			//            start_line += area.page_rows;
+
+			//        if (start_line < 0)
+			//            start_line = 0;
+			//        if (start_line + (size_t) area.page_rows > n_lines)
+			//            start_line = n_lines - area.page_rows;
+			//    }
+			//} else {
+			//    display_area(text, attrs, line_starts, line_lengths, n_lines, area, 0);
+
+			//    c_prt(TERM_WHITE, "", area.row + n_lines, area.col);
+			//    c_prt(TERM_L_BLUE, "(Press any key to continue.)",
+			//            area.row + n_lines + 1, area.col);
+			//    inkey();
+			//}
+
+			//mem_free(line_starts);
+			//mem_free(line_lengths);
+
+			//screen_load();
+
+			//return;
 		}
 
 		public static int get_cmd(cmd_context context, bool wait)

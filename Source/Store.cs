@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using CSAngband.Object;
 using CSAngband.Monster;
+using CSAngband.Player;
 
 namespace CSAngband {
 	/* List of store indices */
@@ -61,6 +62,36 @@ namespace CSAngband {
 		const int STORE_TURNOVER = 9;       /* Normal shop turnover, per day */
 		const int STORE_OBJ_LEVEL= 5;       /* Magic Level for normal stores */
 
+		/* State flags */
+		public const int STORE_GOLD_CHANGE      =0x01;
+		public const int STORE_FRAME_CHANGE     =0x02;
+
+		public const int STORE_SHOW_HELP        =0x04;
+
+		/* Compound flag for the initial display of a store */
+		public const int STORE_INIT_CHANGE = (STORE_FRAME_CHANGE | STORE_GOLD_CHANGE);
+
+
+		/* Flags for the display */
+		public static short store_flags;
+
+		public static Region store_menu_region = new Region( 1, 4, -1, -2 );
+		public static Menu_Type.menu_iter store_menu = new Menu_Type.menu_iter(
+			null,
+			null,
+			store_display_entry,
+			store_menu_handle,
+			null
+		);
+
+		public static Menu_Type.menu_iter store_know_menu = new Menu_Type.menu_iter(
+			null,
+			null,
+			store_display_entry,
+			null,
+			null
+		);
+
 		public static void Init() {
 			Store store_list;
 
@@ -69,6 +100,25 @@ namespace CSAngband {
 			parse_owners(store_list);
 			Misc.stores = flatten_stores(store_list);
 		}
+
+		/* Easy names for the elements of the 'scr_places' arrays. */
+		enum LOC
+		{
+			PRICE = 0,
+			OWNER,
+			HEADER,
+			MORE,
+			HELP_CLEAR,
+			HELP_PROMPT,
+			AU,
+			WEIGHT,
+
+			MAX
+		};
+
+		/* Places for the various things displayed onscreen */
+		static int[] scr_places_x = new int[(int)LOC.MAX];
+		static int[] scr_places_y = new int[(int)LOC.MAX];
 
 		static Store parse_stores() {
 			Parser p = store_parser_new();
@@ -1083,6 +1133,581 @@ namespace CSAngband {
 			    return Misc.stores[(int)n];
 			else
 			    return null;
+		}
+
+		/*
+		 * Redisplay a single store entry
+		 */
+		static void store_display_entry(Menu_Type menu, int oid, bool cursor, int row, int col, int width)
+		{
+			Object.Object o_ptr;
+			int x;
+			Object.Object.Detail desc = Object.Object.Detail.PREFIX;
+
+			//char o_name[80];
+			//char out_val[160];
+			string o_name;
+			string out_val;
+			ConsoleColor colour;
+
+			Store store = current_store();
+
+			Misc.assert(store != null);
+
+			/* Get the object */
+			o_ptr = store.stock[oid];
+
+			/* Describe the object - preserving insriptions in the home */
+			if (store.sidx == STORE.HOME) desc = Object.Object.Detail.FULL;
+			else desc = Object.Object.Detail.FULL | Object.Object.Detail.STORE;
+			o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | desc);
+
+			/* Display the object */
+			Utilities.c_put_str(Misc.tval_to_attr[o_ptr.tval & 0x7F], o_name, row, col);
+
+			/* Show weights */
+			colour = Menu_Type.curs_attrs[(int)Menu_Type.CURS.KNOWN][cursor?1:0];
+			//out_val = String.Format("%3d.%d lb", o_ptr.weight / 10, o_ptr.weight % 10);
+			out_val = String.Format("{0}.{1} lb", o_ptr.weight / 10, o_ptr.weight % 10);
+			Utilities.c_put_str(colour, out_val, row, scr_places_x[(int)LOC.WEIGHT]);
+
+			/* Describe an object (fully) in a store */
+			if (store.sidx != STORE.HOME)
+			{
+			    /* Extract the "minimum" price */
+			    x = price_item(o_ptr, false, 1);
+
+			    /* Make sure the player can afford it */
+			    if ((int) Misc.p_ptr.au < (int) x)
+			        colour = Menu_Type.curs_attrs[(int)Menu_Type.CURS.UNKNOWN][cursor?1:0];
+
+			    /* Actually draw the price */
+			    if (((o_ptr.tval == TVal.TV_WAND) || (o_ptr.tval == TVal.TV_STAFF)) && (o_ptr.number > 1))
+			        //strnfmt(out_val, sizeof out_val, "%9ld avg", (long)x);
+					out_val = String.Format("{0} avg", x);
+			    else
+			        //strnfmt(out_val, sizeof out_val, "%9ld    ", (long)x);
+					out_val = String.Format("{0}    ", (long)x);
+
+			    Utilities.c_put_str(colour, out_val, row, scr_places_x[(int)LOC.PRICE]);
+			}
+		}
+
+		/*
+		 * Determine the price of an object (qty one) in a store.
+		 *
+		 *  store_buying == true  means the shop is buying, player selling
+		 *               == false means the shop is selling, player buying
+		 *
+		 * This function takes into account the player's charisma, but
+		 * never lets a shop-keeper lose money in a transaction.
+		 *
+		 * The "greed" value should exceed 100 when the player is "buying" the
+		 * object, and should be less than 100 when the player is "selling" it.
+		 *
+		 * Hack -- the black market always charges twice as much as it should.
+		 */
+		public static int price_item(Object.Object o_ptr, bool store_buying, int qty)
+		{
+			int adjust;
+			int price;
+			Store store = current_store();
+			Owner ot_ptr;
+
+			if (store == null) return 0;
+
+			ot_ptr = store.owner;
+
+
+			/* Get the value of the stack of wands, or a single item */
+			if ((o_ptr.tval == TVal.TV_WAND) || (o_ptr.tval == TVal.TV_STAFF))
+			    price = o_ptr.value(qty, false);
+			else
+			    price = o_ptr.value(1, false);
+
+			/* Worthless items */
+			if (price <= 0) return (0);
+
+
+			/* Add in the charisma factor */
+			if (store.sidx == STORE.B_MARKET)
+			    adjust = 150;
+			else
+			    adjust = Player.Player.adj_chr_gold[Misc.p_ptr.state.stat_ind[(int)Stat.Chr]];
+
+
+			/* Shop is buying */
+			if (store_buying)
+			{
+			    /* Set the factor */
+			    adjust = 100 + (100 - adjust);
+			    if (adjust > 100) adjust = 100;
+
+			    /* Shops now pay 2/3 of true value */
+			    price = price * 2 / 3;
+
+			    /* Black market sucks */
+			    if (store.sidx == STORE.B_MARKET)
+			        price = price / 2;
+
+			    /* Check for no_selling option */
+			    if (Option.birth_no_selling.value) return (0);
+			}
+
+			/* Shop is selling */
+			else
+			{
+			    /* Fix the factor */
+			    if (adjust < 100) adjust = 100;
+
+			    /* Black market sucks */
+			    if (store.sidx == STORE.B_MARKET)
+			        price = price * 2;
+			}
+
+			/* Compute the final price (with rounding) */
+			price = (int)((price * adjust + 50L) / 100);
+
+			/* Now convert price to total price for non-wands */
+			if (!(o_ptr.tval == TVal.TV_WAND) && !(o_ptr.tval == TVal.TV_STAFF))
+			    price *= qty;
+
+			/* Now limit the price to the purse limit */
+			if (store_buying && (price > ot_ptr.max_cost * qty))
+			    price = ot_ptr.max_cost * qty;
+
+			/* Note -- Never become "free" */
+			if (price <= 0L) return (qty);
+
+			/* Return the price */
+			return (price);
+		}
+
+		/*
+		 *
+		 */
+		static bool store_menu_handle(Menu_Type m, ui_event mevent, int oid)
+		{
+			throw new NotImplementedException();
+			//bool processed = true;
+
+			//if (event.type == EVT_SELECT)
+			//{
+			//    /* Nothing for now, except "handle" the event */
+			//    return true;
+			//    /* In future, maybe we want a display a list of what you can do. */
+			//}
+			//else if (event.type == EVT_KBRD)
+			//{
+			//    bool storechange = false;
+
+			//    switch (event.key.code) {
+			//        case 's':
+			//        case 'd': storechange = store_sell(); break;
+			//        case 'p':
+			//        case 'g': storechange = store_purchase(oid); break;
+			//        case 'l':
+			//        case 'x': store_examine(oid); break;
+
+			//        /* XXX redraw functionality should be another menu_iter handler */
+			//        case KTRL('R'): {
+			//            Term_clear();
+			//            store_flags |= (STORE_FRAME_CHANGE | STORE_GOLD_CHANGE);
+			//            break;
+			//        }
+
+			//        case '?': {
+			//            /* Toggle help */
+			//            if (store_flags & STORE_SHOW_HELP)
+			//                store_flags &= ~(STORE_SHOW_HELP);
+			//            else
+			//                store_flags |= STORE_SHOW_HELP;
+
+			//            /* Redisplay */
+			//            store_flags |= STORE_INIT_CHANGE;
+			//            break;
+			//        }
+
+			//        case '=': {
+			//            do_cmd_options();
+			//            store_menu_set_selections(m, false);
+			//            break;
+			//        }
+
+			//        default:
+			//            processed = store_process_command_key(event.key);
+			//    }
+
+			//    /* Let the game handle any core commands (equipping, etc) */
+			//    process_command(CMD_STORE, true);
+
+			//    if (storechange)
+			//        store_menu_recalc(m);
+
+			//    if (processed) {
+			//        event_signal(EVENT_INVENTORY);
+			//        event_signal(EVENT_EQUIPMENT);
+			//    }
+
+			//    /* Notice and handle stuff */
+			//    notice_stuff(p_ptr);
+			//    handle_stuff(p_ptr);
+
+			//    /* Display the store */
+			//    store_display_recalc(m);
+			//    store_menu_recalc(m);
+			//    store_redraw();
+
+			//    return processed;
+			//}
+
+			//return false;
+		}
+
+		public static void store_menu_set_selections(Menu_Type menu, bool knowledge_menu)
+		{
+			if (knowledge_menu)
+			{
+			    if (Option.rogue_like_commands.value)
+			    {
+			        /* These two can't intersect! */
+			        menu.cmd_keys = "?Ieilx";
+			        menu.selections = "abcdfghjkmnopqrstuvwyz134567";
+			    }
+			    /* Original */
+			    else
+			    {
+			        /* These two can't intersect! */
+			        menu.cmd_keys = "?Ieil";
+			        menu.selections = "abcdfghjkmnopqrstuvwxyz13456";
+			    }
+			}
+			else
+			{
+			    /* Roguelike */
+			    if (Option.rogue_like_commands.value)
+			    {
+			        /* These two can't intersect! */
+			        menu.cmd_keys = "\x04\x05\x10?={}~CEIPTdegilpswx"; /* \x10 = ^p , \x04 = ^D, \x05 = ^E */
+			        menu.selections = "abcfmnoqrtuvyz13456790ABDFGH";
+			    }
+
+			    /* Original */
+			    else
+			    {
+			        /* These two can't intersect! */
+			        menu.cmd_keys = "\x05\x010?={}~CEIbdegiklpstwx"; /* \x05 = ^E, \x10 = ^p */
+			        menu.selections = "acfhjmnoqruvyz13456790ABDFGH";
+			    }
+			}
+		}
+
+		/*
+		 * This function sets up screen locations based on the current term size.
+		 *
+		 * Current screen layout:
+		 *  line 0: reserved for messages
+		 *  line 1: shopkeeper and their purse / item buying price
+		 *  line 2: empty
+		 *  line 3: table headers
+		 *
+		 *  line 4: Start of items
+		 *
+		 * If help is turned off, then the rest of the display goes as:
+		 *
+		 *  line (height - 4): end of items
+		 *  line (height - 3): "more" prompt
+		 *  line (height - 2): empty
+		 *  line (height - 1): Help prompt and remaining gold
+		 *
+		 * If help is turned on, then the rest of the display goes as:
+		 *
+		 *  line (height - 7): end of items
+		 *  line (height - 6): "more" prompt
+		 *  line (height - 4): gold remaining
+		 *  line (height - 3): command help 
+		 */
+		public static void store_display_recalc(Menu_Type m)
+		{
+			int wid, hgt;
+			Region loc;
+
+			Store store = current_store();
+
+			Term.get_size(out wid, out hgt);
+
+			/* Clip the width at a maximum of 104 (enough room for an 80-char item name) */
+			if (wid > 104) wid = 104;
+
+			/* Clip the text_out function at two smaller than the screen width */
+			Misc.text_out_wrap = wid - 2;
+
+
+			/* X co-ords first */
+			scr_places_x[(int)LOC.PRICE] = wid - 14;
+			scr_places_x[(int)LOC.AU] = wid - 26;
+			scr_places_x[(int)LOC.OWNER] = wid - 2;
+			scr_places_x[(int)LOC.WEIGHT] = wid - 14;
+
+			/* Add space for for prices */
+			if (store.sidx != STORE.HOME)
+			    scr_places_x[(int)LOC.WEIGHT] -= 10;
+
+			/* Then Y */
+			scr_places_y[(int)LOC.OWNER] = 1;
+			scr_places_y[(int)LOC.HEADER] = 3;
+
+			/* If we are displaying help, make the height smaller */
+			if ((store_flags & (STORE_SHOW_HELP)) != 0)
+			    hgt -= 3;
+
+			scr_places_y[(int)LOC.MORE] = hgt - 3;
+			scr_places_y[(int)LOC.AU] = hgt - 1;
+
+			loc = m.boundary;
+
+			/* If we're displaying the help, then put it with a line of padding */
+			if ((store_flags & (STORE_SHOW_HELP)) != 0)
+			{
+			    scr_places_y[(int)LOC.HELP_CLEAR] = hgt - 1;
+			    scr_places_y[(int)LOC.HELP_PROMPT] = hgt;
+			    loc.page_rows = -5;
+			}
+			else
+			{
+			    scr_places_y[(int)LOC.HELP_CLEAR] = hgt - 2;
+			    scr_places_y[(int)LOC.HELP_PROMPT] = hgt - 1;
+			    loc.page_rows = -2;
+			}
+
+			m.layout(loc);
+		}
+
+		public static void store_menu_recalc(Menu_Type m)
+		{
+			Store store = current_store();
+			m.priv(store.stock_num, store.stock);
+		}
+
+		/*
+		 * Decides what parts of the store display to redraw.  Called on terminal
+		 * resizings and the redraw command.
+		 */
+		public static void store_redraw()
+		{
+			if ((store_flags & (STORE_FRAME_CHANGE)) != 0)
+			{
+			    store_display_frame();
+
+			    if ((store_flags & STORE_SHOW_HELP) != 0)
+			        store_display_help();
+			    else
+			        Utilities.prt("Press '?' for help.", scr_places_y[(int)LOC.HELP_PROMPT], 1);
+
+			    store_flags &= ~(STORE_FRAME_CHANGE);
+			}
+
+			if ((store_flags & (STORE_GOLD_CHANGE)) != 0)
+			{
+			    /*Utilities.prt(String.Format("Gold Remaining: %9ld", (long)Misc.p_ptr.au),
+			        scr_places_y[(int)LOC.AU], scr_places_x[(int)LOC.AU]);*/
+				Utilities.prt(String.Format("Gold Remaining: {0}", (long)Misc.p_ptr.au),
+			        scr_places_y[(int)LOC.AU], scr_places_x[(int)LOC.AU]);
+			    store_flags &= ~(STORE_GOLD_CHANGE);
+			}
+		}
+
+		/*
+		 * Display store (after clearing screen)
+		 */
+		static void store_display_frame()
+		{
+			//char buf[80];
+			string buf;
+			Store store = current_store();
+			Owner ot_ptr = store.owner;
+
+			/* Clear screen */
+			Term.clear();
+
+			/* The "Home" is special */
+			if (store.sidx == STORE.HOME)
+			{
+			    /* Put the owner name */
+			    Utilities.put_str("Your Home", scr_places_y[(int)LOC.OWNER], 1);
+
+			    /* Label the object descriptions */
+			    Utilities.put_str("Home Inventory", scr_places_y[(int)LOC.HEADER], 1);
+
+			    /* Show weight header */
+			    Utilities.put_str("Weight", scr_places_y[(int)LOC.HEADER], scr_places_x[(int)LOC.WEIGHT] + 2);
+			}
+
+			/* Normal stores */
+			else
+			{
+			    string store_name = Misc.f_info[Cave.FEAT_SHOP_HEAD + (int)store.sidx].name;
+			    string owner_name = ot_ptr.name;
+
+			    /* Put the owner name */
+			    Utilities.put_str(owner_name, scr_places_y[(int)LOC.OWNER], 1);
+
+			    /* Show the max price in the store (above prices) */
+			    //buf = String.Format("{0} (%ld)", store_name, (long)(ot_ptr.max_cost));
+				buf = String.Format("{0} ({1})", store_name, (long)(ot_ptr.max_cost));
+			    Utilities.prt(buf, scr_places_y[(int)LOC.OWNER], scr_places_x[(int)LOC.OWNER] - buf.Length);
+
+			    /* Label the object descriptions */
+			    Utilities.put_str("Store Inventory", scr_places_y[(int)LOC.HEADER], 1);
+
+			    /* Showing weight label */
+			    Utilities.put_str("Weight", scr_places_y[(int)LOC.HEADER], scr_places_x[(int)LOC.WEIGHT] + 2);
+
+			    /* Label the asking price (in stores) */
+			    Utilities.put_str("Price", scr_places_y[(int)LOC.HEADER], scr_places_x[(int)LOC.PRICE] + 4);
+			}
+		}
+
+
+		/*
+		 * Display help.
+		 */
+		static void store_display_help()
+		{
+			throw new NotImplementedException();
+			//int help_loc = scr_places_y[LOC_HELP_PROMPT];
+			//struct store *store = current_store();
+			//bool is_home = (store.sidx == STORE_HOME) ? true : false;
+
+			///* Clear */
+			//clear_from(scr_places_y[LOC_HELP_CLEAR]);
+
+			///* Prepare help hooks */
+			//text_out_hook = text_out_to_screen;
+			//text_out_indent = 1;
+			//Term_gotoxy(1, help_loc);
+
+			//text_out("Use the ");
+			//text_out_c(TERM_L_GREEN, "movement keys");
+			//text_out(" to navigate, or ");
+			//text_out_c(TERM_L_GREEN, "Space");
+			//text_out(" to advance to the next page. '");
+
+			//if (OPT(rogue_like_commands))
+			//    text_out_c(TERM_L_GREEN, "x");
+			//else
+			//    text_out_c(TERM_L_GREEN, "l");
+
+			//text_out("' examines");
+			//if (store_knowledge == STORE_NONE)
+			//{
+			//    text_out(" and '");
+			//    text_out_c(TERM_L_GREEN, "p");
+
+			//    if (is_home) text_out("' picks up");
+			//    else text_out("' purchases");
+			//}
+			//text_out(" the selected item. '");
+
+			//if (store_knowledge == STORE_NONE)
+			//{
+			//    text_out_c(TERM_L_GREEN, "d");
+			//    if (is_home) text_out("' drops");
+			//    else text_out("' sells");
+			//}
+			//else
+			//{
+			//    text_out_c(TERM_L_GREEN, "I");
+			//    text_out("' inspects");
+			//}
+			//text_out(" an item from your inventory. ");
+
+			//text_out_c(TERM_L_GREEN, "ESC");
+			//if (store_knowledge == STORE_NONE)
+			//{
+			//    text_out(" exits the building.");
+			//}
+			//else
+			//{
+			//    text_out(" exits this screen.");
+			//}
+
+			//text_out_indent = 0;
+		}
+
+
+		static string[] comment_hint = new string[]
+		{
+		/*	"%s tells you soberly: \"%s\".",
+			"(%s) There's a saying round here, \"%s\".",
+			"%s offers to tell you a secret next time you're about."*/
+			"\"%s\""
+		};
+
+		/*
+		 * Shopkeeper welcome messages.
+		 *
+		 * The shopkeeper's name must come first, then the character's name.
+		 */
+		static string[] comment_welcome =
+		{
+			"",
+			"%s nods to you.",
+			"%s says hello.",
+			"%s: \"See anything you like, adventurer?\"",
+			"%s: \"How may I help you, %s?\"",
+			"%s: \"Welcome back, %s.\"",
+			"%s: \"A pleasure to see you again, %s.\"",
+			"%s: \"How may I be of assistance, good %s?\"",
+			"%s: \"You do honour to my humble store, noble %s.\"",
+			"%s: \"Me and my family are entirely at your service, glorious %s.\""
+		};
+
+
+		/*
+		 * The greeting a shopkeeper gives the character says a lot about his
+		 * general attitude.
+		 *
+		 * Taken and modified from Sangband 1.0.
+		 */
+		public static void prt_welcome(Owner ot_ptr)
+		{
+			//char short_name[20];
+			string short_name;
+			string owner_name = ot_ptr.name;
+
+			int j;
+
+			if (Random.one_in_(2))
+			    return;
+
+			///* Extract the first name of the store owner (stop before the first space) */
+			//for (j = 0; owner_name[j] && owner_name[j] != ' '; j++)
+			//    short_name[j] = owner_name[j];
+
+			///* Truncate the name */
+			//short_name[j] = '\0';
+
+			short_name = owner_name.Split(' ')[0];
+
+			if (Random.one_in_(3)) {
+			    int i = Random.randint0(comment_hint.Length);
+			    Utilities.msg(comment_hint[i], (object)Xtra3.random_hint());
+			} else if (Misc.p_ptr.lev > 5) {
+			    string player_name;
+
+			    /* We go from level 1 - 50  */
+			    int i = ((int)Misc.p_ptr.lev - 1) / 5;
+			    i = Math.Min(i, comment_welcome.Length - 1);
+
+			    /* Get a title for the character */
+			    if ((i % 2) != 0 && Random.randint0(2) != 0) player_name = Misc.p_ptr.Class.title[(Misc.p_ptr.lev - 1) / 5];
+			    else if (Random.randint0(2) != 0)       player_name = Player_Other.instance.full_name;
+			    else                        player_name = (Misc.p_ptr.psex == Misc.SEX_MALE ? "sir" : "lady");
+
+			    /* Balthazar says "Welcome" */
+			    Utilities.prt(String.Format(comment_welcome[i], short_name, player_name), 0, 0);
+			}
 		}
 
 	}

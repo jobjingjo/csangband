@@ -66,27 +66,7 @@ bool object_is_known_blessed(const object_type *o_ptr)
 }
 
 
-/*
- * \returns whether it is possible an object has a high resist given the
- *          player's current knowledge
- */
-bool object_high_resist_is_possible(const object_type *o_ptr)
-{
-	bitflag flags[OF_SIZE], f2[OF_SIZE];
 
-	/* Actual object flags */
-	object_flags(o_ptr, flags);
-
-	/* Add player's uncertainty */
-	of_comp_union(flags, o_ptr.known_flags);
-
-	/* Check for possible high resist */
-	create_mask(f2, false, OFT_HRES, OFT_MAX);
-	if (of_is_inter(flags, f2))
-		return true;
-	else
-		return false;
-}
 
 
 /**

@@ -517,16 +517,15 @@ namespace CSAngband.Object {
 
 		static int obj_desc_light(Object o_ptr, ref string buf, int max, int end)
 		{
-			throw new NotImplementedException();
-			//bitflag f[OF_SIZE];
+			Bitflag f = new Bitflag(Object_Flag.SIZE);
 
-			//object_flags(o_ptr, f);
+			o_ptr.object_flags(ref f);
 
-			///* Fuelled light sources get number of remaining turns appended */
-			//if ((o_ptr.tval == TV_LIGHT) && !of_has(f, OF_NO_FUEL))
-			//    strnfcat(buf, max, &end, " (%d turns)", o_ptr.timeout);
+			/* Fuelled light sources get number of remaining turns appended */
+			if ((o_ptr.tval == TVal.TV_LIGHT) && !f.has(Object_Flag.NO_FUEL.value))
+			    buf += String.Format(" ({0} turns)", o_ptr.timeout);
 
-			//return end;
+			return buf.Length;
 		}
 
 		static int obj_desc_pval(Object o_ptr, string buf, int max, int end, bool spoil)
@@ -606,7 +605,7 @@ namespace CSAngband.Object {
 			o_ptr.object_flags_known(ref flags_known);
 
 			/* Get inscription */
-			if (o_ptr.note != null)
+			if (o_ptr.note != null && o_ptr.note.value != null)
 			    u[n++] = o_ptr.note.ToString();
 
 			/* Use special inscription, if any */
@@ -633,7 +632,7 @@ namespace CSAngband.Object {
 
 			/* Note curses */
 			Object_Flag.create_mask(f2, false, Object_Flag.object_flag_type.CURSE);
-			if (flags_known.inter(f2))
+			if (flags_known.is_inter(f2))
 			    u[n++] = "cursed";
 
 			/* Note squelch */
@@ -662,11 +661,10 @@ namespace CSAngband.Object {
 		/* Add "unseen" to the end of unaware items in stores */
 		static int obj_desc_aware(Object o_ptr, ref string buf, int max, int end)
 		{
-			throw new NotImplementedException();
-			//if (!object_flavor_is_aware(o_ptr))
-			//    strnfcat(buf, max, &end, " {unseen}");
+			if(!o_ptr.flavor_is_aware())
+				buf += " {unseen}";
 
-			//return end;
+			return end;
 		}
 
 

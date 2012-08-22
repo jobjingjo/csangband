@@ -1818,10 +1818,9 @@ namespace CSAngband {
 		 */
 		public static void track_object(int item)
 		{
-			throw new NotImplementedException();
-			//p_ptr.object_idx = item;
-			//p_ptr.object_kind_idx = NO_OBJECT;
-			//p_ptr.redraw |= (PR_OBJECT);
+			Misc.p_ptr.object_idx = (short)item;
+			Misc.p_ptr.object_kind_idx = Misc.NO_OBJECT;
+			Misc.p_ptr.redraw |= (Misc.PR_OBJECT);
 		}
 
 		public static void track_object_kind(int k_idx)

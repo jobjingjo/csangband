@@ -781,28 +781,25 @@ namespace CSAngband {
 
 		static void ui_leave_game(Game_Event.Event_Type type, Game_Event data, object user)
 		{
-			throw new NotImplementedException();
-		//    /* Because of the "flexible" sidebar, all these things trigger
-		//       the same function. */
-		//    event_remove_handler_set(player_events, N_ELEMENTS(player_events),
-		//                  update_sidebar, null);
+		    /* Because of the "flexible" sidebar, all these things trigger
+		       the same function. */
+			Game_Event.remove_handler_set(player_events, Sidebar.update_sidebar, null);
 
-		//    /* The flexible statusbar has similar requirements, so is
-		//       also trigger by a large set of events. */
-		//    event_remove_handler_set(statusline_events, N_ELEMENTS(statusline_events),
-		//                  update_statusline, null);
+		    /* The flexible statusbar has similar requirements, so is
+		       also trigger by a large set of events. */
+			Game_Event.remove_handler_set(statusline_events, Statusline.update_statusline, null);
 
-		//    /* Player HP can optionally change the colour of the '@' now. */
-		//    event_remove_handler(EVENT_HP, hp_colour_change, null);
+		    /* Player HP can optionally change the colour of the '@' now. */
+			Game_Event.remove_handler(Game_Event.Event_Type.HP, Sidebar.hp_colour_change, null);
 
-		//    /* Simplest way to keep the map up to date - will do for now */
-		//    event_remove_handler(EVENT_MAP, update_maps, angband_term[0]);
-		//#if 0
-		//    event_remove_handler(EVENT_MAP, trace_map_updates, angband_term[0]);
-		//#endif
-		//    /* Check if the panel should shift when the player's moved */
-		//    event_remove_handler(EVENT_PLAYERMOVED, check_panel, null);
-		//    event_remove_handler(EVENT_SEEFLOOR, see_floor_items, null);
+		    /* Simplest way to keep the map up to date - will do for now */
+			Game_Event.remove_handler(Game_Event.Event_Type.MAP, Map.update_maps, Misc.angband_term[0]);
+			//#if 0
+			//    event_remove_handler(EVENT_MAP, trace_map_updates, angband_term[0]);
+			//#endif
+		    /* Check if the panel should shift when the player's moved */
+			Game_Event.remove_handler(Game_Event.Event_Type.PLAYERMOVED, Floor.check_panel, null);
+			Game_Event.remove_handler(Game_Event.Event_Type.SEEFLOOR, Floor.see_floor_items, null);
 		}
 
 		public static void cleanup_angband()

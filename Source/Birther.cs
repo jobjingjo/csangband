@@ -402,13 +402,13 @@ namespace CSAngband {
 		 */
 		static void player_outfit(Player.Player p)
 		{
-			Object.Object object_type_body = new Object.Object();
+			//Object.Object object_type_body = new Object.Object();
 
 			/* Give the player starting equipment */
 			for (Start_Item si = Player.Player.instance.Class.start_items; si != null; si = si.next)
 			{
 			    /* Get local object */
-			    Object.Object i_ptr = object_type_body;
+			    Object.Object i_ptr = new Object.Object();
 
 			    /* Prepare the item */
 			    i_ptr.prep(si.kind, 0, aspect.MINIMISE);
@@ -833,15 +833,14 @@ namespace CSAngband {
 			 * If there's a quickstart character, store it for later use.
 			 * If not, default to whatever the first of the choices is.
 			 */
-			if (quickstart_allowed)
-			    quickstart_prev.save_roller_data();
-			else
-			{
-			    Player.Player.instance.psex = 0;
-			    /* XXX default race/class */
-			    Player.Player.instance.Class = Misc.classes;
-			    Player.Player.instance.Race = Misc.races;
-			    Player.Player.instance.generate(null, null, null);
+			if(quickstart_allowed) {
+				quickstart_prev.save_roller_data();
+			} else {
+				Player.Player.instance.psex = 0;
+				/* XXX default race/class */
+				Player.Player.instance.Class = Misc.classes;
+				Player.Player.instance.Race = Misc.races;
+				Player.Player.instance.generate(null, null, null);
 			}
 
 			/* Handle incrementing name suffix */

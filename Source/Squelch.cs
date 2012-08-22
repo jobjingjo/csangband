@@ -56,7 +56,7 @@ namespace CSAngband {
 		/*
 		 * The different kinds of quality squelch
 		 */
-		enum quality_squelch
+		public enum quality_squelch
 		{
 			SQUELCH_NONE,
 			SQUELCH_BAD,
@@ -342,126 +342,127 @@ namespace CSAngband {
 		 * The main point is when the value is undetermined given current info,
 		 * return the maximum possible value.
 		 */
-		public static byte squelch_level_of(Object.Object o_ptr)
+		public static quality_squelch squelch_level_of(Object.Object o_ptr)
 		{
-			throw new NotImplementedException();
-			//byte value;
-			//bitflag f[OF_SIZE], f2[OF_SIZE];
-			//int i;
+			quality_squelch value = quality_squelch.SQUELCH_NONE;
+			Bitflag f = new Bitflag(Object_Flag.SIZE);
+			Bitflag f2 = new Bitflag(Object_Flag.SIZE);
+			int i;
 
-			//object_flags_known(o_ptr, f);
+			o_ptr.object_flags_known(ref f);
 
-			///* Deal with jewelry specially. */
-			//if (object_is_jewelry(o_ptr))
-			//{
-			//    /* CC: average jewelry has at least one known positive pval */
-			//    for (i = 0; i < o_ptr.num_pvals; i++)
-			//        if ((object_this_pval_is_visible(o_ptr, i)) && (o_ptr.pval[i] > 0))
-			//            return SQUELCH_AVERAGE;
+			/* Deal with jewelry specially. */
+			if (o_ptr.is_jewelry())
+			{
+			    /* CC: average jewelry has at least one known positive pval */
+			    for (i = 0; i < o_ptr.num_pvals; i++)
+			        if ((o_ptr.this_pval_is_visible(i)) && (o_ptr.pval[i] > 0))
+			            return quality_squelch.SQUELCH_AVERAGE;
 
-			//    if ((o_ptr.to_h > 0) || (o_ptr.to_d > 0) || (o_ptr.to_a > 0))
-			//        return SQUELCH_AVERAGE;
-			//    if ((object_attack_plusses_are_visible(o_ptr) &&
-			//            ((o_ptr.to_h < 0) || (o_ptr.to_d < 0))) ||
-			//            (object_defence_plusses_are_visible(o_ptr) && o_ptr.to_a < 0))
-			//        return SQUELCH_BAD;
+			    if ((o_ptr.to_h > 0) || (o_ptr.to_d > 0) || (o_ptr.to_a > 0))
+			        return quality_squelch.SQUELCH_AVERAGE;
+			    if ((o_ptr.attack_plusses_are_visible() &&
+			            ((o_ptr.to_h < 0) || (o_ptr.to_d < 0))) ||
+			            (o_ptr.defence_plusses_are_visible() && o_ptr.to_a < 0))
+			        return quality_squelch.SQUELCH_BAD;
 
-			//    return SQUELCH_AVERAGE;
-			//}
+			    return quality_squelch.SQUELCH_AVERAGE;
+			}
 
-			///* And lights */
-			//if (o_ptr.tval == TV_LIGHT)
-			//{
-			//    create_mask(f2, true, OFID_WIELD, OFT_MAX);
-			//    if (of_is_inter(f, f2))
-			//        return SQUELCH_ALL;
-			//    if ((o_ptr.to_h > 0) || (o_ptr.to_d > 0) || (o_ptr.to_a > 0))
-			//        return SQUELCH_GOOD;
-			//    if ((o_ptr.to_h < 0) || (o_ptr.to_d < 0) || (o_ptr.to_a < 0))
-			//        return SQUELCH_BAD;
+			/* And lights */
+			if (o_ptr.tval == TVal.TV_LIGHT)
+			{
+			    Object_Flag.create_mask(f2, true, Object_Flag.object_flag_id.WIELD);
+			    if (f.is_inter(f2))
+			        return quality_squelch.SQUELCH_ALL;
+			    if ((o_ptr.to_h > 0) || (o_ptr.to_d > 0) || (o_ptr.to_a > 0))
+			        return quality_squelch.SQUELCH_GOOD;
+			    if ((o_ptr.to_h < 0) || (o_ptr.to_d < 0) || (o_ptr.to_a < 0))
+			        return quality_squelch.SQUELCH_BAD;
 
-			//    return SQUELCH_AVERAGE;
-			//}
+			    return quality_squelch.SQUELCH_AVERAGE;
+			}
 
-			///* CC: we need to redefine "bad" with multiple pvals
-			// * At the moment we use "all pvals known and negative" */
-			//for (i = 0; i < o_ptr.num_pvals; i++) {
-			//    if (!object_this_pval_is_visible(o_ptr, i) ||
-			//        (o_ptr.pval[i] > 0))
-			//        break;
+			/* CC: we need to redefine "bad" with multiple pvals
+			 * At the moment we use "all pvals known and negative" */
+			for (i = 0; i < o_ptr.num_pvals; i++) {
+			    if (!o_ptr.this_pval_is_visible(i) ||
+			        (o_ptr.pval[i] > 0))
+			        break;
 
-			//    if (i == (o_ptr.num_pvals - 1))
-			//        return SQUELCH_BAD;
-			//}
+			    if (i == (o_ptr.num_pvals - 1))
+			        return quality_squelch.SQUELCH_BAD;
+			}
 
-			//if (object_was_sensed(o_ptr)) {
-			//    obj_pseudo_t pseudo = object_pseudo(o_ptr);
+			if (o_ptr.was_sensed()) {
+				Object.Object.obj_pseudo_t pseudo = o_ptr.pseudo();
 
-			//    switch (pseudo) {
-			//        case INSCRIP_AVERAGE: {
-			//            value = SQUELCH_AVERAGE;
-			//            break;
-			//        }
+			    switch (pseudo) {
+			        case Object.Object.obj_pseudo_t.INSCRIP_AVERAGE: {
+			            value = quality_squelch.SQUELCH_AVERAGE;
+			            break;
+			        }
 
-			//        case INSCRIP_EXCELLENT: {
-			//            /* have to assume splendid until you have tested it */
-			//            if (object_was_worn(o_ptr)) {
-			//                if (object_high_resist_is_possible(o_ptr))
-			//                    value = SQUELCH_EXCELLENT_NO_SPL;
-			//                else
-			//                    value = SQUELCH_EXCELLENT_NO_HI;
-			//            } else {
-			//                value = SQUELCH_ALL;
-			//            }
-			//            break;
-			//        }
+			        case Object.Object.obj_pseudo_t.INSCRIP_EXCELLENT: {
+			            /* have to assume splendid until you have tested it */
+			            if (o_ptr.was_worn()) {
+			                if (o_ptr.high_resist_is_possible())
+			                    value = quality_squelch.SQUELCH_EXCELLENT_NO_SPL;
+			                else
+			                    value = quality_squelch.SQUELCH_EXCELLENT_NO_HI;
+			            } else {
+			                value = quality_squelch.SQUELCH_ALL;
+			            }
+			            break;
+			        }
 
-			//        case INSCRIP_SPLENDID:
-			//            value = SQUELCH_ALL;
-			//            break;
-			//        case INSCRIP_null:
-			//        case INSCRIP_SPECIAL:
-			//            value = SQUELCH_MAX;
-			//            break;
+			        case Object.Object.obj_pseudo_t.INSCRIP_SPLENDID:
+			            value = quality_squelch.SQUELCH_ALL;
+			            break;
+			        case Object.Object.obj_pseudo_t.INSCRIP_null:
+			        case Object.Object.obj_pseudo_t.INSCRIP_SPECIAL:
+			            value = quality_squelch.SQUELCH_MAX;
+			            break;
 
-			//        /* This is the interesting case */
-			//        case INSCRIP_STRANGE:
-			//        case INSCRIP_MAGICAL: {
-			//            value = SQUELCH_GOOD;
+			        /* This is the interesting case */
+			        case Object.Object.obj_pseudo_t.INSCRIP_STRANGE:
+			        case Object.Object.obj_pseudo_t.INSCRIP_MAGICAL: {
+			            value = quality_squelch.SQUELCH_GOOD;
 
-			//            if ((object_attack_plusses_are_visible(o_ptr) ||
-			//                    randcalc_valid(o_ptr.kind.to_h, o_ptr.to_h) ||
-			//                    randcalc_valid(o_ptr.kind.to_d, o_ptr.to_d)) &&
-			//                    (object_defence_plusses_are_visible(o_ptr) ||
-			//                    randcalc_valid(o_ptr.kind.to_a, o_ptr.to_a))) {
-			//                int isgood = is_object_good(o_ptr);
-			//                if (isgood > 0) {
-			//                    value = SQUELCH_GOOD;
-			//                } else if (isgood < 0) {
-			//                    value = SQUELCH_BAD;
-			//                } else {
-			//                    value = SQUELCH_AVERAGE;
-			//                }
-			//            }
-			//            break;
-			//        }
+			            if ((o_ptr.attack_plusses_are_visible() ||
+			                    Random.randcalc_valid(o_ptr.kind.to_h, o_ptr.to_h) ||
+			                    Random.randcalc_valid(o_ptr.kind.to_d, o_ptr.to_d)) &&
+			                    (o_ptr.defence_plusses_are_visible() ||
+			                    Random.randcalc_valid(o_ptr.kind.to_a, o_ptr.to_a))) {
+			                int isgood = is_object_good(o_ptr);
+			                if (isgood > 0) {
+			                    value = quality_squelch.SQUELCH_GOOD;
+			                } else if (isgood < 0) {
+			                    value = quality_squelch.SQUELCH_BAD;
+			                } else {
+			                    value = quality_squelch.SQUELCH_AVERAGE;
+			                }
+			            }
+			            break;
+			        }
 
-			//        default:
-			//            /* do not handle any other possible pseudo values */
-			//            assert(0);
-			//    }
-			//}
-			//else
-			//{
-			//    if (object_was_worn(o_ptr))
-			//        value = SQUELCH_EXCELLENT_NO_SPL; /* object would be sensed if it were splendid */
-			//    else if (object_is_known_not_artifact(o_ptr))
-			//        value = SQUELCH_ALL;
-			//    else
-			//        value = SQUELCH_MAX;
-			//}
+			        default:
+			            /* do not handle any other possible pseudo values */
+			            Misc.assert(false);
+						break;
+			    }
+			}
+			else
+			{
+			    if (o_ptr.was_worn())
+			        value = quality_squelch.SQUELCH_EXCELLENT_NO_SPL; /* object would be sensed if it were splendid */
+			    else if (o_ptr.is_known_not_artifact())
+			        value = quality_squelch.SQUELCH_ALL;
+			    else
+			        value = quality_squelch.SQUELCH_MAX;
+			}
 
-			//return value;
+			return value;
 		}
 
 		/*
@@ -537,7 +538,7 @@ namespace CSAngband {
 			    return true;
 
 			/* Get result based on the feeling and the squelch_level */
-			if (squelch_level_of(o_ptr) <= squelch_level[type])
+			if ((byte)squelch_level_of(o_ptr) <= squelch_level[type])
 			    return true;
 			else
 			    return false;

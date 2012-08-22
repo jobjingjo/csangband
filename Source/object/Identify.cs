@@ -392,5 +392,28 @@ namespace CSAngband.Object {
 
 			return;
 		}
+
+		/*
+		 * \returns whether it is possible an object has a high resist given the
+		 *          player's current knowledge
+		 */
+		public bool high_resist_is_possible()
+		{
+			throw new NotImplementedException();
+			//bitflag flags[OF_SIZE], f2[OF_SIZE];
+
+			///* Actual object flags */
+			//object_flags(o_ptr, flags);
+
+			///* Add player's uncertainty */
+			//of_comp_union(flags, o_ptr.known_flags);
+
+			///* Check for possible high resist */
+			//create_mask(f2, false, OFT_HRES, OFT_MAX);
+			//if (of_is_inter(flags, f2))
+			//    return true;
+			//else
+			//    return false;
+		}
 	}
 }
