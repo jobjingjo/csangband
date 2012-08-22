@@ -2713,82 +2713,82 @@ namespace CSAngband {
 			Store store = Store.current_store();
 			Menu_Type menu;
 
-			throw new NotImplementedException();
-			///* Verify that there is a store */
-			//if (!store) {
-			//    msg("You see no store here.");
-			//    return;
-			//}
+			/* Verify that there is a store */
+			if (store == null) {
+			    Utilities.msg("You see no store here.");
+			    return;
+			}
 
-			///* Check if we can enter the store */
-			//if (OPT(birth_no_stores)) {
-			//    msg("The doors are locked.");
-			//    return;
-			//}
+			/* Check if we can enter the store */
+			if (Option.birth_no_stores.value) {
+			    Utilities.msg("The doors are locked.");
+			    return;
+			}
 
-			///* Shut down the normal game view - it won't be updated - and start
-			//   up the store state. */
-			//event_signal(EVENT_LEAVE_GAME);
-			//event_signal(EVENT_ENTER_STORE);
+			/* Shut down the normal game view - it won't be updated - and start
+			   up the store state. */
+			Game_Event.signal(Game_Event.Event_Type.LEAVE_GAME);
+			Game_Event.signal(Game_Event.Event_Type.ENTER_STORE);
 
-			///* Forget the view */
-			//forget_view();
+			/* Forget the view */
+			Cave.forget_view();
 
-			///* Reset the command variables */
-			//p_ptr.command_arg = 0;
-
+			/* Reset the command variables */
+			Misc.p_ptr.command_arg = 0;
 
 
-			///*** Display ***/
 
-			///* Save current screen (ie. dungeon) */
-			//screen_save();
+			/*** Display ***/
 
-
-			///*** Inventory display ***/
-
-			///* Wipe the menu and set it up */
-			//menu_init(&menu, MN_SKIN_SCROLL, &store_menu);
-			//menu_layout(&menu, &store_menu_region);
-
-			//store_menu_set_selections(&menu, false);
-			//store_flags = STORE_INIT_CHANGE;
-			//store_display_recalc(&menu);
-			//store_menu_recalc(&menu);
-			//store_redraw();
-
-			///* Say a friendly hello. */
-			//if (store.sidx != STORE_HOME)
-			//    prt_welcome(store.owner);
-
-			//msg_flag = false;
-			//menu_select(&menu, 0, false);
-			//msg_flag = false;
-
-			///* Switch back to the normal game view. */
-			//event_signal(EVENT_LEAVE_STORE);
-			//event_signal(EVENT_ENTER_GAME);
-
-			///* Take a turn */
-			//p_ptr.energy_use = 100;
+			/* Save current screen (ie. dungeon) */
+			Utilities.screen_save();
 
 
-			///* Flush messages XXX XXX XXX */
-			//message_flush();
+			/*** Inventory display ***/
+
+			/* Wipe the menu and set it up */
+			menu = new Menu_Type(Menu_Type.skin_id.SCROLL, Store.store_menu);
+			menu.layout(Store.store_menu_region);
 
 
-			///* Load the screen */
-			//screen_load();
+			Store.store_menu_set_selections(menu, false);
+			Store.store_flags = Store.STORE_INIT_CHANGE;
+			Store.store_display_recalc(menu);
+			Store.store_menu_recalc(menu);
+			Store.store_redraw();
+
+			/* Say a friendly hello. */
+			if (store.sidx != STORE.HOME)
+			    Store.prt_welcome(store.owner);
+
+			Term.msg_flag = false;
+			menu.select(0, false);
+			Term.msg_flag = false;
+
+			/* Switch back to the normal game view. */
+			Game_Event.signal(Game_Event.Event_Type.LEAVE_STORE);
+			Game_Event.signal(Game_Event.Event_Type.ENTER_GAME);
+
+			/* Take a turn */
+			Misc.p_ptr.energy_use = 100;
 
 
-			///* Update the visuals */
-			//p_ptr.update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+			/* Flush messages XXX XXX XXX */
+			Utilities.message_flush();
 
-			///* Redraw entire screen */
-			//p_ptr.redraw |= (PR_BASIC | PR_EXTRA);
 
-			///* Redraw map */
-			//p_ptr.redraw |= (PR_MAP);
+			/* Load the screen */
+			Utilities.screen_load();
+
+
+			/* Update the visuals */
+			Misc.p_ptr.update |= (Misc.PU_UPDATE_VIEW | Misc.PU_MONSTERS);
+
+			/* Redraw entire screen */
+			Misc.p_ptr.redraw |= (uint)(Misc.PR_BASIC | Misc.PR_EXTRA);
+
+			/* Redraw map */
+			Misc.p_ptr.redraw |= (Misc.PR_MAP);
 		}
 
 

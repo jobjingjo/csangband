@@ -225,6 +225,7 @@
     <Compile Include="Source\Utilities.cs" />
     <Compile Include="Source\Vault.cs" />
     <Compile Include="Source\Xtra2.cs" />
+    <Compile Include="Source\Xtra3.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Tests\README" />

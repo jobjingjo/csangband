@@ -6,7 +6,7 @@ using System.Text;
 namespace CSAngband {
 	class Quark {
 		private static List<Quark> quarks;
-		private string value;
+		public string value;
 
 		public static void Init(){
 			quarks = new List<Quark>();

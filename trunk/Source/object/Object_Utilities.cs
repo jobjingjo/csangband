@@ -670,27 +670,26 @@ namespace CSAngband.Object {
 
 		public bool recharge_timeout()
 		{
-			throw new NotImplementedException();
-			//int charging_before, charging_after;
+			int charging_before, charging_after;
 
-			///* Find the number of charging items */
-			//charging_before = number_charging(o_ptr);
+			/* Find the number of charging items */
+			charging_before = number_charging();
 
-			///* Nothing to charge */	
-			//if (charging_before == 0)
-			//    return false;
+			/* Nothing to charge */	
+			if (charging_before == 0)
+			    return false;
 
-			///* Decrease the timeout */
-			//o_ptr.timeout -= MIN(charging_before, o_ptr.timeout);
+			/* Decrease the timeout */
+			timeout -= (short)Math.Min(charging_before, timeout);
 
-			///* Find the new number of charging items */
-			//charging_after = number_charging(o_ptr);
+			/* Find the new number of charging items */
+			charging_after = number_charging();
 
-			///* Return true if at least 1 item obtained a charge */
-			//if (charging_after < charging_before)
-			//    return true;
-			//else
-			//    return false;
+			/* Return true if at least 1 item obtained a charge */
+			if (charging_after < charging_before)
+			    return true;
+			else
+			    return false;
 		}
 
 		/*

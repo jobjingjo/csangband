@@ -141,13 +141,10 @@ namespace CSAngband {
 		}
 
 		//n_types was a size_t
-		public static void remove_handler_set(Event_Type type, int n_types, Handler fn, object user)
+		public static void remove_handler_set(Event_Type[] type, Handler fn, object user)
 		{
-			throw new NotImplementedException();
-			//size_t i;
-
-			//for (i = 0; i < n_types; i++)
-			//    event_remove_handler(type[i], fn, user);
+			for (int i = 0; i < type.Length; i++)
+			    remove_handler(type[i], fn, user);
 		}
 
 

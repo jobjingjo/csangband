@@ -147,7 +147,6 @@ int motion_dir(int y1, int x1, int y2, int x2);
 /* xtra3.c */
 byte monster_health_attr(void);
 void toggle_inven_equip(void);
-char* random_hint(void);
 
 /* wiz-spoil.c */
 bool make_fake_artifact(object_type *o_ptr, struct artifact *artifact);

@@ -67,73 +67,7 @@ void textui_textblock_place(textblock *tb, region orig_area, const char *header)
 	mem_free(line_lengths);
 }
 
-void textui_textblock_show(textblock *tb, region orig_area, const char *header)
-{
-	const char *text = textblock_text(tb);
-	const byte *attrs = textblock_attrs(tb);
 
-	/* xxx on resize this should be recalculated */
-	region area = region_calculate(orig_area);
-
-	size_t *line_starts = null, *line_lengths = null;
-	size_t n_lines;
-
-	n_lines = textblock_calculate_lines(tb,
-			&line_starts, &line_lengths, area.width);
-
-	screen_save();
-
-	/* make room for the header & footer */
-	area.page_rows -= 3;
-
-	c_prt(TERM_L_BLUE, header, area.row, area.col);
-	area.row++;
-
-	if (n_lines > (size_t) area.page_rows) {
-		int start_line = 0;
-
-		c_prt(TERM_WHITE, "", area.row + area.page_rows, area.col);
-		c_prt(TERM_L_BLUE, "(Up/down or ESCAPE to exit.)",
-				area.row + area.page_rows + 1, area.col);
-
-		/* Pager mode */
-		while (1) {
-			struct keypress ch;
-
-			display_area(text, attrs, line_starts, line_lengths, n_lines,
-					area, start_line);
-
-			ch = inkey();
-			if (ch.code == ARROW_UP)
-				start_line--;
-			else if (ch.code== ESCAPE || ch.code == 'q')
-				break;
-			else if (ch.code == ARROW_DOWN)
-				start_line++;
-			else if (ch.code == ' ')
-				start_line += area.page_rows;
-
-			if (start_line < 0)
-				start_line = 0;
-			if (start_line + (size_t) area.page_rows > n_lines)
-				start_line = n_lines - area.page_rows;
-		}
-	} else {
-		display_area(text, attrs, line_starts, line_lengths, n_lines, area, 0);
-
-		c_prt(TERM_WHITE, "", area.row + n_lines, area.col);
-		c_prt(TERM_L_BLUE, "(Press any key to continue.)",
-				area.row + n_lines + 1, area.col);
-		inkey();
-	}
-
-	mem_free(line_starts);
-	mem_free(line_lengths);
-
-	screen_load();
-
-	return;
-}
 
 
 

@@ -170,7 +170,7 @@ namespace CSAngband {
 
 		/* Stored boundary, set by menu_layout().  This is used to calculate
 		 * where the menu should be displayed on display & resize */
-		Region boundary;
+		public Region boundary;
 
 		int filter_count;        /* number of rows in current view */
 		int[] filter_list;  /* optional filter (view) of menu objects */

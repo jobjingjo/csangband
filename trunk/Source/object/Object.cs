@@ -551,8 +551,7 @@ namespace CSAngband.Object
 		 * Default to user definitions.
 		 */
 		public ConsoleColor object_attr(){
-			throw new NotImplementedException();
-			//(object_kind_attr((T).kind))
+			return (object_kind_attr(kind));
 		}
 
 		/*
@@ -561,9 +560,7 @@ namespace CSAngband.Object
 		 * Default to user definitions.
 		 */
 		public char object_char() {
-			throw new NotImplementedException();
-			//#define object_char(T) \
-			//    (object_kind_char((T).kind))
+			return object_kind_char(kind);
 		}
 
 		/*
@@ -572,10 +569,7 @@ namespace CSAngband.Object
 		 * Default to user definitions.
 		 */
 		public static ConsoleColor object_kind_attr(Object_Kind k){
-			throw new NotImplementedException();
-			//return (use_flavor_glyph((kind)) ? 
-			// (kind.flavor.x_attr) :
-			// (kind.x_attr))
+			return (use_flavor_glyph((k)) ? (k.flavor.x_attr) : (k.x_attr));
 		}
 
 		/*
@@ -584,13 +578,20 @@ namespace CSAngband.Object
 		 * Default to user definitions.
 		 */
 		public static char object_kind_char(Object_Kind k){
-			throw new NotImplementedException();
-			//#define object_kind_char(kind) \
-			//(use_flavor_glyph(kind) ? \
-			// ((kind).flavor.x_char) : \
-			// ((kind).x_char))
+			return (use_flavor_glyph(k) ? (k.flavor.x_char) : (k.x_char));
 		}
 		
+		/*
+		 * Determine if the attr and char should consider the item's flavor
+		 *
+		 * Identified scrolls should use their own tile.
+		 */
+		public static bool use_flavor_glyph(Object_Kind kind){
+			return ((kind).flavor != null && !((kind).tval == TVal.TV_SCROLL && (kind).aware));
+		}
+
+
+
 		/**
 		 * Add a pval to an object, rearranging flags as necessary. Returns true
 		 * if the number of pvals is now different, false if it is the same.

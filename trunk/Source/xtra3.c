@@ -531,13 +531,4 @@ static void init_angband_aux(const char *why)
 
 extern game_event_handler ui_enter_birthscreen;
 
-/* Return a random hint from the global hints list */
-char* random_hint(void)
-{
-	struct hint *v, *r = null;
-	int n;
-	for (v = hints, n = 1; v; v = v.next, n++)
-		if (one_in_(n))
-			r = v;
-	return r.hint;
-}
+

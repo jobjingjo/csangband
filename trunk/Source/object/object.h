@@ -38,19 +38,6 @@ typedef enum
 #define sign(x) ((x) > 0 ? 1 : ((x) < 0 ? -1 : 0))
 
 
-/*** Macros ***/
-
-/*
- * Determine if the attr and char should consider the item's flavor
- *
- * Identified scrolls should use their own tile.
- */
-#define use_flavor_glyph(kind) \
-    ((kind).flavor && \
-     !((kind).tval == TV_SCROLL && (kind).aware))
-
-
-
 /*** Functions ***/
 
 /* identify.c */
