@@ -619,8 +619,7 @@ namespace CSAngband.Object {
 		/* Can only put on wieldable items */
 		public static bool obj_can_wear(Object o_ptr)
 		{
-			throw new NotImplementedException();
-			//return (wield_slot(o_ptr) >= INVEN_WIELD);
+			return (o_ptr.wield_slot() >= Misc.INVEN_WIELD);
 		}
 
 		/* Can only fire an item with the right tval */
@@ -1075,6 +1074,72 @@ namespace CSAngband.Object {
 
 			/* Result */
 			return (o_idx);
+		}
+
+		/*
+		 * Verify the "okayness" of a given item.
+		 *
+		 * The item can be negative to mean "item on floor".
+		 */
+		public static bool get_item_okay(int item)
+		{
+			/* Verify the item */
+			return (object_from_item_idx(item).item_tester_okay());
+		}
+
+		/*
+		 * Convert a label into the index of an item in the "inven".
+		 *
+		 * Return "-1" if the label does not indicate a real item.
+		 */
+		public static short label_to_inven(char c)
+		{
+			int i;
+
+			/* Convert */
+			i = (Char.IsLower((char)c) ? Basic.A2I(c) : -1);
+
+			/* Verify the index */
+			if ((i < 0) || (i > Misc.INVEN_PACK)) return (-1);
+
+			/* Empty slots can never be chosen */
+			if (Misc.p_ptr.inventory[i].kind == null) return (-1);
+
+			/* Return the index */
+			return ((short)i);
+		}
+
+
+		/*
+		 * Convert a label into the index of a item in the "equip".
+		 *
+		 * Return "-1" if the label does not indicate a real item.
+		 */
+		public static short label_to_equip(char c)
+		{
+			int i;
+
+			/* Convert */
+			i = (Char.IsLower((char)c) ? Basic.A2I(c) : -1) + Misc.INVEN_WIELD;
+
+			/* Verify the index */
+			if ((i < Misc.INVEN_WIELD) || (i >= Misc.ALL_INVEN_TOTAL)) return (-1);
+			if (i == Misc.INVEN_TOTAL) return (-1);
+
+			/* Empty slots can never be chosen */
+			if (Misc.p_ptr.inventory[i].kind == null) return (-1);
+
+			/* Return the index */
+			return ((short)i);
+		}
+
+		/* Get an o_ptr from an item number */
+		public static Object object_from_item_idx(int item)
+		{
+			if (item >= 0)
+				return Misc.p_ptr.inventory[item];
+			else
+				return byid((short)(0 - item));
 		}
 	}
 }

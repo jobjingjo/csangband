@@ -35,56 +35,6 @@
 extern void init_translate_visuals(void);
 #endif /* ALLOW_BORG_GRAPHICS */
 
-
-/*
- * Convert a label into the index of an item in the "inven".
- *
- * Return "-1" if the label does not indicate a real item.
- */
-s16b label_to_inven(int c)
-{
-	int i;
-
-	/* Convert */
-	i = (islower((unsigned char)c) ? A2I(c) : -1);
-
-	/* Verify the index */
-	if ((i < 0) || (i > INVEN_PACK)) return (-1);
-
-	/* Empty slots can never be chosen */
-	if (!p_ptr.inventory[i].kind) return (-1);
-
-	/* Return the index */
-	return (i);
-}
-
-
-/*
- * Convert a label into the index of a item in the "equip".
- *
- * Return "-1" if the label does not indicate a real item.
- */
-s16b label_to_equip(int c)
-{
-	int i;
-
-	/* Convert */
-	i = (islower((unsigned char)c) ? A2I(c) : -1) + INVEN_WIELD;
-
-	/* Verify the index */
-	if ((i < INVEN_WIELD) || (i >= ALL_INVEN_TOTAL)) return (-1);
-	if (i == INVEN_TOTAL) return (-1);
-
-	/* Empty slots can never be chosen */
-	if (!p_ptr.inventory[i].kind) return (-1);
-
-	/* Return the index */
-	return (i);
-}
-
-
-
-
 /*
  * \returns whether item o_ptr will fit in slot 'slot'
  */
@@ -1491,15 +1441,6 @@ u16b object_effect(const object_type *o_ptr)
 		return o_ptr.kind.effect;
 }
 
-/* Get an o_ptr from an item number */
-object_type *object_from_item_idx(int item)
-{
-	if (item >= 0)
-		return &p_ptr.inventory[item];
-	else
-		return object_byid(0 - item);
-}
-
 
 /*
  * Does the given object need to be aimed?
@@ -1514,18 +1455,6 @@ bool obj_needs_aim(object_type *o_ptr)
 			o_ptr.tval == TV_SHOT || o_ptr.tval == TV_ARROW ||
 			o_ptr.tval == TV_WAND ||
 			(o_ptr.tval == TV_ROD && !object_flavor_is_aware(o_ptr));
-}
-
-
-/*
- * Verify the "okayness" of a given item.
- *
- * The item can be negative to mean "item on floor".
- */
-bool get_item_okay(int item)
-{
-	/* Verify the item */
-	return (item_tester_okay(object_from_item_idx(item)));
 }
 
 

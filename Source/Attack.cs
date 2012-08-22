@@ -73,7 +73,7 @@ namespace CSAngband {
 
 			/* Handle player fear (only for invisible monsters) */
 			if (Misc.p_ptr.check_state(Object_Flag.AFRAID, Misc.p_ptr.state.flags)) {
-			    Utilities.msgt(Message_Type.MSG_AFRAID, "You are too afraid to attack %s!", m_name);
+			    Utilities.msgt(Message_Type.MSG_AFRAID, "You are too afraid to attack {0}!", m_name);
 			    return false;
 			}
 
