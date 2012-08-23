@@ -1533,45 +1533,45 @@ namespace CSAngband {
 		 */
 		static void regenhp(int percent)
 		{
-			throw new NotImplementedException();
-			//s32b new_chp, new_chp_frac;
-			//int old_chp;
+			int new_chp, new_chp_frac;
+			int old_chp;
 
-			///* Save the old hitpoints */
-			//old_chp = p_ptr.chp;
+			/* Save the old hitpoints */
+			old_chp = Misc.p_ptr.chp;
 
-			///* Extract the new hitpoints */
-			//new_chp = ((long)p_ptr.mhp) * percent + PY_REGEN_HPBASE;
-			//p_ptr.chp += (s16b)(new_chp >> 16);   /* div 65536 */
+			/* Extract the new hitpoints */
+			new_chp = (int)(((long)Misc.p_ptr.mhp) * percent + Misc.PY_REGEN_HPBASE);
+			Misc.p_ptr.chp += (short)(new_chp >> 16);   /* div 65536 */
 
-			///* check for overflow */
-			//if ((p_ptr.chp < 0) && (old_chp > 0)) p_ptr.chp = MAX_SHORT;
-			//new_chp_frac = (new_chp & 0xFFFF) + p_ptr.chp_frac;	/* mod 65536 */
-			//if (new_chp_frac >= 0x10000L)
-			//{
-			//    p_ptr.chp_frac = (u16b)(new_chp_frac - 0x10000L);
-			//    p_ptr.chp++;
-			//}
-			//else
-			//{
-			//    p_ptr.chp_frac = (u16b)new_chp_frac;
-			//}
+			/* check for overflow */
+			if ((Misc.p_ptr.chp < 0) && (old_chp > 0)) Misc.p_ptr.chp = short.MaxValue;
+			new_chp_frac = (new_chp & 0xFFFF) + Misc.p_ptr.chp_frac;	/* mod 65536 */
+			if (new_chp_frac >= 0x10000L)
+			{
+			    Misc.p_ptr.chp_frac = (ushort)(new_chp_frac - 0x10000L);
+			    Misc.p_ptr.chp++;
+			}
+			else
+			{
+			    Misc.p_ptr.chp_frac = (ushort)new_chp_frac;
+			}
 
-			///* Fully healed */
-			//if (p_ptr.chp >= p_ptr.mhp)
-			//{
-			//    p_ptr.chp = p_ptr.mhp;
-			//    p_ptr.chp_frac = 0;
-			//}
+			/* Fully healed */
+			if (Misc.p_ptr.chp >= Misc.p_ptr.mhp)
+			{
+			    Misc.p_ptr.chp = Misc.p_ptr.mhp;
+			    Misc.p_ptr.chp_frac = 0;
+			}
 
-			///* Notice changes */
-			//if (old_chp != p_ptr.chp)
-			//{
-			//    /* Redraw */
-			//    p_ptr.redraw |= (PR_HP);
-			//    wieldeds_notice_flag(p_ptr, OF_REGEN);
-			//    wieldeds_notice_flag(p_ptr, OF_IMPAIR_HP);
-			//}
+			/* Notice changes */
+			if (old_chp != Misc.p_ptr.chp)
+			{
+				throw new NotImplementedException();
+				///* Redraw */
+				//Misc.p_ptr.redraw |= (Misc.PR_HP);
+				//wieldeds_notice_flag(Misc.p_ptr, OF_REGEN);
+				//wieldeds_notice_flag(Misc.p_ptr, OF_IMPAIR_HP);
+			}
 		}
 
 
