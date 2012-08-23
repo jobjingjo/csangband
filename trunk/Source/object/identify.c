@@ -223,31 +223,6 @@ static void object_notice_defence_plusses(struct player *p, object_type *o_ptr)
 }
 
 
-
-
-
-/*
- * Notice a single flag - returns true if anything new was learned
- */
-bool object_notice_flag(object_type *o_ptr, int flag)
-{
-	if (!of_has(o_ptr.known_flags, flag))
-	{
-		of_on(o_ptr.known_flags, flag);
-		/* XXX Eddie don't want infinite recursion if object_check_for_ident sets more flags,
-		 * but maybe this will interfere with savefile repair
-		 */
-		object_check_for_ident(o_ptr);
-		event_signal(EVENT_INVENTORY);
-		event_signal(EVENT_EQUIPMENT);
-
-		return true;
-	}
-
-	return false;
-}
-
-
 /**
  * Notice things which happen on defending.
  */
@@ -405,65 +380,6 @@ void object_notice_on_wield(object_type *o_ptr)
 	object_notice_sensing(o_ptr);
 
 	/* XXX Eddie should we check_for_ident here? */
-}
-
-
-/**
- * Notice things about an object that would be noticed in time.
- */
-static void object_notice_after_time(void)
-{
-	int i;
-	int flag;
-
-	object_type *o_ptr;
-	char o_name[80];
-
-	bitflag f[OF_SIZE], timed_mask[OF_SIZE];
-
-	create_mask(timed_mask, true, OFID_TIMED, OFT_MAX);
-
-	/* Check every item the player is wearing */
-	for (i = INVEN_WIELD; i < ALL_INVEN_TOTAL; i++)
-	{
-		o_ptr = &p_ptr.inventory[i];
-
-		if (!o_ptr.kind || object_is_known(o_ptr)) continue;
-
-		/* Check for timed notice flags */
-		object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
-		object_flags(o_ptr, f);
-		of_inter(f, timed_mask);
-
-		for (flag = of_next(f, FLAG_START); flag != FLAG_END; flag = of_next(f, flag + 1))
-		{
-			if (!of_has(o_ptr.known_flags, flag))
-			{
-				/* Message */
-				flag_message(flag, o_name);
-
-				/* Notice the flag */
-				object_notice_flag(o_ptr, flag);
-
-				if (object_is_jewelry(o_ptr) &&
-					 (!object_effect(o_ptr) || object_effect_is_known(o_ptr)))
-				{
-					/* XXX this is a small hack, but jewelry with anything noticeable really is obvious */
-					/* XXX except, wait until learn activation if that is only clue */
-					object_flavor_aware(o_ptr);
-					object_check_for_ident(o_ptr);
-				}
-			}
-			else
-			{
-				/* Notice the flag is absent */
-				object_notice_flag(o_ptr, flag);
-			}
-		}
-
-		/* XXX Is this necessary? */
-		object_check_for_ident(o_ptr);
-	}
 }
 
 

@@ -1431,18 +1431,6 @@ void display_itemlist(void)
 /*** Generic utility functions ***/
 
 /*
- * Return an object's effect.
- */
-u16b object_effect(const object_type *o_ptr)
-{
-	if (o_ptr.artifact)
-		return o_ptr.artifact.effect;
-	else
-		return o_ptr.kind.effect;
-}
-
-
-/*
  * Does the given object need to be aimed?
  */ 
 bool obj_needs_aim(object_type *o_ptr)

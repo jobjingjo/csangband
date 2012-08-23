@@ -278,13 +278,12 @@ namespace CSAngband.Object {
 		 */
 		public static void flag_message(int flag, string name)
 		{
-			throw new NotImplementedException();
-			//const struct object_flag *of_ptr = &object_flag_table[flag];
+			Object_Flag of_ptr = Object_Flag.list[flag];
 
-			//if (!streq(of_ptr.message, ""))
-			//    msg(of_ptr.message, name);
+			if (of_ptr.message != null && of_ptr.message != "")
+			    Utilities.msg(of_ptr.message, name);
 
-			//return;
+			return;
 		}
 
 		/**
