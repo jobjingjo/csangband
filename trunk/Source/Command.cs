@@ -460,51 +460,169 @@ namespace CSAngband {
 			/* Nothing to pick up -- return */
 			if (Cave.cave.o_idx[py][px] == 0) return (0);
 
+			/* Always pickup gold, effortlessly */
+			py_pickup_gold();
+
+
+			/* Scan the remaining objects */
+			for (this_o_idx = Cave.cave.o_idx[py][px]; this_o_idx != 0; this_o_idx = next_o_idx)
+			{
+			    /* Get the object and the next object */
+			    o_ptr = Object.Object.byid(this_o_idx);
+			    next_o_idx = o_ptr.next_o_idx;
+
+			    /* Ignore all hidden objects and non-objects */
+			    if (Squelch.item_ok(o_ptr) || o_ptr.kind == null) continue;
+
+			    /* XXX Hack -- Enforce limit */
+			    if (floor_num >= floor_list.Length) break;
+
+
+			    /* Hack -- disturb */
+			    Cave.disturb(Misc.p_ptr, 0, 0);
+
+				throw new NotImplementedException();
+				///* Automatically pick up items into the backpack */
+				//if (auto_pickup_okay(o_ptr))
+				//{
+				//    /* Pick up the object with message */
+				//    py_pickup_aux(this_o_idx, true);
+				//    objs_picked_up++;
+
+				//    continue;
+				//}
+
+
+				///* Tally objects and store them in an array. */
+
+				///* Remember this object index */
+				//floor_list[floor_num] = this_o_idx;
+
+				///* Count non-gold objects that remain on the floor. */
+				//floor_num++;
+			}
+
+			return objs_picked_up;
+		}
+
+		/*** Pickup ***/
+
+		/*
+		 * Pickup all gold at the player's current location.
+		 */
+		static void py_pickup_gold()
+		{
 			throw new NotImplementedException();
+			//int py = p_ptr.py;
+			//int px = p_ptr.px;
 
-			///* Always pickup gold, effortlessly */
-			//py_pickup_gold();
+			//s32b total_gold = 0L;
+			//byte *treasure;
+
+			//s16b this_o_idx = 0;
+			//s16b next_o_idx = 0;
+
+			//object_type *o_ptr;
+
+			//int sound_msg;
+			//bool verbal = false;
+
+			///* Allocate an array of ordinary gold objects */
+			//treasure = C_ZNEW(SV_GOLD_MAX, byte);
 
 
-			///* Scan the remaining objects */
+			///* Pick up all the ordinary gold objects */
 			//for (this_o_idx = cave.o_idx[py][px]; this_o_idx; this_o_idx = next_o_idx)
 			//{
-			//    /* Get the object and the next object */
+			//    /* Get the object */
 			//    o_ptr = object_byid(this_o_idx);
+
+			//    /* Get the next object */
 			//    next_o_idx = o_ptr.next_o_idx;
 
-			//    /* Ignore all hidden objects and non-objects */
-			//    if (squelch_item_ok(o_ptr) || !o_ptr.kind) continue;
+			//    /* Ignore if not legal treasure */
+			//    if ((o_ptr.tval != TV_GOLD) ||
+			//        (o_ptr.sval >= SV_GOLD_MAX)) continue;
 
-			//    /* XXX Hack -- Enforce limit */
-			//    if (floor_num >= N_ELEMENTS(floor_list)) break;
+			//    /* Note that we have this kind of treasure */
+			//    treasure[o_ptr.sval]++;
 
+			//    /* Remember whether feedback message is in order */
+			//    if (!squelch_item_ok(o_ptr))
+			//        verbal = true;
 
-			//    /* Hack -- disturb */
-			//    disturb(p_ptr, 0, 0);
+			//    /* Increment total value */
+			//    total_gold += (s32b)o_ptr.pval[DEFAULT_PVAL];
 
-
-			//    /* Automatically pick up items into the backpack */
-			//    if (auto_pickup_okay(o_ptr))
-			//    {
-			//        /* Pick up the object with message */
-			//        py_pickup_aux(this_o_idx, true);
-			//        objs_picked_up++;
-
-			//        continue;
-			//    }
-
-
-			//    /* Tally objects and store them in an array. */
-
-			//    /* Remember this object index */
-			//    floor_list[floor_num] = this_o_idx;
-
-			//    /* Count non-gold objects that remain on the floor. */
-			//    floor_num++;
+			//    /* Delete the gold */
+			//    delete_object_idx(this_o_idx);
 			//}
 
-			//return objs_picked_up;
+			///* Pick up the gold, if present */
+			//if (total_gold)
+			//{
+			//    char buf[1024];
+			//    char tmp[80];
+			//    int i, count, total;
+			//    object_kind *kind;
+
+			//    /* Build a message */
+			//    (void)strnfmt(buf, sizeof(buf), "You have found %ld gold pieces worth of ", (long)total_gold);
+
+			//    /* Count the types of treasure present */
+			//    for (total = 0, i = 0; i < SV_GOLD_MAX; i++)
+			//    {
+			//        if (treasure[i]) total++;
+			//    }
+
+			//    /* List the treasure types */
+			//    for (count = 0, i = 0; i < SV_GOLD_MAX; i++)
+			//    {
+			//        /* Skip if no treasure of this type */
+			//        if (!treasure[i]) continue;
+
+			//        /* Get this object index */
+			//        kind = lookup_kind(TV_GOLD, i);
+			//        if (!kind) continue;
+
+			//        /* Get the object name */
+			//        object_kind_name(tmp, sizeof tmp, kind, true);
+
+			//        /* Build up the pickup string */
+			//        my_strcat(buf, tmp, sizeof(buf));
+
+			//        /* Added another kind of treasure */
+			//        count++;
+
+			//        /* Add a comma if necessary */
+			//        if ((total > 2) && (count < total)) my_strcat(buf, ",", sizeof(buf));
+
+			//        /* Add an "and" if necessary */
+			//        if ((total >= 2) && (count == total-1)) my_strcat(buf, " and", sizeof(buf));
+
+			//        /* Add a space or period if necessary */
+			//        if (count < total) my_strcat(buf, " ", sizeof(buf));
+			//        else               my_strcat(buf, ".", sizeof(buf));
+			//    }
+
+			//    /* Determine which sound to play */
+			//    if      (total_gold < 200) sound_msg = MSG_MONEY1;
+			//    else if (total_gold < 600) sound_msg = MSG_MONEY2;
+			//    else                       sound_msg = MSG_MONEY3;
+
+			//    /* Display the message */
+			//    if (verbal)
+			//        msgt(sound_msg, "%s", buf);
+
+			//    /* Add gold to purse */
+			//    p_ptr.au += total_gold;
+
+			//    /* Redraw gold */
+			//    p_ptr.redraw |= (PR_GOLD);
+			//}
+
+			///* Free the gold array */
+			//FREE(treasure);
 		}
 
 		/*
