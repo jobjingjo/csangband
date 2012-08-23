@@ -115,37 +115,42 @@ namespace CSAngband.Object {
 		 */
 		int slay_power(bool verbose, StreamWriter log_file, bool known)
 		{
-			throw new NotImplementedException();
-			//bitflag s_index[OF_SIZE], f[OF_SIZE], f2[OF_SIZE];
-			//u32b sv = 0;
-			//int i, j;
-			//int mult;
-			//const struct slay *best_s_ptr = null;
-			//monster_race *r_ptr;
-			//monster_type *m_ptr;
+			Bitflag s_index = new Bitflag(Object_Flag.SIZE);
+			Bitflag f = new Bitflag(Object_Flag.SIZE);
+			Bitflag f2 = new Bitflag(Object_Flag.SIZE);
+			int sv = 0; //uint
+			int i, j;
+			int mult;
+			Slay best_s_ptr = null;
+			Monster_Race r_ptr;
+			Monster.Monster m_ptr;
 			//monster_type monster_type_body;
-			//const char *desc[SL_MAX] = { 0 }, *brand[SL_MAX] = { 0 };
-			//int s_mult[SL_MAX] = { 0 };
+			string[] desc = new string[Slay.MAX.value];// = { 0 }, *
+			string[] brand = new string[Slay.MAX.value];// = { 0 };
+			int[] s_mult = new int[Slay.MAX.value];// = { 0 };
 
-			//if (known)
-			//    object_flags(o_ptr, f);
-			//else
-			//    object_flags_known(o_ptr, f);
+			if (known)
+			    object_flags(ref f);
+			else
+			    object_flags_known(ref f);
 
-			///* Combine the slay bytes into an index value, return if there are none */
-			//of_copy(s_index, f);
-			//create_mask(f2, false, OFT_SLAY, OFT_KILL, OFT_BRAND, OFT_MAX);
+			/* Combine the slay bytes into an index value, return if there are none */
+			s_index.copy(f);
+			Object_Flag.create_mask(f2, false, Object_Flag.object_flag_type.SLAY, 
+				Object_Flag.object_flag_type.KILL, Object_Flag.object_flag_type.BRAND);
 
-			//if (!of_is_inter(s_index, f2))
-			//    return tot_mon_power;
-			//else
-			//    of_inter(s_index, f2);
+			if (!s_index.is_inter(f2))
+			    return Eval.tot_mon_power;
+			else
+			    s_index.inter(f2);
+
+			throw new NotImplementedException();
 
 			///* Look in the cache to see if we know this one yet */
 			//sv = check_slay_cache(s_index);
 
 			///* If it's cached (or there are no slays), return the value */
-			//if (sv)	{
+			//if (sv != 0)	{
 			//    file_putf(log_file, "Slay cache hit\n");
 			//    return sv;
 			//}

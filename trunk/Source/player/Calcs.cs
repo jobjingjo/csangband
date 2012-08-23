@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CSAngband.Object;
+using CSAngband.Monster;
 
 namespace CSAngband.Player {
 	partial class Player {
@@ -1458,9 +1459,8 @@ namespace CSAngband.Player {
 			if ((notice & Misc.PN_MON_MESSAGE)!=0)
 			{
 				notice &= ~(Misc.PN_MON_MESSAGE);
-				throw new NotImplementedException();
 				/* Make sure this comes after all of the monster messages */
-				//flush_all_monster_messages();
+				Monster_Message.flush_all_monster_messages();
 			}
 		}
 
