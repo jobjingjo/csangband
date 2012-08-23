@@ -104,12 +104,11 @@ namespace CSAngband {
 		 */
 		public static void look()
 		{
-			throw new NotImplementedException();
-			///* Look around */
-			//if (target_set_interactive(TARGET_LOOK, -1, -1))
-			//{
-			//    msg("Target Selected.");
-			//}
+			/* Look around */
+			if (Target.set_interactive(Target.LOOK, -1, -1))
+			{
+			    Utilities.msg("Target Selected.");
+			}
 		}
 
 
