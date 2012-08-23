@@ -346,8 +346,10 @@ namespace CSAngband.Object {
 			    }
 
 			    /* If the monster doesn't resist or the slay flag matches */
-			    if ((s_ptr.brand != null && s_ptr.brand.Length != 0 && !r_ptr.flags.has(s_ptr.resist_flag.value)) ||
-			            (s_ptr.monster_flag != Monster_Flag.NONE && r_ptr.flags.has(s_ptr.monster_flag.value))) {
+			    if ((s_ptr.brand != null && s_ptr.brand.Length != 0 && 
+						!r_ptr.flags.has(s_ptr.resist_flag.value)) ||
+			            (s_ptr.monster_flag != Monster_Flag.NONE && 
+						r_ptr.flags.has(s_ptr.monster_flag.value))) {
 
 			        /* compare multipliers to determine best attack */
 			        if ((best_s_ptr == null) || ((best_s_ptr).mult < s_ptr.mult))
@@ -399,20 +401,16 @@ namespace CSAngband.Object {
 		 * \param index is the set of slay flags whose value we are adding
 		 * \param value is the value of the slay flags in index
 		 */
-		//index might be an array
 		public static bool fill_slay_cache(Bitflag index, int value)
 		{
-			throw new NotImplementedException();
-			//int i;
+			for (int i = 0; !slay_cache[i].flags.is_empty(); i++) {
+			    if (index.is_equal(slay_cache[i].flags)) {
+			        slay_cache[i].value = value;
+			        return true;
+			    }
+			}
 
-			//for (i = 0; !Object_Flag.is_empty(slay_cache[i].flags); i++) {
-			//    if (Object_Flag.is_equal(index, slay_cache[i].flags)) {
-			//        slay_cache[i].value = value;
-			//        return true;
-			//    }
-			//}
-
-			//return false;
+			return false;
 		}
 
 		public static void free_slay_cache()
