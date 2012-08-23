@@ -26,9 +26,8 @@ namespace CSAngband.Object {
 			/* Notice some things after a while */
 			if (Misc.turn >= (object_last_wield + 3000))
 			{
-				throw new NotImplementedException();
-				//object_notice_after_time();
-				//object_last_wield = 0;
+				object_notice_after_time();
+				object_last_wield = 0;
 			}
 
 
@@ -163,6 +162,85 @@ namespace CSAngband.Object {
 			    Misc.p_ptr.redraw |= (Misc.PR_INVEN | Misc.PR_EQUIP);
 			}
 		}
+
+		/**
+		 * Notice things about an object that would be noticed in time.
+		 */
+		static void object_notice_after_time()
+		{
+			int i;
+			int flag;
+
+			Object o_ptr;
+			string o_name;//[80];
+
+			Bitflag f = new Bitflag(Object_Flag.SIZE);
+			Bitflag timed_mask = new Bitflag(Object_Flag.SIZE);
+
+			Object_Flag.create_mask(timed_mask, true, Object_Flag.object_flag_id.TIMED);
+
+			/* Check every item the player is wearing */
+			for (i = Misc.INVEN_WIELD; i < Misc.ALL_INVEN_TOTAL; i++)
+			{
+				o_ptr = Misc.p_ptr.inventory[i];
+
+				if (o_ptr.kind == null || o_ptr.is_known()) continue;
+
+				/* Check for timed notice flags */
+				o_name = o_ptr.object_desc(Detail.BASE);
+				o_ptr.object_flags(ref f);
+				f.inter(timed_mask);
+
+				for (flag = f.next(Bitflag.FLAG_START); flag != Bitflag.FLAG_null; flag = f.next(flag + 1))
+				{
+					if (!o_ptr.known_flags.has(flag))
+					{
+						/* Message */
+						Object_Flag.flag_message(flag, o_name);
+
+						/* Notice the flag */
+						o_ptr.notice_flag(flag);
+
+						if (o_ptr.is_jewelry() && (o_ptr.effect() == null || o_ptr.effect_is_known()))
+						{
+							/* XXX this is a small hack, but jewelry with anything noticeable really is obvious */
+							/* XXX except, wait until learn activation if that is only clue */
+							o_ptr.flavor_aware();
+							o_ptr.check_for_ident();
+						}
+					}
+					else
+					{
+						/* Notice the flag is absent */
+						o_ptr.notice_flag(flag);
+					}
+				}
+
+				/* XXX Is this necessary? */
+				o_ptr.check_for_ident();
+			}
+		}
+
+		/*
+		 * Notice a single flag - returns true if anything new was learned
+		 */
+		public bool notice_flag(int flag)
+		{
+			if (!known_flags.has(flag))
+			{
+				known_flags.on(flag);
+				/* XXX Eddie don't want infinite recursion if object_check_for_ident sets more flags,
+				 * but maybe this will interfere with savefile repair
+				 */
+				check_for_ident();
+				Game_Event.signal(Game_Event.Event_Type.INVENTORY);
+				Game_Event.signal(Game_Event.Event_Type.EQUIPMENT);
+				return true;
+			}
+
+			return false;
+		}
+
 
 		/*
 		 * Mark an object as sensed.

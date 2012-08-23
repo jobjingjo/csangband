@@ -1140,5 +1140,16 @@ namespace CSAngband.Object {
 			else
 				return byid((short)(0 - item));
 		}
+
+		/*
+		 * Return an object's effect.
+		 */
+		public Effect effect()
+		{
+			if (artifact != null)
+				return artifact.effect;
+			else
+				return kind.effect;
+		}
 	}
 }
