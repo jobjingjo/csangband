@@ -29,7 +29,7 @@ namespace CSAngband.Object {
 			list.Add(this);
 		}
 
-		int value;					/* Numerical index */
+		public int value;					/* Numerical index */
 
 		string name;
 		Object_Flag object_flag;			/* Object flag for the slay */
