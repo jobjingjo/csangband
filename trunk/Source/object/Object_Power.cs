@@ -144,68 +144,66 @@ namespace CSAngband.Object {
 			else
 			    s_index.inter(f2);
 
-			throw new NotImplementedException();
+			/* Look in the cache to see if we know this one yet */
+			sv = Slay.check_slay_cache(s_index);
 
-			///* Look in the cache to see if we know this one yet */
-			//sv = check_slay_cache(s_index);
+			/* If it's cached (or there are no slays), return the value */
+			if (sv != 0)	{
+			    //file_putf(log_file, "Slay cache hit\n");
+			    return sv;
+			}
 
-			///* If it's cached (or there are no slays), return the value */
-			//if (sv != 0)	{
-			//    file_putf(log_file, "Slay cache hit\n");
-			//    return sv;
-			//}
+			/*
+			 * Otherwise we need to calculate the expected average multiplier
+			 * for this combination (multiplied by the total number of
+			 * monsters, which we'll divide out later).
+			 */
+			for (i = 0; i < Misc.z_info.r_max; i++)	{
+			    best_s_ptr = null;
+			    mult = 1;
+			    r_ptr = Misc.r_info[i];
+				m_ptr = new Monster.Monster();
+			    m_ptr.r_idx = (short)i;
 
-			///*
-			// * Otherwise we need to calculate the expected average multiplier
-			// * for this combination (multiplied by the total number of
-			// * monsters, which we'll divide out later).
-			// */
-			//for (i = 0; i < z_info.r_max; i++)	{
-			//    best_s_ptr = null;
-			//    mult = 1;
-			//    r_ptr = &r_info[i];
-			//    m_ptr = &monster_type_body;
-			//    m_ptr.r_idx = i;
+			    /* Find the best multiplier against this monster */
+			    Slay.improve_attack_modifier(this, m_ptr, ref best_s_ptr, false, !known);
+			    if (best_s_ptr != null)
+			        mult = best_s_ptr.mult;
 
-			//    /* Find the best multiplier against this monster */
-			//    improve_attack_modifier((object_type *)o_ptr, m_ptr, &best_s_ptr,
-			//            false, !known);
-			//    if (best_s_ptr)
-			//        mult = best_s_ptr.mult;
+			    /* Add the multiple to sv */
+			    sv += (int)(mult * r_ptr.scaled_power);
+			}
 
-			//    /* Add the multiple to sv */
-			//    sv += mult * r_ptr.scaled_power;
-			//}
+			/*
+			 * To get the expected damage for this weapon, multiply the
+			 * average damage from base dice by sv, and divide by the
+			 * total number of monsters.
+			 */
+			if (verbose) {
+			    /* Write info about the slay combination and multiplier */
+			    //file_putf(log_file, "Slay multiplier for: ");
 
-			///*
-			// * To get the expected damage for this weapon, multiply the
-			// * average damage from base dice by sv, and divide by the
-			// * total number of monsters.
-			// */
-			//if (verbose) {
-			//    /* Write info about the slay combination and multiplier */
-			//    file_putf(log_file, "Slay multiplier for: ");
+			    j = Slay.list_slays(s_index, s_index, desc, brand, s_mult, false);
 
-			//    j = list_slays(s_index, s_index, desc, brand, s_mult, false);
+				//for (i = 0; i < j; i++) {
+				//    if (brand[i]) {
+				//        file_putf(log_file, brand[i]);
+				//    } else {
+				//        file_putf(log_file, desc[i]);
+				//    }
+				//    file_putf(log_file, "x%d ", s_mult[i]); 
+				//}
+				//file_putf(log_file, "\nsv is: %d\n", sv);
+				//file_putf(log_file, " and t_m_p is: %d \n", tot_mon_power);
+				//file_putf(log_file, "times 1000 is: %d\n", (1000 * sv) / tot_mon_power);
+			}
 
-			//    for (i = 0; i < j; i++) {
-			//        if (brand[i]) {
-			//            file_putf(log_file, brand[i]);
-			//        } else {
-			//            file_putf(log_file, desc[i]);
-			//        }
-			//        file_putf(log_file, "x%d ", s_mult[i]); 
-			//    }
-			//    file_putf(log_file, "\nsv is: %d\n", sv);
-			//    file_putf(log_file, " and t_m_p is: %d \n", tot_mon_power);
-			//    file_putf(log_file, "times 1000 is: %d\n", (1000 * sv) / tot_mon_power);
-			//}
+			/* Add to the cache */
+			if(Slay.fill_slay_cache(s_index, sv)) {
+				//file_putf(log_file, "Added to slay cache\n");
+			}
 
-			///* Add to the cache */
-			//if (fill_slay_cache(s_index, sv))
-			//    file_putf(log_file, "Added to slay cache\n");
-
-			//return sv;
+			return sv;
 		}
 
 		/*
