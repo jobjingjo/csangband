@@ -384,13 +384,12 @@ namespace CSAngband.Object {
 		//index might be an array
 		public static int check_slay_cache(Bitflag index)
 		{
-			throw new NotImplementedException();
-			//int i;
+			int i;
 
-			//for (i = 0; !Object_Flag.is_empty(slay_cache[i].flags); i++)
-			//    if (Object_Flag.is_equal(index, slay_cache[i].flags)) break;
+			for (i = 0; !slay_cache[i].flags.is_empty(); i++)
+			    if (index.is_equal(slay_cache[i].flags)) break;
 
-			//return slay_cache[i].value;
+			return slay_cache[i].value;
 		}
 
 
