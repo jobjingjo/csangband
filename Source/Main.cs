@@ -511,7 +511,8 @@ namespace CSAngband {
 
 			if(c == 127) {
 				//TODO: Figure out why town walls are 127, and change them to this
-				c = (char)9608;
+				//c = (char)9608;
+				c = '#'; //#s are less buggy
 			}
 
 			return (c);
