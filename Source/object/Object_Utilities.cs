@@ -24,7 +24,7 @@ namespace CSAngband.Object {
 			for (i = 1; i < Misc.o_max; i++)
 			{
 				Object o_ptr = Object.byid((short)i);
-				if (o_ptr.kind == null) continue;
+				if (o_ptr == null || o_ptr.kind == null) continue;
 
 				/* Preserve artifacts or mark them as lost in the history */
 				if (o_ptr.artifact != null) {
