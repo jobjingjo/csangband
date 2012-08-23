@@ -50,34 +50,33 @@ namespace CSAngband {
 		 */
 		public static void equip()
 		{
-			throw new NotImplementedException();
-			//ui_event e;
+			ui_event e;
 
-			///* Hack -- Start in "equipment" mode */
-			//p_ptr.command_wrk = (USE_EQUIP);
+			/* Hack -- Start in "equipment" mode */
+			Misc.p_ptr.command_wrk = (Misc.USE_EQUIP);
 
-			///* Save screen */
-			//screen_save();
+			/* Save screen */
+			Utilities.screen_save();
 
-			///* Hack -- show empty slots */
-			//item_tester_full = true;
+			/* Hack -- show empty slots */
+			Misc.item_tester_full = true;
 
-			///* Display the equipment */
-			//show_equip(OLIST_WEIGHT);
+			/* Display the equipment */
+			Object.Object.show_equip(Object.Object.olist_detail_t.OLIST_WEIGHT);
 
-			///* Hack -- undo the hack above */
-			//item_tester_full = false;
+			/* Hack -- undo the hack above */
+			Misc.item_tester_full = false;
 
-			///* Prompt for a command */
-			//prt("(Equipment) Command: ", 0, 0);
+			/* Prompt for a command */
+			Utilities.prt("(Equipment) Command: ", 0, 0);
 
-			///* Get a new command */
-			//e = inkey_ex();
-			//if (!(e.type == EVT_KBRD && e.key.code == ESCAPE))
-			//    Term_event_push(&e);
+			/* Get a new command */
+			e = Utilities.inkey_ex();
+			if (!(e.type == ui_event_type.EVT_KBRD && e.key.code == keycode_t.ESCAPE))
+			    Term.event_push(e);
 
-			///* Load screen */
-			//screen_load();
+			/* Load screen */
+			Utilities.screen_load();
 		}
 
 		/*

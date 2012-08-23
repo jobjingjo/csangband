@@ -1595,42 +1595,41 @@ namespace CSAngband {
 		 * Pick up treasure if "pickup" is true.
 		 */
 		public static void hold(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			///* Take a turn */
-			//p_ptr.energy_use = 100;
+			/* Take a turn */
+			Misc.p_ptr.energy_use = 100;
 
-			///* Spontaneous Searching */
-			//if ((p_ptr.state.skills[SKILL_SEARCH_FREQUENCY] >= 50) ||
-			//    one_in_(50 - p_ptr.state.skills[SKILL_SEARCH_FREQUENCY]))
-			//{
-			//    search(false);
-			//}
+			/* Spontaneous Searching */
+			if ((Misc.p_ptr.state.skills[(int)Skill.SEARCH_FREQUENCY] >= 50) ||
+				Random.one_in_(50 - Misc.p_ptr.state.skills[(int)Skill.SEARCH_FREQUENCY]))
+			{
+			    Command.search(false);
+			}
 
-			///* Continuous Searching */
-			//if (p_ptr.searching)
-			//{
-			//    search(false);
-			//}
+			/* Continuous Searching */
+			if (Misc.p_ptr.searching != 0)
+			{
+			    Command.search(false);
+			}
 
-			///* Pick things up, not using extra energy */
-			//do_autopickup();
+			/* Pick things up, not using extra energy */
+			Command.do_autopickup();
 
-			///* Hack -- enter a store if we are on one */
-			//if ((cave.feat[p_ptr.py][p_ptr.px] >= FEAT_SHOP_HEAD) &&
-			//    (cave.feat[p_ptr.py][p_ptr.px] <= FEAT_SHOP_TAIL))
-			//{
-			//    /* Disturb */
-			//    disturb(p_ptr, 0, 0);
+			/* Hack -- enter a store if we are on one */
+			if ((Cave.cave.feat[Misc.p_ptr.py][Misc.p_ptr.px] >= Cave.FEAT_SHOP_HEAD) &&
+			    (Cave.cave.feat[Misc.p_ptr.py][Misc.p_ptr.px] <= Cave.FEAT_SHOP_TAIL))
+			{
+			    /* Disturb */
+			    Cave.disturb(Misc.p_ptr, 0, 0);
 
-			//    cmd_insert(CMD_ENTER_STORE);
+				Game_Command.insert(Command_Code.ENTER_STORE);
 
-			//    /* Free turn XXX XXX XXX */
-			//    p_ptr.energy_use = 0;
-			//}
-			//else
-			//{
-			//    event_signal(EVENT_SEEFLOOR);
-			//}
+			    /* Free turn XXX XXX XXX */
+			    Misc.p_ptr.energy_use = 0;
+			}
+			else
+			{
+				Game_Event.signal(Game_Event.Event_Type.SEEFLOOR);
+			}
 		}
 
 

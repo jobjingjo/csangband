@@ -999,7 +999,6 @@ namespace CSAngband.Object {
 		 */
 		public static void show_equip(olist_detail_t mode)
 		{
-			throw new NotImplementedException();
 		   // int i, last_slot = 0;
 
 		   // object_type *o_ptr;
