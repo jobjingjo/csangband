@@ -89,7 +89,7 @@ namespace CSAngband {
 		{
 			string tmp;//char tmp[32];
 
-			tmp = Misc.p_ptr.lev.ToString();
+			tmp = Misc.p_ptr.lev.ToString().PadLeft(6, ' ');
 			//strnfmt(tmp, sizeof(tmp), "%6d", p_ptr.lev);
 
 			if (Misc.p_ptr.lev >= Misc.p_ptr.max_lev)
@@ -122,7 +122,7 @@ namespace CSAngband {
 			    xp = (long)(Player.Player.player_exp[Misc.p_ptr.lev - 1] * Misc.p_ptr.expfact / 100L) - Misc.p_ptr.exp;
 
 			/* Format XP */
-			out_val = xp.ToString();
+			out_val = xp.ToString().PadLeft(8, ' ');
 			//strnfmt(out_val, sizeof(out_val), "%8ld", (long)xp);
 
 
@@ -148,7 +148,7 @@ namespace CSAngband {
 			string tmp;
 
 			Utilities.put_str("AU ", row, col);
-			tmp = Misc.p_ptr.au.ToString();
+			tmp = Misc.p_ptr.au.ToString().PadLeft(9, ' ');
 			//strnfmt(tmp, sizeof(tmp), "%9ld", (long)p_ptr.au);
 			Utilities.c_put_str(ConsoleColor.Green, tmp, row, col + 3);
 		}
@@ -196,7 +196,7 @@ namespace CSAngband {
 			string tmp;//char tmp[32];
 
 			Utilities.put_str("Cur AC ", row, col);
-			tmp = (Misc.p_ptr.state.dis_ac + Misc.p_ptr.state.dis_to_a).ToString();
+			tmp = (Misc.p_ptr.state.dis_ac + Misc.p_ptr.state.dis_to_a).ToString().PadLeft(5, ' ');
 			//strnfmt(tmp, sizeof(tmp), "%5d", p_ptr.state.dis_ac + p_ptr.state.dis_to_a);
 			Utilities.c_put_str(ConsoleColor.Green, tmp, row, col + 7);
 		}
@@ -212,10 +212,8 @@ namespace CSAngband {
 
 			Utilities.put_str("HP ", row, col);
 
-			max_hp = Misc.p_ptr.mhp.ToString();
-			cur_hp = Misc.p_ptr.chp.ToString();
-			//strnfmt(max_hp, sizeof(max_hp), "%4d", p_ptr.mhp);
-			//strnfmt(cur_hp, sizeof(cur_hp), "%4d", p_ptr.chp);
+			max_hp = Misc.p_ptr.mhp.ToString().PadLeft(4, ' ');
+			cur_hp = Misc.p_ptr.chp.ToString().PadLeft(4, ' ');
 	
 			Utilities.c_put_str(color, cur_hp, row, col + 3);
 			Utilities.c_put_str(ConsoleColor.White, "/", row, col + 7);
@@ -236,10 +234,8 @@ namespace CSAngband {
 
 			Utilities.put_str("SP ", row, col);
 
-			max_sp = Misc.p_ptr.msp.ToString();
-			cur_sp = Misc.p_ptr.csp.ToString();
-			//strnfmt(max_sp, sizeof(max_sp), "%4d", p_ptr.msp);
-			//strnfmt(cur_sp, sizeof(cur_sp), "%4d", p_ptr.csp);
+			max_sp = Misc.p_ptr.msp.ToString().PadLeft(4, ' ');
+			cur_sp = Misc.p_ptr.csp.ToString().PadLeft(4, ' ');
 
 			/* Show mana */
 			Utilities.c_put_str(color, cur_sp, row, col + 3);
