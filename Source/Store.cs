@@ -1636,12 +1636,13 @@ namespace CSAngband {
 		}
 
 
+		//Nick: The first 3 were commented out.
 		static string[] comment_hint = new string[]
 		{
-		/*	"%s tells you soberly: \"%s\".",
-			"(%s) There's a saying round here, \"%s\".",
-			"%s offers to tell you a secret next time you're about."*/
-			"\"%s\""
+			/*"{0} tells you soberly: \"{0}\".",
+			"({0}) There's a saying round here, \"{0}\".",
+			"{0} offers to tell you a secret next time you're about."*/
+			"\"{0}\""
 		};
 
 		/*
@@ -1652,15 +1653,15 @@ namespace CSAngband {
 		static string[] comment_welcome =
 		{
 			"",
-			"%s nods to you.",
-			"%s says hello.",
-			"%s: \"See anything you like, adventurer?\"",
-			"%s: \"How may I help you, %s?\"",
-			"%s: \"Welcome back, %s.\"",
-			"%s: \"A pleasure to see you again, %s.\"",
-			"%s: \"How may I be of assistance, good %s?\"",
-			"%s: \"You do honour to my humble store, noble %s.\"",
-			"%s: \"Me and my family are entirely at your service, glorious %s.\""
+			"{0} nods to you.",
+			"{0} says hello.",
+			"{0}: \"See anything you like, adventurer?\"",
+			"{0}: \"How may I help you, {1}?\"",
+			"{0}: \"Welcome back, {1}.\"",
+			"{0}: \"A pleasure to see you again, {1}.\"",
+			"{0}: \"How may I be of assistance, good {1}?\"",
+			"{0}: \"You do honour to my humble store, noble {1}.\"",
+			"{0}: \"Me and my family are entirely at your service, glorious {1}.\""
 		};
 
 

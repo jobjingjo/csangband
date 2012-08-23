@@ -205,15 +205,15 @@ namespace CSAngband {
 				Utilities.c_put_str(ConsoleColor.Green, buf, row + i, col + 5);
 
 				/* Race Bonus */
-				buf = p_ptr.Race.r_adj[i].ToString();
+				buf = p_ptr.Race.r_adj[i].ToString().PadLeft(3, ' ');
 				Utilities.c_put_str(ConsoleColor.Cyan, buf, row + i, col + 12);
 
 				/* Class Bonus */
-				buf = p_ptr.Class.c_adj[i].ToString();
+				buf = p_ptr.Class.c_adj[i].ToString().PadLeft(3, ' ');
 				Utilities.c_put_str(ConsoleColor.Cyan, buf, row + i, col + 16);
 
 				/* Equipment Bonus */
-				buf = p_ptr.state.stat_add[i].ToString();
+				buf = p_ptr.state.stat_add[i].ToString().PadLeft(3, ' ');
 				Utilities.c_put_str(ConsoleColor.Cyan, buf, row + i, col + 20);
 
 				/* Resulting "modified" maximum value */

@@ -342,7 +342,7 @@ namespace CSAngband {
 			    if (!c.pflags.has(k)) continue;
 			    s = get_pflag_desc(k);
 			    if (s.Length == 0) continue;
-			    Utilities.text_out_e("\n%s", s);
+			    Utilities.text_out_e("\n{0}", s);
 			    n_flags++;
 			}
 
