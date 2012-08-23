@@ -554,14 +554,6 @@ namespace CSAngband {
 		static int Term_text_xxx(int x, int y, int n, ConsoleColor a, char[] cp) {
 			Term_Data td = (Term_Data)(Term.instance.data);
 
-			//For debuging
-			//bool found = false;
-			//foreach(ConsoleColor e in Enum.GetValues(typeof(ConsoleColor))) {
-			//    if(a == e) {
-			//        found = true;
-			//    }
-			//}
-
 			for(int i = 0; i < cp.Length; i++) {
 				cp[i] = Term_xchar_xxx(cp[i]);
 			}

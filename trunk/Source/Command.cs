@@ -304,12 +304,12 @@ namespace CSAngband {
 			        (Cave.cave_isknowntrap(Cave.cave, y, x) ||
 			        Cave.cave_iscloseddoor(Cave.cave, y, x)))
 			{
-				throw new NotImplementedException();
-				///* Auto-repeat if not already repeating */
-				//if (cmd_get_nrepeats() == 0)
-				//    cmd_set_repeat(99);
+				/* Auto-repeat if not already repeating */
+				if(Game_Command.get_nrepeats() == 0) {
+					Game_Command.set_repeat(99);
+				}
 
-				//do_cmd_alter_aux(dir);
+				Do_Command.alter_aux(dir);
 			}
 
 			/* Cannot walk through walls */
