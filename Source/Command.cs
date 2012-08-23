@@ -193,7 +193,7 @@ namespace CSAngband {
 		{
 			int obj_feeling = Cave.cave.feeling / 10;
 			int mon_feeling = Cave.cave.feeling - (10 * obj_feeling);
-			//string join;
+			string join;
 
 			/* Don't show feelings for cold-hearted characters */
 			if (Option.birth_no_feelings.value) return;
@@ -203,38 +203,36 @@ namespace CSAngband {
 				Utilities.msg("Looks like a typical town.");
 				return;
 			}
-
-			throw new NotImplementedException();
 	
-			///* Display only the object feeling when it's first discovered. */
-			//if (obj_only){
-			//    msg("You feel that %s", obj_feeling_text[obj_feeling]);
-			//    return;
-			//}
+			/* Display only the object feeling when it's first discovered. */
+			if (obj_only){
+			    Utilities.msg("You feel that %s", obj_feeling_text[obj_feeling]);
+			    return;
+			}
 	
-			///* Players automatically get a monster feeling. */
-			//if (cave.feeling_squares < FEELING1){
-			//    msg("%s.", mon_feeling_text[mon_feeling]);
-			//    return;
-			//}
+			/* Players automatically get a monster feeling. */
+			if (Cave.cave.feeling_squares < Cave.FEELING1){
+			    Utilities.msg("%s.", mon_feeling_text[mon_feeling]);
+			    return;
+			}
 	
-			///* Verify the feelings */
-			//if (obj_feeling >= N_ELEMENTS(obj_feeling_text))
-			//    obj_feeling = N_ELEMENTS(obj_feeling_text) - 1;
+			/* Verify the feelings */
+			if (obj_feeling >= obj_feeling_text.Length)
+			    obj_feeling = obj_feeling_text.Length - 1;
 
-			//if (mon_feeling >= N_ELEMENTS(mon_feeling_text))
-			//    mon_feeling = N_ELEMENTS(mon_feeling_text) - 1;
+			if (mon_feeling >= mon_feeling_text.Length)
+			    mon_feeling = mon_feeling_text.Length - 1;
 
-			///* Decide the conjunction */
-			//if ((mon_feeling <= 5 && obj_feeling > 6) ||
-			//        (mon_feeling > 5 && obj_feeling <= 6))
-			//    join = ", yet";
-			//else
-			//    join = ", and";
+			/* Decide the conjunction */
+			if ((mon_feeling <= 5 && obj_feeling > 6) ||
+			        (mon_feeling > 5 && obj_feeling <= 6))
+			    join = ", yet";
+			else
+			    join = ", and";
 
-			///* Display the feeling */
-			//msg("%s%s %s", mon_feeling_text[mon_feeling], join,
-			//    obj_feeling_text[obj_feeling]);
+			/* Display the feeling */
+			Utilities.msg("{0}{1} {2}", mon_feeling_text[mon_feeling], join,
+			    obj_feeling_text[obj_feeling]);
 		}
 
 		/**

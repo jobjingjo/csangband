@@ -186,7 +186,7 @@ namespace CSAngband {
 			string note = get_autoinscription(o_ptr.kind);
 
 			/* Don't inscribe unaware objects */
-			if (note != null || !o_ptr.flavor_is_aware())
+			if (note == null || note.Length == 0 || !o_ptr.flavor_is_aware())
 			    return 0;
 
 			/* Don't re-inscribe if it's already inscribed */

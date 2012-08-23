@@ -12,7 +12,7 @@ namespace CSAngband {
 		 * Information for Feelings 
 		 */
 		const int FEELING_TOTAL	=	100;		/* total number of feeling squares per level */
-		const int FEELING1 = 10;		/* Squares needed to see in order to trigger first feeling */
+		public const int FEELING1 = 10;		/* Squares needed to see in order to trigger first feeling */
 
 		/*
 		 * Misc constants

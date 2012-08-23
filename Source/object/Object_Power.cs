@@ -162,6 +162,8 @@ namespace CSAngband.Object {
 			    best_s_ptr = null;
 			    mult = 1;
 			    r_ptr = Misc.r_info[i];
+				if(r_ptr == null)
+					continue;
 				m_ptr = new Monster.Monster();
 			    m_ptr.r_idx = (short)i;
 
