@@ -680,6 +680,9 @@ namespace CSAngband {
 			        /* Set "CAVE_TEMP" flag */
 			        info |= (CAVE_TEMP);
 
+					//NICK This is a hack, if we have seen it, we mark it...
+					info |= (CAVE_MARK);
+
 			        /* Save grid for later */
 			        fast_temp_g[fast_temp_n++] = (ushort)g;
 			    }

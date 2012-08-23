@@ -1273,46 +1273,45 @@ namespace CSAngband {
 		 * is confused, and it must be verified against the new grid.
 		 */
 		public static void alter_aux(int dir) {
-			throw new NotImplementedException();
-			//int y, x;
-			//bool more = false;
+			int y, x;
+			bool more = false;
 
-			///* Get location */
-			//y = p_ptr.py + ddy[dir];
-			//x = p_ptr.px + ddx[dir];
+			/* Get location */
+			y = Misc.p_ptr.py + Misc.ddy[dir];
+			x = Misc.p_ptr.px + Misc.ddx[dir];
 
-			///* Take a turn */
-			//p_ptr.energy_use = 100;
+			/* Take a turn */
+			Misc.p_ptr.energy_use = 100;
 
-			///* Apply confusion */
-			//if (player_confuse_dir(p_ptr, &dir, false)) {
-			//    /* Get location */
-			//    y = p_ptr.py + ddy[dir];
-			//    x = p_ptr.px + ddx[dir];
-			//}
+			/* Apply confusion */
+			if (Misc.p_ptr.confuse_dir(ref dir, false)) {
+			    /* Get location */
+			    y = Misc.p_ptr.py + Misc.ddy[dir];
+			    x = Misc.p_ptr.px + Misc.ddx[dir];
+			}
 
-			///* Attack monsters */
-			//if (cave.m_idx[y][x] > 0)
-			//    py_attack(y, x);
+			/* Attack monsters */
+			if (Cave.cave.m_idx[y][x] > 0)
+			    Attack.py_attack(y, x);
 
-			///* Tunnel through walls and rubble */
-			//else if (cave_isdiggable(cave, y, x))
-			//    more = do_cmd_tunnel_aux(y, x);
+			/* Tunnel through walls and rubble */
+			else if (Cave.cave_isdiggable(Cave.cave, y, x))
+			    more = Do_Command.tunnel_aux(y, x);
 
-			///* Open closed doors */
-			//else if (cave_iscloseddoor(cave, y, x))
-			//    more = do_cmd_open_aux(y, x);
+			/* Open closed doors */
+			else if (Cave.cave_iscloseddoor(Cave.cave, y, x))
+			    more = Do_Command.open_aux(y, x);
 
-			///* Disarm traps */
-			//else if (cave_isknowntrap(cave, y, x))
-			//    more = do_cmd_disarm_aux(y, x);
+			/* Disarm traps */
+			else if (Cave.cave_isknowntrap(Cave.cave, y, x))
+			    more = Do_Command.disarm_aux(y, x);
 
-			///* Oops */
-			//else
-			//    msg("You spin around.");
+			/* Oops */
+			else
+			    Utilities.msg("You spin around.");
 
-			///* Cancel repetition unless we can continue */
-			//if (!more) disturb(p_ptr, 0, 0);
+			/* Cancel repetition unless we can continue */
+			if (!more) Cave.disturb(Misc.p_ptr, 0, 0);
 		}
 
 		public static void alter(Command_Code code, cmd_arg[] args) {
