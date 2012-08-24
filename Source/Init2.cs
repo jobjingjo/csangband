@@ -10,7 +10,8 @@ namespace CSAngband {
 	partial class Init {
 		/* Parsing functions for limits.txt */
 
-#region Z_PARSER
+#region Limits Parser
+
 		public static Parser.Error parse_z(Parser p) {
 			Maxima z;
 			string label;
@@ -78,7 +79,8 @@ namespace CSAngband {
 
 #endregion
 
-#region F_PARSER
+#region Terrain/Feature Parser
+
 		public static Parser init_parse_f() {
 			Parser p = new Parser();
 			p.priv = null;
@@ -107,12 +109,12 @@ namespace CSAngband {
 				Misc.f_info[f.fidx] = f;
 			}
 
-			f = (Feature)p.priv;
-			while (f != null) {
-				n = f.next;
-				//free(f);
-				f = n;
-			}
+			//f = (Feature)p.priv;
+			//while (f != null) {
+			//    n = f.next;
+			//    //free(f);
+			//    f = n;
+			//}
 
 			p.Destroy();
 			return 0;
@@ -149,7 +151,7 @@ namespace CSAngband {
 			ConsoleColor attr = 0;
 			Feature f = (Feature)p.priv;
 
-			if (f != null)
+			if (f == null)
 			    return Parser.Error.MISSING_RECORD_HEADER;
 			f.d_char = glyph;
 			attr = Utilities.color_text_to_attr(color);
@@ -263,7 +265,7 @@ namespace CSAngband {
 		}
 #endregion
 
-#region KB_PARSER
+#region Object Base Parser
 		/* Parsing functions for object_base.txt */
 		class kb_parsedata {
 			public kb_parsedata(){
@@ -441,7 +443,8 @@ namespace CSAngband {
 
 #endregion
 
-#region K_PARSER
+#region Object Parser
+
 		public static Parser init_parse_k() {
 			Parser p = new Parser();
 			p.priv = null;
@@ -710,7 +713,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<E_PARSER>>>
+#region Ego Item Parser
 
 		public static Parser init_parse_e() {
 			Parser p = new Parser();
@@ -979,7 +982,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<A_PARSER>>>
+#region Artifact Parser
 			
 		public static Parser init_parse_a() {
 			Parser p = new Parser();
@@ -1226,7 +1229,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<MP_PARSER>>>
+#region Monster Pain Parser
 
 		public static Parser init_parse_mp() {
 			Parser p = new Parser();
@@ -1310,7 +1313,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<RB_PARSER>>>
+#region Monster Base Parser
 
 		public static Parser init_parse_rb() {
 			Parser p = new Parser();
@@ -1543,7 +1546,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<R_PARSER>>>
+#region Monster Parser
 
 		public static Parser init_parse_r() {
 			Parser p = new Parser();
@@ -1943,7 +1946,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<PIT_PARSER>>>
+#region Pit Parser
 		public static Parser init_parse_pit() {
 			Parser p = new Parser();
 			p.priv = null;
@@ -2143,7 +2146,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<V_PARSER>>>
+#region Vault Parser
 		public static Parser init_parse_v() {
 			Parser p = new Parser();
 			p.priv = null;
@@ -2228,7 +2231,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<H_PARSER>>>
+#region History Parser
 
 
 		public static Parser init_parse_h() {
@@ -2350,7 +2353,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<P_PARSER>>>
+#region Player Race Parser
 
 		public static Parser init_parse_p() {
 			Parser p = new Parser();
@@ -2587,7 +2590,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<C_PARSER>>>
+#region Player Class Parser
 
 		public static Parser init_parse_c() {
 			Parser p = new Parser();
@@ -2841,7 +2844,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<FLAVOR_PARSER>>>
+#region Flavor Parser
 		public static Parser init_parse_flavor() {
 			Parser p = new Parser();
 			p.priv = null;
@@ -2935,7 +2938,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<S_PARSER>>>
+#region Spells Parser
 		public static Parser init_parse_s() {
 			Parser p = new Parser();
 			p.priv = null;
@@ -3029,7 +3032,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<HINTS_PARSER>>>
+#region Hints Parser
 		public static Parser init_parse_hints() {
 			Parser p = new Parser();
 			p.Register("H str text", parse_hint);
@@ -3083,7 +3086,7 @@ namespace CSAngband {
 
 #endregion
 
-#region <<<NAMES_PARSER>>>
+#region Names Parser
 		public static Parser init_parse_names() {
 			Parser p = new Parser();
 			names_parse n = new names_parse();
