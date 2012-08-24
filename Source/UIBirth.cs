@@ -180,9 +180,9 @@ namespace CSAngband {
 
 		static void skill_help(short[] skills, int mhp, int exp, int infra) {
 			Utilities.text_out_e("Hit/Shoot/Throw: {0}/{1}/{2}\n", skills[(int)Skill.TO_HIT_MELEE], skills[(int)Skill.TO_HIT_BOW], skills[(int)Skill.TO_HIT_THROW]);
-			Utilities.text_out_e("Hit die: {0}   XP mod: {1}%\n", mhp, exp);
-			Utilities.text_out_e("Disarm: {0}   Devices: {1}\n", skills[(int)Skill.DISARM], skills[(int)Skill.DEVICE]);
-			Utilities.text_out_e("Save:   {0}   Stealth: {1}\n", skills[(int)Skill.SAVE], skills[(int)Skill.STEALTH]);
+			Utilities.text_out_e("Hit die: {0}   XP mod: {1}%\n", mhp.ToString().PadLeft(2, ' '), exp);
+			Utilities.text_out_e("Disarm: {0}   Devices: {1}\n", skills[(int)Skill.DISARM].ToString().PadLeft(3, ' '), skills[(int)Skill.DEVICE]);
+			Utilities.text_out_e("Save:   {0}   Stealth: {1}\n", skills[(int)Skill.SAVE].ToString().PadLeft(3, ' '), skills[(int)Skill.STEALTH]);
 			if (infra >= 0)
 			    Utilities.text_out_e("Infravision:  {0} ft\n", infra * 10);
 			Utilities.text_out_e("Digging:      {0}\n", skills[(int)Skill.DIGGING]);
@@ -263,7 +263,8 @@ namespace CSAngband {
 			    int adj1 = r.r_adj[j];
 			    int adj2 = r.r_adj[j + len];
 
-			    Utilities.text_out_e("%s%+3d  %s%+3d\n", name1, adj1, name2, adj2);
+			    Utilities.text_out_e("{0}{1}  {2}{3}\n", name1, (adj1 > 0? "+" + adj1 : adj1.ToString()).PadLeft(3, ' '), 
+														 name2, (adj2 > 0? "+" + adj2 : adj2.ToString()).PadLeft(3, ' '));
 			}
 
 			Utilities.text_out_e("\n");
@@ -274,7 +275,7 @@ namespace CSAngband {
 			{
 			    if (n_flags >= flag_space) break;
 			    if (!r.flags.has(k)) continue;
-			    Utilities.text_out_e("\n%s", get_flag_desc(k));
+			    Utilities.text_out_e("\n{0}", get_flag_desc(k));
 			    n_flags++;
 			}
 
@@ -322,7 +323,8 @@ namespace CSAngband {
 			    int adj1 = c.c_adj[j] + Player.Player.instance.Race.r_adj[j];
 			    int adj2 = c.c_adj[j + len] + Player.Player.instance.Race.r_adj[j + len];
 
-			    Utilities.text_out_e("%s%+3d  %s%+3d\n", name1, adj1, name2, adj2);
+				Utilities.text_out_e("{0}{1}  {2}{3}\n", name1, (adj1 > 0 ? "+" + adj1 : adj1.ToString()).PadLeft(3, ' '), 
+														 name2, (adj2 > 0 ? "+" + adj2 : adj2.ToString()).PadLeft(3, ' '));
 			}
 
 			Utilities.text_out_e("\n");
