@@ -20,46 +20,48 @@ namespace CSAngband {
 		public static List<keypress> inkey_next = new List<keypress>(); //might be an array/list
 
 		class color_chart_info {
-			public color_chart_info(char a, string b, ConsoleColor c) {
+			public color_chart_info(char a, string b, string wat, ConsoleColor c) {
 				sym = a;
 				name = b;
+				shortname = wat;
 				color = c;
 			}
 
 			public char sym;
 			public string name;
+			public string shortname;
 			public ConsoleColor color;
 		}
 
 		static color_chart_info[] color_chart = new color_chart_info[] {
-			new color_chart_info('d', "Black", ConsoleColor.Black),
-			new color_chart_info('w', "White", ConsoleColor.White),
-			new color_chart_info('s', "Slate", ConsoleColor.Gray),
-			new color_chart_info('o', "Orange", ConsoleColor.DarkYellow),
-			new color_chart_info('r', "Red", ConsoleColor.Red),
-			new color_chart_info('g', "Green", ConsoleColor.DarkGreen),
-			new color_chart_info('b', "Blue", ConsoleColor.Blue),
-			new color_chart_info('u', "Umber", ConsoleColor.DarkRed),
-			new color_chart_info('D', "Light Dark", ConsoleColor.DarkGray),
-			new color_chart_info('W', "Light Slate", ConsoleColor.White),
-			new color_chart_info('P', "Light Purple", ConsoleColor.Magenta),
-			new color_chart_info('y', "Yellow", ConsoleColor.Yellow),
-			new color_chart_info('R', "Light Red", ConsoleColor.Red),
-			new color_chart_info('G', "Light Green", ConsoleColor.Green),
-			new color_chart_info('B', "Light Blue", ConsoleColor.Cyan),
-			new color_chart_info('U', "Light Umber", ConsoleColor.Red),
-			new color_chart_info('p', "Purple", ConsoleColor.DarkMagenta),
-			new color_chart_info('v', "Violet", ConsoleColor.DarkMagenta),
-			new color_chart_info('t', "Teal", ConsoleColor.DarkCyan),
-			new color_chart_info('m', "Mud", ConsoleColor.DarkYellow),
-			new color_chart_info('Y', "Light Yellow", ConsoleColor.Yellow),
-			new color_chart_info('i', "Magenta-Pink", ConsoleColor.Magenta),
-			new color_chart_info('T', "Light Teal", ConsoleColor.Cyan),
-			new color_chart_info('V', "Light Violet", ConsoleColor.Magenta),
-			new color_chart_info('I', "Light Pink", ConsoleColor.Red),
-			new color_chart_info('M', "Mustard", ConsoleColor.DarkYellow),
-			new color_chart_info('z', "Blue Slate", ConsoleColor.Cyan),
-			new color_chart_info('Z', "Deep Light Blue", ConsoleColor.Cyan)
+			new color_chart_info('d', "Black", "black", ConsoleColor.Black),
+			new color_chart_info('w', "White", "white", ConsoleColor.White),
+			new color_chart_info('s', "Slate", "slate", ConsoleColor.Gray),
+			new color_chart_info('o', "Orange", "orange", ConsoleColor.DarkYellow),
+			new color_chart_info('r', "Red", "red", ConsoleColor.Red),
+			new color_chart_info('g', "Green", "green", ConsoleColor.DarkGreen),
+			new color_chart_info('b', "Blue", "blue", ConsoleColor.Blue),
+			new color_chart_info('u', "Umber", "umber", ConsoleColor.DarkRed),
+			new color_chart_info('D', "Light Dark", "lightdark", ConsoleColor.DarkGray),
+			new color_chart_info('W', "Light Slate", "lightslate", ConsoleColor.White),
+			new color_chart_info('P', "Light Purple", "lightpurple", ConsoleColor.Magenta),
+			new color_chart_info('y', "Yellow", "yellow", ConsoleColor.Yellow),
+			new color_chart_info('R', "Light Red", "lightred", ConsoleColor.Red),
+			new color_chart_info('G', "Light Green", "lightgreen", ConsoleColor.Green),
+			new color_chart_info('B', "Light Blue", "lightblue", ConsoleColor.Cyan),
+			new color_chart_info('U', "Light Umber", "lightumber", ConsoleColor.Red),
+			new color_chart_info('p', "Purple", "purple", ConsoleColor.DarkMagenta),
+			new color_chart_info('v', "Violet", "violet", ConsoleColor.DarkMagenta),
+			new color_chart_info('t', "Teal", "teal", ConsoleColor.DarkCyan),
+			new color_chart_info('m', "Mud", "mud", ConsoleColor.DarkYellow),
+			new color_chart_info('Y', "Light Yellow", "lightyellow", ConsoleColor.Yellow),
+			new color_chart_info('i', "Magenta-Pink", "magentapink", ConsoleColor.Magenta),
+			new color_chart_info('T', "Light Teal", "lightteal", ConsoleColor.Cyan),
+			new color_chart_info('V', "Light Violet", "lightviolet", ConsoleColor.Magenta),
+			new color_chart_info('I', "Light Pink", "lightpink", ConsoleColor.Red),
+			new color_chart_info('M', "Mustard", "mustard", ConsoleColor.DarkYellow),
+			new color_chart_info('z', "Blue Slate", "blueslate", ConsoleColor.Cyan),
+			new color_chart_info('Z', "Deep Light Blue", "deeplightblue", ConsoleColor.Cyan)
 		};
 
 		/*
@@ -73,7 +75,7 @@ namespace CSAngband {
 						return i.color;
 					}
 				} else {
-					if(name == i.name) {
+					if(name == i.name || name.ToLower() == i.name.ToLower() || name == i.shortname) {
 						return i.color;
 					}
 				}
@@ -765,8 +767,66 @@ namespace CSAngband {
 		{
 
 			//Formatted String
-			string output = fmt;//String.Format(fmt, args);
-			Misc.text_out_hook(ConsoleColor.White, output);
+			//string output = fmt;//String.Format(fmt, args);
+			if(args.Length > 0) {
+				fmt = String.Format(fmt, args);
+			}
+
+			string prt = "";
+			ConsoleColor current_color = ConsoleColor.White;
+			int arg_len = 0;
+			int arg_at = 0;
+
+			for(string parse = fmt; parse.Length > 0; parse = parse.Substring(1)) {
+				char next = parse[0];
+
+				if(next != '{') {
+					prt += next;
+				} else {
+					if(prt.Length > 0) {
+						//Flush what we have...
+						object[] new_args = new object[arg_len];
+						for(int i = arg_at; i < arg_at + arg_len; i++) {
+							new_args[i - arg_at] = args[i];
+						}
+						arg_at += arg_len;
+						arg_len = 0;
+						prt = string.Format(prt, new_args);
+						Misc.text_out_hook(current_color, prt);
+						prt = "";
+					}
+
+					parse = parse.Substring(1);
+
+					if(parse[0] == '/') {
+						current_color = ConsoleColor.White;
+						parse = parse.Substring(1);
+					} else if (char.IsDigit(parse[0])) {
+						//That means a C# style argument
+						prt += "{" + parse[0];
+						arg_len += 1;
+					} else {
+						int endbrace = parse.IndexOf('}');
+						string color = parse.Substring(0, endbrace);
+						parse = parse.Substring(endbrace); //Skip over to the end brace.
+
+						current_color = color_text_to_attr(color);
+					}
+				}
+			}
+			if(prt.Length > 0) {
+				//Flush what we have...
+				object[] new_args = new object[arg_len];
+				for(int i = arg_at; i < arg_at + arg_len; i++) {
+					new_args[i - arg_at] = args[i];
+				}
+				arg_at += arg_len;
+				arg_len = 0;
+				prt = string.Format(prt, new_args);
+				Misc.text_out_hook(current_color, prt);
+				prt = "";
+			}
+			//throw new NotImplementedException();
 
 			//TODO make it look at the embedded formatting!!!
 
@@ -903,7 +963,7 @@ namespace CSAngband {
 			/* Process the string */
 			for (string s = str; s.Length > 0; s = s.Substring(1))
 			{
-			    char ch = '\0';
+			    //char ch = '\0';
 
 			    /* Force wrap */
 			    if (s[0] == '\n')
@@ -925,7 +985,7 @@ namespace CSAngband {
 			    //ch = (my_isprint((unsigned char)*s) ? *s : ' ');
 
 			    /* Wrap words as needed */
-			    if ((x >= wrap - 1) && (ch != ' '))
+			    if ((x >= wrap - 1) && (s[0] != ' '))
 			    {
 			        int i, n = 0;
 
@@ -977,7 +1037,7 @@ namespace CSAngband {
 			    }
 
 			    /* Dump */
-			    Term.addch(a, ch);
+			    Term.addch(a, s[0]);
 
 			    /* Advance */
 			    if (++x > wrap) x = wrap;
