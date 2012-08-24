@@ -505,14 +505,14 @@ namespace CSAngband {
 			/* The xxx port uses the Latin-1 standard */
 
 			if(c == '\a') { 
-				//TODO: Figure out how to change this properly
-				c = (char)183;
+			    //TODO: Figure out how to change this properly
+			    c = (char)183;
 			}
 
 			if(c == 127) {
-				//TODO: Figure out why town walls are 127, and change them to this
-				//c = (char)9608;
-				c = '#'; //#s are less buggy
+			    //TODO: Figure out why town walls are 127, and change them to this
+			    //c = (char)9608;
+			    c = '#'; //#s are less buggy
 			}
 
 			return (c);
