@@ -1293,31 +1293,34 @@ namespace CSAngband.Object
 		 */
 		public bool this_pval_is_visible(int pval)
 		{
-			throw new NotImplementedException();
-			//bitflag f[MAX_PVALS][OF_SIZE], f2[OF_SIZE];
-
-			//assert(o_ptr.kind);
-
-			//if (o_ptr.ident & IDENT_STORE)
-			//    return true;
-
-			///* Aware jewelry with non-variable pval */
-			//if (object_is_jewelry(o_ptr) && object_flavor_is_aware(o_ptr)) {
-			//    if (!randcalc_varies(o_ptr.kind.pval[pval]))
-			//        return true;
+			Bitflag[] f = new Bitflag[Misc.MAX_PVALS];
+			//for (int i = 0; i < f.Length; i++){ //We use f for an outtype, no need to initialize
+			//    f[i] = new Bitflag(Object_Flag.SIZE);
 			//}
+			Bitflag f2 = new Bitflag(Object_Flag.SIZE);
 
-			//if (object_was_worn(o_ptr)) {
-			//    object_pval_flags_known(o_ptr, f);
+			Misc.assert(kind != null);
 
-			//    /* Create the mask for pval-related flags */
-			//    create_mask(f2, false, OFT_STAT, OFT_PVAL, OFT_MAX);
+			if ((ident & IDENT_STORE) != 0)
+			    return true;
 
-			//    if (of_is_inter(f[pval], f2))
-			//        return true;
-			//}
+			/* Aware jewelry with non-variable pval */
+			if (is_jewelry() && flavor_is_aware()) {
+			    if (!Random.randcalc_varies(kind.pval[pval]))
+			        return true;
+			}
 
-			//return false;
+			if (was_worn()) {
+			    pval_flags_known(out f);
+
+			    /* Create the mask for pval-related flags */
+			    Object_Flag.create_mask(f2, false, Object_Flag.object_flag_type.STAT, Object_Flag.object_flag_type.PVAL);
+
+			    if (f[pval].is_inter(f2))
+			        return true;
+			}
+
+			return false;
 		}
 
 		/**
@@ -2227,6 +2230,37 @@ namespace CSAngband.Object
 			//    track_object(NO_OBJECT);
 			//}
 		}
+
+		/**
+		 * Obtain the pval_flags for an item which are known to the player
+		 */
+		public void pval_flags_known(out Bitflag[] flags)
+		{
+			throw new NotImplementedException();
+			//int i, flag;
+
+			//object_pval_flags(flags);
+
+			//for (i = 0; i < MAX_PVALS; i++)
+			//    of_inter(flags[i], o_ptr.known_flags);
+
+			///* Kind and ego pval_flags may have shifted pvals so we iterate */
+			//if (object_flavor_is_aware(o_ptr))
+			//    for (i = 0; i < MAX_PVALS; i++)
+			//        for (flag = of_next(o_ptr.kind.pval_flags[i], FLAG_START);
+			//                flag != FLAG_END; flag = of_next(o_ptr.kind.pval_flags[i],
+			//                flag + 1))
+			//            of_on(flags[which_pval(o_ptr, flag)], flag);
+
+			//if (o_ptr.ego && easy_know(o_ptr))
+			//    for (i = 0; i < MAX_PVALS; i++)
+			//        for (flag = of_next(o_ptr.ego.pval_flags[i], FLAG_START);
+			//                flag != FLAG_END; flag = of_next(o_ptr.ego.pval_flags[i],
+			//                flag + 1))
+			//            of_on(flags[which_pval(o_ptr, flag)], flag);
+		}
+
+
 
 
 	}
