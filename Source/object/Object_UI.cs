@@ -999,76 +999,83 @@ namespace CSAngband.Object {
 		 */
 		public static void show_equip(olist_detail_t mode)
 		{
-		   // int i, last_slot = 0;
+		    int i, last_slot = 0;
 
-		   // object_type *o_ptr;
+		    Object o_ptr;
 
-		   //int num_obj = 0;
-		   //char labels[50][80];
-		   //object_type *objects[50];
+		   int num_obj = 0;
+		   string[] labels = new string[50]; //[80];
+		   Object[] objects = new Object[50];
 
-		   // char tmp_val[80];
+		    string tmp_val;//[80];
 
-		   //bool in_term = (mode & OLIST_WINDOW) ? true : false;
+		   bool in_term = (mode & olist_detail_t.OLIST_WINDOW) != 0 ? true : false;
 
-		   // /* Find the last equipment slot to display */
-		   // for (i = INVEN_WIELD; i < ALL_INVEN_TOTAL; i++)
-		   // {
-		   //     o_ptr = &p_ptr.inventory[i];
-		   //     if (i < INVEN_TOTAL || o_ptr.kind) last_slot = i;
-		   // }
+		    /* Find the last equipment slot to display */
+		    for (i = Misc.INVEN_WIELD; i < Misc.ALL_INVEN_TOTAL; i++)
+		    {
+		        o_ptr = Misc.p_ptr.inventory[i];
+		        if (i < Misc.INVEN_TOTAL || o_ptr.kind != null) last_slot = i;
+		    }
 
-		   // /* Build the object list */
-		   // for (i = INVEN_WIELD; i <= last_slot; i++)
-		   // {
-		   //     o_ptr = &p_ptr.inventory[i];
+		    /* Build the object list */
+		    for (i = Misc.INVEN_WIELD; i <= last_slot; i++)
+		    {
+		        o_ptr = Misc.p_ptr.inventory[i];
 
-		   //     /* May need a blank line to separate the quiver */
-		   //     if (i == INVEN_TOTAL)
-		   //     {
-		   //         int j;
-		   //         bool need_spacer = false;
+		        /* May need a blank line to separate the quiver */
+		        if (i == Misc.INVEN_TOTAL)
+		        {
+		            int j;
+		            bool need_spacer = false;
 			
-		   //         /* Scan the rest of the items for acceptable entries */
-		   //         for (j = i; j < last_slot; j++)
-		   //         {
-		   //             o_ptr = &p_ptr.inventory[j];
-		   //             if (item_tester_okay(o_ptr)) need_spacer = true;
-		   //         }
+		            /* Scan the rest of the items for acceptable entries */
+		            for (j = i; j < last_slot; j++)
+		            {
+		                o_ptr = Misc.p_ptr.inventory[j];
+		                if (o_ptr.item_tester_okay()) need_spacer = true;
+		            }
 
-		   //         /* Add a spacer between equipment and quiver */
-		   //         if (num_obj > 0 && need_spacer)
-		   //         {
-		   //             my_strcpy(labels[num_obj], "", sizeof(labels[num_obj]));
-		   //             objects[num_obj] = null;
-		   //             num_obj++;
-		   //         }
+		            /* Add a spacer between equipment and quiver */
+		            if (num_obj > 0 && need_spacer)
+		            {
+						labels[num_obj] = "";
+		                //my_strcpy(labels[num_obj], "", sizeof(labels[num_obj]));
+		                objects[num_obj] = null;
+		                num_obj++;
+		            }
 
-		   //         continue;
-		   //     }
+		            continue;
+		        }
 
-		   //     /* Acceptable items get a label */
-		   //     if (item_tester_okay(o_ptr))
-		   //         strnfmt(labels[num_obj], sizeof(labels[num_obj]), "%c) ", index_to_label(i));
+		        /* Acceptable items get a label */
+		        if (o_ptr.item_tester_okay()){
+		            labels[num_obj] = String.Format("{0}) ", index_to_label(i));
+					//strnfmt(labels[num_obj], sizeof(labels[num_obj]), "%c) ", index_to_label(i));
+				}
 
-		   //     /* Unacceptable items are still displayed in term windows */
-		   //     else if (in_term)
-		   //         my_strcpy(labels[num_obj], "   ", sizeof(labels[num_obj]));
+		        /* Unacceptable items are still displayed in term windows */
+		        else if (in_term){
+		            labels[num_obj] = "   ";
+					//my_strcpy(labels[num_obj], "   ", sizeof(labels[num_obj]));
+				}
 
-		   //     /* Unacceptable items are skipped in the main window */
-		   //     else continue;
+		        /* Unacceptable items are skipped in the main window */
+		        else continue;
 
-		   //     /* Show full slot labels */
-		   //     strnfmt(tmp_val, sizeof(tmp_val), "%-14s: ", mention_use(i));
-		   //     my_strcat(labels[num_obj], tmp_val, sizeof(labels[num_obj]));
+		        /* Show full slot labels */
+				tmp_val = String.Format("{0}: ", mention_use(i).PadRight(14, ' '));
+				labels[num_obj] += tmp_val;
+				//strnfmt(tmp_val, sizeof(tmp_val), "%-14s: ", mention_use(i));
+				//my_strcat(labels[num_obj], tmp_val, sizeof(labels[num_obj]));
 
-		   //     /* Save the object */
-		   //     objects[num_obj] = o_ptr;
-		   //     num_obj++;
-		   // }
+		        /* Save the object */
+		        objects[num_obj] = o_ptr;
+		        num_obj++;
+		    }
 
-		   // /* Display the object list */
-		   // show_obj_list(num_obj, 0, labels, objects, mode);
+		    /* Display the object list */
+		    show_obj_list(num_obj, 0, labels, objects, mode);
 		}
 
 		/*

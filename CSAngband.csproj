@@ -283,7 +283,6 @@
     <Content Include="Source\Object\obj-make.c" />
     <Content Include="Source\Object\obj-util.c" />
     <Content Include="Source\Object\object.h" />
-    <Content Include="Source\Object\pval.c" />
     <Content Include="Source\Object\pval.h" />
     <Content Include="Source\Object\randart.c" />
     <Content Include="Source\parser.c" />

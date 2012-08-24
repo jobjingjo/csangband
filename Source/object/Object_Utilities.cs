@@ -1151,5 +1151,57 @@ namespace CSAngband.Object {
 			else
 				return kind.effect;
 		}
+
+		/*
+		 * Return a string mentioning how a given item is carried
+		 */
+		public static string mention_use(int slot)
+		{
+			switch (slot)
+			{
+				case Misc.INVEN_WIELD:
+				{
+					if (Player.Player.adj_str_hold[Misc.p_ptr.state.stat_ind[(int)Stat.Str]] < Misc.p_ptr.inventory[slot].weight / 10)
+						return "Just lifting";
+					else
+						return "Wielding";
+				}
+
+				case Misc.INVEN_BOW:
+				{
+					if (Player.Player.adj_str_hold[Misc.p_ptr.state.stat_ind[(int)Stat.Str]] < Misc.p_ptr.inventory[slot].weight / 10)
+						return "Just holding";
+					else
+						return "Shooting";
+				}
+
+				case Misc.INVEN_LEFT:  return "On left hand";
+				case Misc.INVEN_RIGHT: return "On right hand";
+				case Misc.INVEN_NECK:  return "Around neck";
+				case Misc.INVEN_LIGHT: return "Light source";
+				case Misc.INVEN_BODY:  return "On body";
+				case Misc.INVEN_OUTER: return "About body";
+				case Misc.INVEN_ARM:   return "On arm";
+				case Misc.INVEN_HEAD:  return "On head";
+				case Misc.INVEN_HANDS: return "On hands";
+				case Misc.INVEN_FEET:  return "On feet";
+
+				case Misc.QUIVER_START + 0: return "In quiver [f0]";
+				case Misc.QUIVER_START + 1: return "In quiver [f1]";
+				case Misc.QUIVER_START + 2: return "In quiver [f2]";
+				case Misc.QUIVER_START + 3: return "In quiver [f3]";
+				case Misc.QUIVER_START + 4: return "In quiver [f4]";
+				case Misc.QUIVER_START + 5: return "In quiver [f5]";
+				case Misc.QUIVER_START + 6: return "In quiver [f6]";
+				case Misc.QUIVER_START + 7: return "In quiver [f7]";
+				case Misc.QUIVER_START + 8: return "In quiver [f8]";
+				case Misc.QUIVER_START + 9: return "In quiver [f9]";
+			}
+
+			/*if (slot >= QUIVER_START && slot < QUIVER_END)
+				return "In quiver";*/
+
+			return "In pack";
+		}
 	}
 }

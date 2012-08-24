@@ -49,57 +49,7 @@ bool slot_can_wield_item(int slot, const object_type *o_ptr)
 }
 
 
-/*
- * Return a string mentioning how a given item is carried
- */
-const char *mention_use(int slot)
-{
-	switch (slot)
-	{
-		case INVEN_WIELD:
-		{
-			if (adj_str_hold[p_ptr.state.stat_ind[A_STR]] < p_ptr.inventory[slot].weight / 10)
-				return "Just lifting";
-			else
-				return "Wielding";
-		}
 
-		case INVEN_BOW:
-		{
-			if (adj_str_hold[p_ptr.state.stat_ind[A_STR]] < p_ptr.inventory[slot].weight / 10)
-				return "Just holding";
-			else
-				return "Shooting";
-		}
-
-		case INVEN_LEFT:  return "On left hand";
-		case INVEN_RIGHT: return "On right hand";
-		case INVEN_NECK:  return "Around neck";
-		case INVEN_LIGHT: return "Light source";
-		case INVEN_BODY:  return "On body";
-		case INVEN_OUTER: return "About body";
-		case INVEN_ARM:   return "On arm";
-		case INVEN_HEAD:  return "On head";
-		case INVEN_HANDS: return "On hands";
-		case INVEN_FEET:  return "On feet";
-
-		case QUIVER_START + 0: return "In quiver [f0]";
-		case QUIVER_START + 1: return "In quiver [f1]";
-		case QUIVER_START + 2: return "In quiver [f2]";
-		case QUIVER_START + 3: return "In quiver [f3]";
-		case QUIVER_START + 4: return "In quiver [f4]";
-		case QUIVER_START + 5: return "In quiver [f5]";
-		case QUIVER_START + 6: return "In quiver [f6]";
-		case QUIVER_START + 7: return "In quiver [f7]";
-		case QUIVER_START + 8: return "In quiver [f8]";
-		case QUIVER_START + 9: return "In quiver [f9]";
-	}
-
-	/*if (slot >= QUIVER_START && slot < QUIVER_END)
-		return "In quiver";*/
-
-	return "In pack";
-}
 
 
 /*
