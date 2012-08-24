@@ -2065,7 +2065,7 @@ namespace CSAngband.Object
 
 			    /* Figure out which slot this ammo prefers, if any */
 			    k = o_ptr.get_inscribed_ammo_slot();
-			    if (k == null) continue;
+			    if (k == 0) continue;
 
 			    k -= Misc.QUIVER_START;
 			    if (k == i) locked[i] = true;
