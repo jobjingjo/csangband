@@ -715,34 +715,7 @@ static bool find_hiding(int m_idx, int *yp, int *xp)
 }
 
 
-/*
- * Hack -- compare the "strength" of two monsters XXX XXX XXX
- */
-static int compare_monsters(const monster_type *m_ptr, const monster_type *n_ptr)
-{
-	monster_race *r_ptr;
 
-	u32b mexp1, mexp2;
-
-	/* Race 1 */
-	r_ptr = &r_info[m_ptr.r_idx];
-
-	/* Extract mexp */
-	mexp1 = r_ptr.mexp;
-
-	/* Race 2 */
-	r_ptr = &r_info[n_ptr.r_idx];
-
-	/* Extract mexp */
-	mexp2 = r_ptr.mexp;
-
-	/* Compare */
-	if (mexp1 < mexp2) return (-1);
-	if (mexp1 > mexp2) return (1);
-
-	/* Assume equal */
-	return (0);
-}
 
 
 

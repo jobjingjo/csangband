@@ -17,10 +17,6 @@ struct player;
 #define ORIGIN_BYTES 4 /* savefile bytes - room for 32 origin types */
 
 
-/* Whether to learn egos and flavors with less than complete information */
-#define EASY_LEARN 1
-
-
 /**
  * Modes for object_info()
  */
@@ -58,7 +54,6 @@ bool object_high_resist_is_possible(const object_type *o_ptr);
 void object_flavor_tried(object_type *o_ptr);
 void object_notice_everything(object_type *o_ptr);
 void object_notice_indestructible(object_type *o_ptr);
-void object_notice_ego(object_type *o_ptr);
 void object_notice_sensing(object_type *o_ptr);
 void object_sense_artifact(object_type *o_ptr);
 bool object_notice_flags(object_type *o_ptr, bitflag flags[OF_SIZE]);
@@ -186,7 +181,6 @@ bool obj_can_takeoff(const object_type *o_ptr);
 bool obj_can_wear(const object_type *o_ptr);
 bool obj_can_fire(const object_type *o_ptr);
 bool obj_has_inscrip(const object_type *o_ptr);
-u16b object_effect(const object_type *o_ptr);
 object_type *object_from_item_idx(int item);
 bool obj_needs_aim(object_type *o_ptr);
 bool get_item_okay(int item);

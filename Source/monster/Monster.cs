@@ -721,50 +721,52 @@ namespace CSAngband.Monster {
 			        /* Assume no movement */
 			        do_move = false;
 
-					throw new NotImplementedException();
-					//if (compare_monsters(m_ptr, n_ptr) > 0)
-					//{
-					//    /* Learn about pushing and shoving */
-					//    if (m_ptr.ml)
-					//    {
-					//        rf_on(l_ptr.flags, RF_KILL_BODY);
-					//        rf_on(l_ptr.flags, RF_MOVE_BODY);
-					//    }
+					if (compare_monsters(m_ptr, n_ptr) > 0)
+					{
+					    /* Learn about pushing and shoving */
+					    if (m_ptr.ml)
+					    {
+					        l_ptr.flags.on(Monster_Flag.KILL_BODY.value);
+					        l_ptr.flags.on(Monster_Flag.MOVE_BODY.value);
+					    }
 
-					//    if (kill_ok || move_ok)
-					//    {
-					//        /* Get the names of the monsters involved */
-					//        //char m_name[80];
-					//        //char n_name[80];
-					//        string m_name;
-					//        string n_name;
-					//        m_name = m_ptr.monster_desc(MDESC_IND1);
-					//        n_name = n_ptr.monster_desc(MDESC_IND1);
+					    if (kill_ok || move_ok)
+					    {
+					        /* Get the names of the monsters involved */
+					        //char m_name[80];
+					        //char n_name[80];
+					        string m_name;
+					        string n_name;
+					        m_name = m_ptr.monster_desc(Desc.IND1);
+					        n_name = n_ptr.monster_desc(Desc.IND1);
 
-					//        /* Allow movement */
-					//        do_move = true;
+					        /* Allow movement */
+					        do_move = true;
 
-					//        /* Monster ate another monster */
-					//        if (kill_ok)
-					//        {
-					//            /* Note if visible */
-					//            if (m_ptr.ml && (m_ptr.mflag & (MFLAG_VIEW)))
-					//            {
-					//                msg("%^s tramples over %s.", m_name, n_name);
-					//            }
+					        /* Monster ate another monster */
+					        if (kill_ok)
+					        {
+					            /* Note if visible */
+					            if (m_ptr.ml && (m_ptr.mflag & (Monster_Flag.MFLAG_VIEW)) != 0)
+					            {
+									string name = Char.ToUpper(m_name[0]) + m_name.Substring(1);
+					                Utilities.msg("{0} tramples over {1}.", name, n_name);
+					            }
 
-					//            delete_monster(ny, nx);
-					//        }
-					//        else
-					//        {
-					//            /* Note if visible */
-					//            if (m_ptr.ml && (m_ptr.mflag & (MFLAG_VIEW)))
-					//            {
-					//                msg("%^s pushes past %s.", m_name, n_name);
-					//            }
-					//        }
-					//    }
-					//}
+								throw new NotImplementedException();
+					            //delete_monster(ny, nx);
+					        }
+					        else
+					        {
+					            /* Note if visible */
+					            if (m_ptr.ml && (m_ptr.mflag & (Monster_Flag.MFLAG_VIEW)) != 0)
+					            {
+									string name = Char.ToUpper(m_name[0]) + m_name.Substring(1);
+					                Utilities.msg("{0} pushes past {1}.", name, n_name);
+					            }
+					        }
+					    }
+					}
 			    }
 
 			    /* Creature has been allowed move */
@@ -933,6 +935,35 @@ namespace CSAngband.Monster {
 				//become_aware(m_idx);
 			}
 
+		}
+
+		/*
+		 * Hack -- compare the "strength" of two monsters XXX XXX XXX
+		 */
+		static int compare_monsters(Monster m_ptr, Monster n_ptr)
+		{
+			Monster_Race r_ptr;
+
+			int mexp1, mexp2;
+
+			/* Race 1 */
+			r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			/* Extract mexp */
+			mexp1 = r_ptr.mexp;
+
+			/* Race 2 */
+			r_ptr = Misc.r_info[n_ptr.r_idx];
+
+			/* Extract mexp */
+			mexp2 = r_ptr.mexp;
+
+			/* Compare */
+			if (mexp1 < mexp2) return (-1);
+			if (mexp1 > mexp2) return (1);
+
+			/* Assume equal */
+			return (0);
 		}
 
 		/*

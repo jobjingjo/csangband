@@ -5,6 +5,10 @@ using System.Text;
 
 namespace CSAngband.Object {
 	partial class Object {
+
+		/* Whether to learn egos and flavors with less than complete information */
+		const bool EASY_LEARN = true;
+
 		/** Time last item was wielded */
 		static int object_last_wield = 0;
 		/*
@@ -297,46 +301,102 @@ namespace CSAngband.Object {
 		 */
 		bool check_for_ident()
 		{
-			throw new NotImplementedException();
-			//bitflag flags[OF_SIZE], known_flags[OF_SIZE], f2[OF_SIZE];
+			Bitflag flags = new Bitflag(Object_Flag.SIZE);
+			Bitflag known_flags = new Bitflag(Object_Flag.SIZE);
+			Bitflag f2 = new Bitflag(Object_Flag.SIZE);
 	
-			//object_flags(o_ptr, flags);
-			//object_flags_known(o_ptr, known_flags);
+			object_flags(ref flags);
+			object_flags_known(ref known_flags);
 
-			///* Some flags are irrelevant or never learned or too hard to learn */
-			//create_mask(f2, false, OFT_INT, OFT_IGNORE, OFT_HATES, OFT_MAX);
+			/* Some flags are irrelevant or never learned or too hard to learn */
+			Object_Flag.create_mask(f2, false,	Object_Flag.object_flag_type.INT, 
+												Object_Flag.object_flag_type.IGNORE, 
+												Object_Flag.object_flag_type.HATES);
 
-			//of_diff(flags, f2);
-			//of_diff(known_flags, f2);
+			flags.diff(f2);
+			known_flags.diff(f2);
 
-			//if (!of_is_equal(flags, known_flags)) return false;
+			if (!flags.is_equal(known_flags)) return false;
 
-			///* If we know attack bonuses, and defence bonuses, and effect, then
-			// * we effectively know everything, so mark as such */
-			//if ((object_attack_plusses_are_visible(o_ptr) || (object_was_sensed(o_ptr) && o_ptr.to_h == 0 && o_ptr.to_d == 0)) &&
-			//    (object_defence_plusses_are_visible(o_ptr) || (object_was_sensed(o_ptr) && o_ptr.to_a == 0)) &&
-			//    (object_effect_is_known(o_ptr) || !object_effect(o_ptr)))
+			/* If we know attack bonuses, and defence bonuses, and effect, then
+			 * we effectively know everything, so mark as such */
+			if ((attack_plusses_are_visible() || (was_sensed() && to_h == 0 && to_d == 0)) &&
+			    (defence_plusses_are_visible() || (was_sensed() && to_a == 0)) &&
+			    (effect_is_known() || effect() == null))
+			{
+			    /* In addition to knowing the pval flags, it is necessary to know the pvals to know everything */
+			    int i;
+			    for (i = 0; i < num_pvals; i++)
+			        if (!this_pval_is_visible(i))
+			            break;
+			    if (i == num_pvals) {
+			        notice_everything();
+			        return true;
+			    }
+			}
+
+			/* We still know all the flags, so we still know if it's an ego */
+			if (ego != null)
+			{
+			    /* require worn status so you don't learn launcher of accuracy or gloves of slaying before wield */
+			    if (was_worn())
+			        notice_ego();
+			}
+
+			return false;
+		}
+
+		/*
+		 * Notice the ego on an ego item.
+		 */
+		public void notice_ego()
+		{
+			throw new NotImplementedException();
+			//bitflag learned_flags[OF_SIZE];
+			//bitflag xtra_flags[OF_SIZE];
+
+			//if (!o_ptr.ego)
+			//    return;
+
+
+			///* XXX Eddie print a message on notice ego if not already noticed? */
+			///* XXX Eddie should we do something about everseen of egos here? */
+
+			///* Learn ego flags */
+			//of_union(o_ptr.known_flags, o_ptr.ego.flags);
+
+			///* Learn all flags except random abilities */
+			//of_setall(learned_flags);
+
+			//switch (o_ptr.ego.xtra)
 			//{
-			//    /* In addition to knowing the pval flags, it is necessary to know the pvals to know everything */
-			//    int i;
-			//    for (i = 0; i < o_ptr.num_pvals; i++)
-			//        if (!object_this_pval_is_visible(o_ptr, i))
-			//            break;
-			//    if (i == o_ptr.num_pvals) {
-			//        object_notice_everything(o_ptr);
-			//        return true;
-			//    }
+			//    case OBJECT_XTRA_TYPE_NONE:
+			//        break;
+			//    case OBJECT_XTRA_TYPE_SUSTAIN:
+			//        create_mask(xtra_flags, false, OFT_SUST, OFT_MAX);
+			//        of_diff(learned_flags, xtra_flags);
+			//        break;
+			//    case OBJECT_XTRA_TYPE_RESIST:
+			//        create_mask(xtra_flags, false, OFT_HRES, OFT_MAX);
+			//        of_diff(learned_flags, xtra_flags);
+			//        break;
+			//    case OBJECT_XTRA_TYPE_POWER:
+			//        create_mask(xtra_flags, false, OFT_MISC, OFT_PROT, OFT_MAX);
+			//        of_diff(learned_flags, xtra_flags);
+			//        break;
+			//    default:
+			//        assert(0);
 			//}
 
-			///* We still know all the flags, so we still know if it's an ego */
-			//if (o_ptr.ego)
-			//{
-			//    /* require worn status so you don't learn launcher of accuracy or gloves of slaying before wield */
-			//    if (object_was_worn(o_ptr))
-			//        object_notice_ego(o_ptr);
-			//}
+			//of_union(o_ptr.known_flags, learned_flags);
 
-			//return false;
+			//if (object_add_ident_flags(o_ptr, IDENT_NAME))
+			//{
+			//    /* if you know the ego, you know which it is of excellent or splendid */
+			//    object_notice_sensing(o_ptr);
+
+			//    object_check_for_ident(o_ptr);
+			//}
 		}
 
 		/*
@@ -400,53 +460,52 @@ namespace CSAngband.Object {
 		 */
 		public static void wieldeds_notice_flag(Player.Player p, int flag)
 		{
-			throw new NotImplementedException();
-			//int i;
+			int i;
 
-			///* Sanity check */
-			//if (!flag) return;
+			/* Sanity check */
+			if (flag == 0) return;
 
-			///* XXX Eddie need different naming conventions for starting wieldeds at INVEN_WIELD vs INVEN_WIELD+2 */
-			//for (i = INVEN_WIELD; i < ALL_INVEN_TOTAL; i++)
-			//{
-			//    object_type *o_ptr = &p.inventory[i];
-			//    bitflag f[OF_SIZE];
+			/* XXX Eddie need different naming conventions for starting wieldeds at INVEN_WIELD vs INVEN_WIELD+2 */
+			for (i = Misc.INVEN_WIELD; i < Misc.ALL_INVEN_TOTAL; i++)
+			{
+			    Object o_ptr = p.inventory[i];
+			    Bitflag f = new Bitflag(Object_Flag.SIZE);
 
-			//    if (!o_ptr.kind) continue;
+			    if (o_ptr.kind == null) continue;
 
-			//    object_flags(o_ptr, f);
+			    o_ptr.object_flags(ref f);
 
-			//    if (of_has(f, flag) && !of_has(o_ptr.known_flags, flag))
-			//    {
-			//        char o_name[80];
-			//        object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
+			    if (f.has(flag) && !o_ptr.known_flags.has(flag))
+			    {
+			        //char o_name[80];
+					string o_name = o_ptr.object_desc(Detail.BASE);
 
-			//        /* Notice the flag */
-			//        object_notice_flag(o_ptr, flag);
+			        /* Notice the flag */
+			        o_ptr.notice_flag(flag);
 
-			//        /* XXX Eddie should this go before noticing the flag to avoid learning twice? */
-			//        if (EASY_LEARN && object_is_jewelry(o_ptr))
-			//        {
-			//            /* XXX Eddie EASY_LEARN Possible concern: gets =teleportation just from +2 speed */
-			//            object_flavor_aware(o_ptr);
-			//            object_check_for_ident(o_ptr);
-			//        }
+			        /* XXX Eddie should this go before noticing the flag to avoid learning twice? */
+			        if (EASY_LEARN && o_ptr.is_jewelry())
+			        {
+			            /* XXX Eddie EASY_LEARN Possible concern: gets =teleportation just from +2 speed */
+			            o_ptr.flavor_aware();
+			            o_ptr.check_for_ident();
+			        }
 
-			//        /* Message */
-			//        flag_message(flag, o_name);
-			//    }
-			//    else
-			//    {
-			//        /* Notice that flag is absent */
-			//        object_notice_flag(o_ptr, flag);
-			//    }
+			        /* Message */
+			        Object_Flag.flag_message(flag, o_name);
+			    }
+			    else
+			    {
+			        /* Notice that flag is absent */
+			        o_ptr.notice_flag(flag);
+			    }
 
-			//    /* XXX Eddie should not need this, should be done in noticing, but will remove later */
-			//    object_check_for_ident(o_ptr);
+			    /* XXX Eddie should not need this, should be done in noticing, but will remove later */
+			    o_ptr.check_for_ident();
 
-			//}
+			}
 
-			//return;
+			return;
 		}
 
 
