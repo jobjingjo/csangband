@@ -47,36 +47,35 @@ namespace CSAngband {
 		 */
 		public static bool able(int m_idx)
 		{
-			throw new NotImplementedException();
-			//int py = p_ptr.py;
-			//int px = p_ptr.px;
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
 
-			//monster_type *m_ptr;
+			Monster.Monster m_ptr;
 
-			///* No monster */
-			//if (m_idx <= 0) return (false);
+			/* No monster */
+			if (m_idx <= 0) return (false);
 
-			///* Get monster */
-			//m_ptr = cave_monster(cave, m_idx);
+			/* Get monster */
+			m_ptr = Cave.cave_monster(Cave.cave, m_idx);
 
-			///* Monster must be alive */
-			//if (!m_ptr.r_idx) return (false);
+			/* Monster must be alive */
+			if (m_ptr.r_idx == 0) return (false);
 
-			///* Monster must be visible */
-			//if (!m_ptr.ml) return (false);
+			/* Monster must be visible */
+			if (!m_ptr.ml) return (false);
 	
-			///* Player must be aware this is a monster */
-			//if (m_ptr.unaware) return (false);
+			/* Player must be aware this is a monster */
+			if (m_ptr.unaware) return (false);
 
-			///* Monster must be projectable */
-			//if (!projectable(py, px, m_ptr.fy, m_ptr.fx, PROJECT_NONE))
-			//    return (false);
+			/* Monster must be projectable */
+			if (!Cave.projectable(py, px, m_ptr.fy, m_ptr.fx, Spell.PROJECT_NONE))
+			    return (false);
 
-			///* Hack -- no targeting hallucinations */
-			//if (p_ptr.timed[TMD_IMAGE]) return (false);
+			/* Hack -- no targeting hallucinations */
+			if (Misc.p_ptr.timed[(int)Timed_Effect.IMAGE] != 0) return (false);
 
-			///* Assume okay */
-			//return (true);
+			/* Assume okay */
+			return (true);
 		}
 
 		/*
@@ -87,14 +86,13 @@ namespace CSAngband {
 			/* Acceptable target */
 			if ((m_idx > 0) && able(m_idx))
 			{
-				throw new NotImplementedException();
-				//monster_type *m_ptr = cave_monster(cave, m_idx);
+				Monster.Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
 
-				///* Save target info */
-				//target_set = true;
-				//target_who = m_idx;
-				//target_y = m_ptr.fy;
-				//target_x = m_ptr.fx;
+				/* Save target info */
+				target_set = true;
+				target_who = (ushort)m_idx;
+				target_y = m_ptr.fy;
+				target_x = m_ptr.fx;
 			}
 
 			/* Clear target */
@@ -638,66 +636,226 @@ namespace CSAngband {
 			return (false);
 		}
 
+		/*
+		 * Sorting hook -- comp function -- by "distance to player"
+		 *
+		 * We use "u" and "v" to point to arrays of "x" and "y" positions,
+		 * and sort the arrays by double-distance to the player.
+		 */
+		static int cmp_distance(Loc a, Loc b)
+		{
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
+			int da, db, kx, ky;
+
+			/* Absolute distance components */
+			kx = a.x; kx -= px; kx = Math.Abs(kx);
+			ky = a.y; ky -= py; ky = Math.Abs(ky);
+
+			/* Approximate Double Distance to the first point */
+			da = ((kx > ky) ? (kx + kx + ky) : (ky + ky + kx));
+
+			/* Absolute distance components */
+			kx = b.x; kx -= px; kx = Math.Abs(kx);
+			ky = b.y; ky -= py; ky = Math.Abs(ky);
+
+			/* Approximate Double Distance to the first point */
+			db = ((kx > ky) ? (kx + kx + ky) : (ky + ky + kx));
+
+			/* Compare the distances */
+			if (da < db)
+			    return -1;
+			if (da > db)
+			    return 1;
+			return 0;
+		}
+
+		/**
+		 * Obtains the location the player currently targets.
+		 *
+		 * Both `col` and `row` must point somewhere, and on function termination,
+		 * contain the X and Y locations respectively.
+		 */
+		public static void get(out short col, out short row)
+		{
+			//assert(col);
+			//assert(row);
+
+			col = target_x;
+			row = target_y;
+		}
+
+
+		/*
+		 * Hack -- determine if a given location is "interesting"
+		 */
+		static bool set_interactive_accept(int y, int x)
+		{
+			Object.Object o_ptr;
+
+
+			/* Player grids are always interesting */
+			if (Cave.cave.m_idx[y][x] < 0) return (true);
+
+
+			/* Handle hallucination */
+			if (Misc.p_ptr.timed[(int)Timed_Effect.IMAGE] != 0) return (false);
+
+
+			/* Visible monsters */
+			if (Cave.cave.m_idx[y][x] > 0)
+			{
+				Monster.Monster m_ptr = Cave.cave_monster(Cave.cave, Cave.cave.m_idx[y][x]);
+
+				/* Visible monsters */
+				if (m_ptr.ml && !m_ptr.unaware) return (true);
+			}
+
+			/* Scan all objects in the grid */
+			for (o_ptr = Object.Object.get_first_object(y, x); o_ptr != null; o_ptr = Object.Object.get_next_object(o_ptr))
+			{
+				/* Memorized object */
+				if (o_ptr.marked != 0 && !Squelch.item_ok(o_ptr)) return (true);
+			}
+
+			/* Interesting memorized features */
+			if ((Cave.cave.info[y][x] & (Cave.CAVE_MARK)) != 0)
+			{
+				/* Notice glyphs */
+				if (Cave.cave.feat[y][x] == Cave.FEAT_GLYPH) return (true);
+
+				/* Notice doors */
+				if (Cave.cave.feat[y][x] == Cave.FEAT_OPEN) return (true);
+				if (Cave.cave.feat[y][x] == Cave.FEAT_BROKEN) return (true);
+
+				/* Notice stairs */
+				if (Cave.cave.feat[y][x] == Cave.FEAT_LESS) return (true);
+				if (Cave.cave.feat[y][x] == Cave.FEAT_MORE) return (true);
+
+				/* Notice shops */
+				if ((Cave.cave.feat[y][x] >= Cave.FEAT_SHOP_HEAD) &&
+					(Cave.cave.feat[y][x] <= Cave.FEAT_SHOP_TAIL)) return (true);
+
+				/* Notice traps */
+				if (Cave.cave_isknowntrap(Cave.cave, y, x)) return true;
+
+				/* Notice doors */
+				if (Cave.cave_iscloseddoor(Cave.cave, y, x)) return true;
+
+				/* Notice rubble */
+				if (Cave.cave.feat[y][x] == Cave.FEAT_RUBBLE) return (true);
+
+				/* Notice veins with treasure */
+				if (Cave.cave.feat[y][x] == Cave.FEAT_MAGMA_K) return (true);
+				if (Cave.cave.feat[y][x] == Cave.FEAT_QUARTZ_K) return (true);
+			}
+
+			/* Nope */
+			return (false);
+		}
+
+		/*
+		 * Return a target set of target_able monsters.
+		 */
+		static List<Loc> set_interactive_prepare(int mode)
+		{
+			int y, x;
+			List<Loc> targets = new List<Loc>();// point_set_new(TS_INITIAL_SIZE);
+
+			/* Scan the current panel */
+			for (y = Term.instance.offset_y; y < Term.instance.offset_y + Misc.SCREEN_HGT; y++)
+			{
+			    for (x = Term.instance.offset_x; x < Term.instance.offset_x + Misc.SCREEN_WID; x++)
+			    {
+			        /* Check bounds */
+			        if (!Cave.cave.in_bounds_fully(y, x)) continue;
+
+			        /* Require "interesting" contents */
+			        if (!set_interactive_accept(y, x)) continue;
+
+			        /* Special mode */
+			        if ((mode & (KILL)) != 0)
+			        {
+			            /* Must contain a monster */
+			            if (!(Cave.cave.m_idx[y][x] > 0)) continue;
+
+			            /* Must be a targettable monster */
+			            if (!able(Cave.cave.m_idx[y][x])) continue;
+			        }
+
+			        /* Save the location */
+					targets.Add(new Loc(x, y));
+			    }
+			}
+
+			targets.Sort(cmp_distance);
+
+			//sort(targets.pts, point_set_size(targets), sizeof(*(targets.pts)), cmp_distance);
+			return targets;
+		}
+
 		public static bool set_closest(int mode)
 		{
-			throw new NotImplementedException();
-			//int y, x, m_idx;
-			//monster_type *m_ptr;
+			int y, x, m_idx;
+			Monster.Monster m_ptr;
 			//char m_name[80];
-			//bool visibility;
-			//struct point_set *targets;
+			string m_name;
+			bool visibility;
+			List<Loc> targets;
 
-			///* Cancel old target */
-			//target_set_monster(0);
+			/* Cancel old target */
+			set_monster(0);
 
-			///* Get ready to do targetting */
-			//targets = target_set_interactive_prepare(mode);
+			/* Get ready to do targetting */
+			targets = set_interactive_prepare(mode);
 
-			///* If nothing was prepared, then return */
-			//if (point_set_size(targets) < 1)
-			//{
-			//    msg("No Available Target.");
-			//    point_set_dispose(targets);
-			//    return false;
-			//}
+			/* If nothing was prepared, then return */
+			if (targets.Count() < 1)
+			{
+			    Utilities.msg("No Available Target.");
+			    //point_set_dispose(targets);
+			    return false;
+			}
 
-			///* Find the first monster in the queue */
-			//y = targets.pts[0].y;
-			//x = targets.pts[0].x;
-			//m_idx = cave.m_idx[y][x];
+			/* Find the first monster in the queue */
+			y = targets[0].y;
+			x = targets[0].x;
+			m_idx = Cave.cave.m_idx[y][x];
 	
-			///* Target the monster, if possible */
-			//if ((m_idx <= 0) || !target_able(m_idx))
-			//{
-			//    msg("No Available Target.");
-			//    point_set_dispose(targets);
-			//    return false;
-			//}
+			/* Target the monster, if possible */
+			if ((m_idx <= 0) || !able(m_idx))
+			{
+			    Utilities.msg("No Available Target.");
+			    //point_set_dispose(targets);
+			    return false;
+			}
 
-			///* Target the monster */
-			//m_ptr = cave_monster(cave, m_idx);
-			//monster_desc(m_name, sizeof(m_name), m_ptr, 0x00);
-			//if (!(mode & TARGET_QUIET))
-			//    msg("%^s is targeted.", m_name);
-			//Term_fresh();
+			/* Target the monster */
+			m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			m_name = m_ptr.monster_desc(0x00);
+			if((mode & QUIET) == 0) {
+				string temp = Char.ToUpper(m_name[0]) + m_name.Substring(1);
+				Utilities.msg("{0} is targeted.", temp);
+			}
+			Term.fresh();
 
-			///* Set up target information */
-			//monster_race_track(m_ptr.r_idx);
-			//health_track(p_ptr, cave.m_idx[y][x]);
-			//target_set_monster(m_idx);
+			/* Set up target information */
+			Cave.monster_race_track(m_ptr.r_idx);
+			Cave.health_track(Misc.p_ptr, Cave.cave.m_idx[y][x]);
+			set_monster(m_idx);
 
-			///* Visual cue */
-			//Term_get_cursor(&visibility);
-			//(void)Term_set_cursor(true);
-			//move_cursor_relative(y, x);
-			//Term_redraw_section(x, y, x, y);
+			/* Visual cue */
+			visibility = Term.get_cursor();
+			Term.set_cursor(true);
+			Cave.move_cursor_relative(y, x);
+			Term.redraw_section(x, y, x, y);
 
-			///* TODO: what's an appropriate amount of time to spend highlighting */
-			//Term_xtra(TERM_XTRA_DELAY, 150);
-			//(void)Term_set_cursor(visibility);
+			/* TODO: what's an appropriate amount of time to spend highlighting */
+			Term.xtra(TERM_XTRA.DELAY, 150);
+			Term.set_cursor(visibility);
 
 			//point_set_dispose(targets);
-			//return true;
+			return true;
 		}
 
 	}

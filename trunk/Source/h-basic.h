@@ -244,10 +244,7 @@ typedef int errr;
  */
 #define N_ELEMENTS(a) (sizeof(a) / sizeof((a)[0]))
 
-/*
- * Return "s" (or not) depending on whether n is singular.
- */
-#define PLURAL(n)		((n) == 1 ? "" : "s")
+
 
 
 

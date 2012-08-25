@@ -858,5 +858,12 @@ namespace CSAngband {
 		 * rings, amulets), and the ones from 16 to 127 are "normal".
 		 */
 		public const int ART_MIN_NORMAL = 16;
+
+		/*
+		 * Return "s" (or not) depending on whether n is singular.
+		 */
+		public static string PLURAL(bool n){
+			return (n ? "" : "s");
+		}
 	}
 }

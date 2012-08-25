@@ -447,8 +447,7 @@ namespace CSAngband {
 
 		public static void feeling()
 		{
-			throw new NotImplementedException();
-			//display_feeling(false);
+			Command.display_feeling(false);
 		}
 
 

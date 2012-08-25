@@ -165,6 +165,16 @@ namespace CSAngband {
 			return ((cave.info[Y][X] & (CAVE_SEEN)) != 0);
 		}
 
+		/*
+		 * Determine if a "legal" grid is a "clean" floor grid
+		 *
+		 * Line 1 -- forbid non-floors
+		 * Line 2 -- forbid normal objects
+		 */
+		public static bool cave_clean_bold(int Y, int X){
+			return ((cave.feat[Y][X] == FEAT_FLOOR) && (cave.o_idx[Y][X] == 0));
+		}
+
 		/**
 		 * cave_predicate is a function pointer which tests a given square to
 		 * see if the predicate in question is true.
@@ -271,14 +281,14 @@ namespace CSAngband {
 		/*
 		 * Convert a "grid" (G) into a "location" (Y)
 		 */
-		static int GRID_Y(int G){
+		public static int GRID_Y(int G){
 			return ((int)((G) / 256U));
 		}
 
 		/*
 		 * Convert a "grid" (G) into a "location" (X)
 		 */
-		static int GRID_X(int G) {
+		public static int GRID_X(int G) {
 			return ((int)((G) % 256U));
 		}
 
@@ -1484,232 +1494,238 @@ namespace CSAngband {
 		 * by "update_view_los()", and very different from the one used by "los()".
 		 */
 		//gp was u16b *
-		public static int project_path(ushort[] gp, int range, int y1, int x1, int y2, int x2, int flg)
+		public static int project_path(out List<ushort> gp, int range, int y1, int x1, int y2, int x2, int flg)
 		{
-			throw new NotImplementedException();
-			//int y, x;
+			gp = new List<ushort>();
+			int y, x;
 
-			//int n = 0;
-			//int k = 0;
+			int n = 0;
+			int k = 0;
 
-			///* Absolute */
-			//int ay, ax;
+			/* Absolute */
+			int ay, ax;
 
-			///* Offsets */
-			//int sy, sx;
+			/* Offsets */
+			int sy, sx;
 
-			///* Fractions */
-			//int frac;
+			/* Fractions */
+			int frac;
 
-			///* Scale factors */
-			//int full, half;
+			/* Scale factors */
+			int full, half;
 
-			///* Slope */
-			//int m;
-
-
-			///* No path necessary (or allowed) */
-			//if ((x1 == x2) && (y1 == y2)) return (0);
+			/* Slope */
+			int m;
 
 
-			///* Analyze "dy" */
-			//if (y2 < y1)
-			//{
-			//    ay = (y1 - y2);
-			//    sy = -1;
-			//}
-			//else
-			//{
-			//    ay = (y2 - y1);
-			//    sy = 1;
-			//}
-
-			///* Analyze "dx" */
-			//if (x2 < x1)
-			//{
-			//    ax = (x1 - x2);
-			//    sx = -1;
-			//}
-			//else
-			//{
-			//    ax = (x2 - x1);
-			//    sx = 1;
-			//}
+			/* No path necessary (or allowed) */
+			if ((x1 == x2) && (y1 == y2)) return (0);
 
 
-			///* Number of "units" in one "half" grid */
-			//half = (ay * ax);
+			/* Analyze "dy" */
+			if (y2 < y1)
+			{
+			    ay = (y1 - y2);
+			    sy = -1;
+			}
+			else
+			{
+			    ay = (y2 - y1);
+			    sy = 1;
+			}
 
-			///* Number of "units" in one "full" grid */
-			//full = half << 1;
-
-
-			///* Vertical */
-			//if (ay > ax)
-			//{
-			//    /* Start at tile edge */
-			//    frac = ax * ax;
-
-			//    /* Let m = ((dx/dy) * full) = (dx * dx * 2) = (frac * 2) */
-			//    m = frac << 1;
-
-			//    /* Start */
-			//    y = y1 + sy;
-			//    x = x1;
-
-			//    /* Create the projection path */
-			//    while (1)
-			//    {
-			//        /* Save grid */
-			//        gp[n++] = GRID(y,x);
-
-			//        /* Hack -- Check maximum range */
-			//        if ((n + (k >> 1)) >= range) break;
-
-			//        /* Sometimes stop at destination grid */
-			//        if (!(flg & (PROJECT_THRU)))
-			//        {
-			//            if ((x == x2) && (y == y2)) break;
-			//        }
-
-			//        /* Always stop at non-initial wall grids */
-			//        if ((n > 0) && !cave_floor_bold(y, x)) break;
-
-			//        /* Sometimes stop at non-initial monsters/players */
-			//        if (flg & (PROJECT_STOP))
-			//        {
-			//            if ((n > 0) && (cave.m_idx[y][x] != 0)) break;
-			//        }
-
-			//        /* Slant */
-			//        if (m)
-			//        {
-			//            /* Advance (X) part 1 */
-			//            frac += m;
-
-			//            /* Horizontal change */
-			//            if (frac >= half)
-			//            {
-			//                /* Advance (X) part 2 */
-			//                x += sx;
-
-			//                /* Advance (X) part 3 */
-			//                frac -= full;
-
-			//                /* Track distance */
-			//                k++;
-			//            }
-			//        }
-
-			//        /* Advance (Y) */
-			//        y += sy;
-			//    }
-			//}
-
-			///* Horizontal */
-			//else if (ax > ay)
-			//{
-			//    /* Start at tile edge */
-			//    frac = ay * ay;
-
-			//    /* Let m = ((dy/dx) * full) = (dy * dy * 2) = (frac * 2) */
-			//    m = frac << 1;
-
-			//    /* Start */
-			//    y = y1;
-			//    x = x1 + sx;
-
-			//    /* Create the projection path */
-			//    while (1)
-			//    {
-			//        /* Save grid */
-			//        gp[n++] = GRID(y,x);
-
-			//        /* Hack -- Check maximum range */
-			//        if ((n + (k >> 1)) >= range) break;
-
-			//        /* Sometimes stop at destination grid */
-			//        if (!(flg & (PROJECT_THRU)))
-			//        {
-			//            if ((x == x2) && (y == y2)) break;
-			//        }
-
-			//        /* Always stop at non-initial wall grids */
-			//        if ((n > 0) && !cave_floor_bold(y, x)) break;
-
-			//        /* Sometimes stop at non-initial monsters/players */
-			//        if (flg & (PROJECT_STOP))
-			//        {
-			//            if ((n > 0) && (cave.m_idx[y][x] != 0)) break;
-			//        }
-
-			//        /* Slant */
-			//        if (m)
-			//        {
-			//            /* Advance (Y) part 1 */
-			//            frac += m;
-
-			//            /* Vertical change */
-			//            if (frac >= half)
-			//            {
-			//                /* Advance (Y) part 2 */
-			//                y += sy;
-
-			//                /* Advance (Y) part 3 */
-			//                frac -= full;
-
-			//                /* Track distance */
-			//                k++;
-			//            }
-			//        }
-
-			//        /* Advance (X) */
-			//        x += sx;
-			//    }
-			//}
-
-			///* Diagonal */
-			//else
-			//{
-			//    /* Start */
-			//    y = y1 + sy;
-			//    x = x1 + sx;
-
-			//    /* Create the projection path */
-			//    while (1)
-			//    {
-			//        /* Save grid */
-			//        gp[n++] = GRID(y,x);
-
-			//        /* Hack -- Check maximum range */
-			//        if ((n + (n >> 1)) >= range) break;
-
-			//        /* Sometimes stop at destination grid */
-			//        if (!(flg & (PROJECT_THRU)))
-			//        {
-			//            if ((x == x2) && (y == y2)) break;
-			//        }
-
-			//        /* Always stop at non-initial wall grids */
-			//        if ((n > 0) && !cave_floor_bold(y, x)) break;
-
-			//        /* Sometimes stop at non-initial monsters/players */
-			//        if (flg & (PROJECT_STOP))
-			//        {
-			//            if ((n > 0) && (cave.m_idx[y][x] != 0)) break;
-			//        }
-
-			//        /* Advance (Y) */
-			//        y += sy;
-
-			//        /* Advance (X) */
-			//        x += sx;
-			//    }
-			//}
+			/* Analyze "dx" */
+			if (x2 < x1)
+			{
+			    ax = (x1 - x2);
+			    sx = -1;
+			}
+			else
+			{
+			    ax = (x2 - x1);
+			    sx = 1;
+			}
 
 
-			///* Length */
-			//return (n);
+			/* Number of "units" in one "half" grid */
+			half = (ay * ax);
+
+			/* Number of "units" in one "full" grid */
+			full = half << 1;
+
+
+			/* Vertical */
+			if (ay > ax)
+			{
+			    /* Start at tile edge */
+			    frac = ax * ax;
+
+			    /* Let m = ((dx/dy) * full) = (dx * dx * 2) = (frac * 2) */
+			    m = frac << 1;
+
+			    /* Start */
+			    y = y1 + sy;
+			    x = x1;
+
+			    /* Create the projection path */
+			    while (true)
+			    {
+			        /* Save grid */
+			        //gp[n++] = (ushort)GRID(y,x);
+					gp.Add((ushort)GRID(y, x));
+					n++;
+
+			        /* Hack -- Check maximum range */
+			        if ((n + (k >> 1)) >= range) break;
+
+			        /* Sometimes stop at destination grid */
+			        if ((flg & (Spell.PROJECT_THRU)) == 0)
+			        {
+			            if ((x == x2) && (y == y2)) break;
+			        }
+
+			        /* Always stop at non-initial wall grids */
+			        if ((n > 0) && !cave_floor_bold(y, x)) break;
+
+			        /* Sometimes stop at non-initial monsters/players */
+			        if ((flg & (Spell.PROJECT_STOP)) != 0)
+			        {
+			            if ((n > 0) && (cave.m_idx[y][x] != 0)) break;
+			        }
+
+			        /* Slant */
+			        if (m != 0)
+			        {
+			            /* Advance (X) part 1 */
+			            frac += m;
+
+			            /* Horizontal change */
+			            if (frac >= half)
+			            {
+			                /* Advance (X) part 2 */
+			                x += sx;
+
+			                /* Advance (X) part 3 */
+			                frac -= full;
+
+			                /* Track distance */
+			                k++;
+			            }
+			        }
+
+			        /* Advance (Y) */
+			        y += sy;
+			    }
+			}
+
+			/* Horizontal */
+			else if (ax > ay)
+			{
+			    /* Start at tile edge */
+			    frac = ay * ay;
+
+			    /* Let m = ((dy/dx) * full) = (dy * dy * 2) = (frac * 2) */
+			    m = frac << 1;
+
+			    /* Start */
+			    y = y1;
+			    x = x1 + sx;
+
+			    /* Create the projection path */
+			    while (true)
+			    {
+			        /* Save grid */
+			        //gp[n++] = GRID(y,x);
+					gp.Add((ushort)GRID(y, x));
+					n++;
+
+			        /* Hack -- Check maximum range */
+			        if ((n + (k >> 1)) >= range) break;
+
+			        /* Sometimes stop at destination grid */
+			        if ((flg & (Spell.PROJECT_THRU)) == 0)
+			        {
+			            if ((x == x2) && (y == y2)) break;
+			        }
+
+			        /* Always stop at non-initial wall grids */
+			        if ((n > 0) && !cave_floor_bold(y, x)) break;
+
+			        /* Sometimes stop at non-initial monsters/players */
+			        if ((flg & (Spell.PROJECT_STOP)) != 0)
+			        {
+			            if ((n > 0) && (cave.m_idx[y][x] != 0)) break;
+			        }
+
+			        /* Slant */
+			        if (m != 0)
+			        {
+			            /* Advance (Y) part 1 */
+			            frac += m;
+
+			            /* Vertical change */
+			            if (frac >= half)
+			            {
+			                /* Advance (Y) part 2 */
+			                y += sy;
+
+			                /* Advance (Y) part 3 */
+			                frac -= full;
+
+			                /* Track distance */
+			                k++;
+			            }
+			        }
+
+			        /* Advance (X) */
+			        x += sx;
+			    }
+			}
+
+			/* Diagonal */
+			else
+			{
+			    /* Start */
+			    y = y1 + sy;
+			    x = x1 + sx;
+
+			    /* Create the projection path */
+			    while (true)
+			    {
+			        /* Save grid */
+			        //gp[n++] = GRID(y,x);
+					gp.Add((ushort)GRID(y, x));
+					n++;
+
+			        /* Hack -- Check maximum range */
+			        if ((n + (n >> 1)) >= range) break;
+
+			        /* Sometimes stop at destination grid */
+			        if ((flg & (Spell.PROJECT_THRU)) == 0)
+			        {
+			            if ((x == x2) && (y == y2)) break;
+			        }
+
+			        /* Always stop at non-initial wall grids */
+			        if ((n > 0) && !cave_floor_bold(y, x)) break;
+
+			        /* Sometimes stop at non-initial monsters/players */
+			        if ((flg & (Spell.PROJECT_STOP)) != 0)
+			        {
+			            if ((n > 0) && (cave.m_idx[y][x] != 0)) break;
+			        }
+
+			        /* Advance (Y) */
+			        y += sy;
+
+			        /* Advance (X) */
+			        x += sx;
+			    }
+			}
+
+
+			/* Length */
+			return (n);
 		}
 
 
@@ -1725,30 +1741,30 @@ namespace CSAngband {
 		 */
 		public static bool projectable(int y1, int x1, int y2, int x2, int flg)
 		{
-			throw new NotImplementedException();
-			//int y, x;
+			int y, x;
 
-			//int grid_n = 0;
+			int grid_n = 0;
 			//u16b grid_g[512];
+			List<ushort> grid_g;
 
-			///* Check the projection path */
-			//grid_n = project_path(grid_g, MAX_RANGE, y1, x1, y2, x2, flg);
+			/* Check the projection path */
+			grid_n = project_path(out grid_g, Misc.MAX_RANGE, y1, x1, y2, x2, flg);
 
-			///* No grid is ever projectable from itself */
-			//if (!grid_n) return (false);
+			/* No grid is ever projectable from itself */
+			if (grid_n == 0) return (false);
 
-			///* Final grid */
-			//y = GRID_Y(grid_g[grid_n-1]);
-			//x = GRID_X(grid_g[grid_n-1]);
+			/* Final grid */
+			y = GRID_Y(grid_g[grid_n-1]);
+			x = GRID_X(grid_g[grid_n-1]);
 
-			///* May not end in a wall grid */
-			//if (!cave_floor_bold(y, x)) return (false);
+			/* May not end in a wall grid */
+			if (!cave_floor_bold(y, x)) return (false);
 
-			///* May not end in an unrequested grid */
-			//if ((y != y2) || (x != x2)) return (false);
+			/* May not end in an unrequested grid */
+			if ((y != y2) || (x != x2)) return (false);
 
-			///* Assume okay */
-			//return (true);
+			/* Assume okay */
+			return (true);
 		}
 
 
@@ -2829,54 +2845,55 @@ namespace CSAngband {
 		 *
 		 * Note the use of "Term_queue_char()" for efficiency.
 		 */
-		static void print_rel_map(char c, byte a, int y, int x)
+		static void print_rel_map(char c, ConsoleColor a, int y, int x)
 		{
-			throw new NotImplementedException();
-			//int ky, kx;
+			int ky, kx;
 
-			//int j;
+			int j;
 
-			///* Scan windows */
-			//for (j = 0; j < ANGBAND_TERM_MAX; j++)
-			//{
-			//    term *t = angband_term[j];
+			/* Scan windows */
+			for (j = 0; j < Misc.ANGBAND_TERM_MAX; j++)
+			{
+			    Term t = Misc.angband_term[j];
 
-			//    /* No window */
-			//    if (!t) continue;
+			    /* No window */
+			    if (t == null) continue;
 
-			//    /* No relevant flags */
-			//    if (!(op_ptr.window_flag[j] & (PW_MAP))) continue;
+			    /* No relevant flags */
+			    if ((Player.Player_Other.instance.window_flag[j] & (Misc.PW_MAP)) == 0) continue;
 
-			//    /* Location relative to panel */
-			//    ky = y - t.offset_y;
+			    /* Location relative to panel */
+			    ky = y - t.offset_y;
 
-			//    if (tile_height > 1)
-			//    {
-			//            ky = tile_height * ky;
-			//        if (ky + 1 >= t.hgt) continue;
-			//    }
+			    if (Term.tile_height > 1)
+			    {
+			        ky = Term.tile_height * ky;
+			        if (ky + 1 >= t.hgt) continue;
+			    }
 
-			//    /* Verify location */
-			//    if ((ky < 0) || (ky >= t.hgt)) continue;
+			    /* Verify location */
+			    if ((ky < 0) || (ky >= t.hgt)) continue;
 
-			//    /* Location relative to panel */
-			//    kx = x - t.offset_x;
+			    /* Location relative to panel */
+			    kx = x - t.offset_x;
 
-			//    if (tile_width > 1)
-			//    {
-			//            kx = tile_width * kx;
-			//        if (kx + 1 >= t.wid) continue;
-			//    }
+			    if (Term.tile_width > 1)
+			    {
+			        kx = Term.tile_width * kx;
+			        if (kx + 1 >= t.wid) continue;
+			    }
 
-			//    /* Verify location */
-			//    if ((kx < 0) || (kx >= t.wid)) continue;
+			    /* Verify location */
+			    if ((kx < 0) || (kx >= t.wid)) continue;
 
-			//    /* Hack -- Queue it */
-			//    Term_queue_char(t, kx, ky, a, c, 0, 0);
+			    /* Hack -- Queue it */
+			    t.queue_char(kx, ky, a, c, 0, (char)0);
 
-			//    if ((tile_width > 1) || (tile_height > 1))
-			//            Term_big_queue_char(Term, kx, ky, a, c, 0, 0);
-			//}
+				if((Term.tile_width > 1) || (Term.tile_height > 1)) {
+					throw new NotImplementedException();
+					//Term_big_queue_char(Term, kx, ky, a, c, 0, 0);
+				}
+			}
 		}
 
 
@@ -2890,36 +2907,37 @@ namespace CSAngband {
 		 *
 		 * The main screen will always be at least 24x80 in size.
 		 */
-		public static void print_rel(char c, byte a, int y, int x)
+		public static void print_rel(char c, ConsoleColor a, int y, int x)
 		{
-			throw new NotImplementedException();
-			//int ky, kx;
-			//int vy, vx;
+			int ky, kx;
+			int vy, vx;
 
-			///* Print on map sub-windows */
-			//print_rel_map(c, a, y, x);
+			/* Print on map sub-windows */
+			print_rel_map(c, a, y, x);
 
-			///* Location relative to panel */
-			//ky = y - Term.offset_y;
+			/* Location relative to panel */
+			ky = y - Term.instance.offset_y;
 
-			///* Verify location */
-			//if ((ky < 0) || (ky >= SCREEN_HGT)) return;
+			/* Verify location */
+			if ((ky < 0) || (ky >= Misc.SCREEN_HGT)) return;
 
-			///* Location relative to panel */
-			//kx = x - Term.offset_x;
+			/* Location relative to panel */
+			kx = x - Term.instance.offset_x;
 
-			///* Verify location */
-			//if ((kx < 0) || (kx >= SCREEN_WID)) return;
+			/* Verify location */
+			if ((kx < 0) || (kx >= Misc.SCREEN_WID)) return;
 
-			///* Get right position */
-			//vx = COL_MAP + (tile_width * kx);
-			//vy = ROW_MAP + (tile_height * ky);
+			/* Get right position */
+			vx = Misc.COL_MAP + (Term.tile_width * kx);
+			vy = Misc.ROW_MAP + (Term.tile_height * ky);
 
-			///* Hack -- Queue it */
-			//Term_queue_char(Term, vx, vy, a, c, 0, 0);
+			/* Hack -- Queue it */
+			Term.instance.queue_char(vx, vy, a, c, 0, (char)0);
 
-			//if ((tile_width > 1) || (tile_height > 1))
-			//        Term_big_queue_char(Term, vx, vy, a, c, 0, 0);
+			if((Term.tile_width > 1) || (Term.tile_height > 1)) {
+				throw new NotImplementedException();
+				//Term_big_queue_char(Term, vx, vy, a, c, 0, 0);
+			}
 		}
 
 

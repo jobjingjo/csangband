@@ -36,7 +36,7 @@ namespace CSAngband.Object {
 		Monster_Flag monster_flag;			/* Which monster flag(s) make it vulnerable */
 		Monster_Flag resist_flag;			/* Which monster flag(s) make it resist */
 		public int mult;					/* Slay multiplier */
-		string range_verb;		/* attack verb for ranged hits */
+		public string range_verb;		/* attack verb for ranged hits */
 		public string melee_verb; 	/* attack verb for melee hits */
 		string active_verb; 	/* verb for when the object is active */
 		string desc;			/* description of vulnerable creatures */

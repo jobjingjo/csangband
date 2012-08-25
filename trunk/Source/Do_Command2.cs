@@ -2967,8 +2967,7 @@ namespace CSAngband {
 			    return;
 			}
 
-			throw new NotImplementedException();
-			//ranged_helper(item, dir, range, shots, attack);
+			Attack.ranged_helper(item, dir, range, shots, attack);
 		}
 	}
 }

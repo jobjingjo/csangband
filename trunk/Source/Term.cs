@@ -1955,51 +1955,50 @@ namespace CSAngband {
 		}
 
 
-		///*
-		// * Redraw part of a window.
-		// */
-		//errr Term_redraw_section(int x1, int y1, int x2, int y2)
-		//{
-		//    int i, j;
+		/*
+		 * Redraw part of a window.
+		 */
+		public static int redraw_section(int x1, int y1, int x2, int y2)
+		{
+		    int i, j;
+			char[] c_ptr; //char*
 
-		//    char *c_ptr;
-
-		//    /* Bounds checking */
-		//    if (y2 >= instance.hgt) y2 = instance.hgt - 1;
-		//    if (x2 >= instance.wid) x2 = instance.wid - 1;
-		//    if (y1 < 0) y1 = 0;
-		//    if (x1 < 0) x1 = 0;
+		    /* Bounds checking */
+		    if (y2 >= instance.hgt) y2 = instance.hgt - 1;
+		    if (x2 >= instance.wid) x2 = instance.wid - 1;
+		    if (y1 < 0) y1 = 0;
+		    if (x1 < 0) x1 = 0;
 
 
-		//    /* Set y limits */
-		//    instance.y1 = y1;
-		//    instance.y2 = y2;
+		    /* Set y limits */
+		    instance.y1 = (byte)y1;
+		    instance.y2 = (byte)y2;
 
-		//    /* Set the x limits */
-		//    for (i = instance.y1; i <= instance.y2; i++)
-		//    {
-		//        if ((x1 > 0) && (instance.old.a[i][x1] == 255))
-		//            x1--;
+		    /* Set the x limits */
+		    for (i = instance.y1; i <= instance.y2; i++)
+		    {
+		        if ((x1 > 0) && (instance.old.a[i][x1] == (ConsoleColor)255))
+		            x1--;
 
-		//        instance.x1[i] = x1;
-		//        instance.x2[i] = x2;
+		        instance.x1[i] = (byte)x1;
+		        instance.x2[i] = (byte)x2;
 
-		//        c_ptr = instance.old.c[i];
+		        c_ptr = instance.old.c[i];
 
-		//        /* Clear the section so it is redrawn */
-		//        for (j = x1; j <= x2; j++)
-		//        {
-		//            /* Hack - set the old character to "none" */
-		//            c_ptr[j] = 0;
-		//        }
-		//    }
+		        /* Clear the section so it is redrawn */
+		        for (j = x1; j <= x2; j++)
+		        {
+		            /* Hack - set the old character to "none" */
+		            c_ptr[j] = (char)0;
+		        }
+		    }
 
-		//    /* Hack -- Refresh */
-		//    Term_fresh();
+		    /* Hack -- Refresh */
+		    fresh();
 
-		//    /* Success */
-		//    return (0);
-		//}
+		    /* Success */
+		    return (0);
+		}
 
 
 

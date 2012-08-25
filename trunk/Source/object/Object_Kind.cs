@@ -26,6 +26,7 @@ namespace CSAngband.Object
 			}
 
 			effect = Effect.XXX;
+			time = new random_value();
 		}
 		public string Name;
 		public string Text;

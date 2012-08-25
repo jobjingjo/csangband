@@ -345,84 +345,83 @@ namespace CSAngband.Monster {
 						//}
 			        } else if (effect.value == RBE.EAT_ITEM.value)
 			        {
-						throw new NotImplementedException();
-						//// Take damage
-						//take_hit(p, damage, ddesc);
+						// Take damage
+						Spell.take_hit(p, damage, ddesc);
 
-						//// Saving throw (unless paralyzed) based on dex and level
-						//if (!p.timed[TMD_PARALYZED] &&
-						//    (randint0(100) < (adj_dex_safe[p.state.stat_ind[A_DEX]] +
-						//                        p.lev)))
-						//{
-						//    // Saving throw message
-						//    msg("You grab hold of your backpack!");
+						// Saving throw (unless paralyzed) based on dex and level
+						if (p.timed[(int)Timed_Effect.PARALYZED] == 0 &&
+						    (Random.randint0(100) < (Player.Player.adj_dex_safe[p.state.stat_ind[(int)Stat.Dex]] +
+						                        p.lev)))
+						{
+						    // Saving throw message
+						    Utilities.msg("You grab hold of your backpack!");
 
-						//    // Occasional "blink" anyway
-						//    blinked = true;
+						    // Occasional "blink" anyway
+						    blinked = true;
 
-						//    // Obvious 
-						//    obvious = true;
+						    // Obvious 
+						    obvious = true;
 
-						//    // Done 
-						//    break;
-						//}
+						    // Done 
+						    break;
+						}
 
-						//// Find an item 
-						//for (k = 0; k < 10; k++)
-						//{
-						//    object_type *i_ptr;
-						//    object_type object_type_body;
+						// Find an item 
+						for (int k = 0; k < 10; k++)
+						{
+						    Object.Object i_ptr;
+						    //object_type object_type_body;
 
-						//    // Pick an item 
-						//    i = randint0(INVEN_PACK);
+						    // Pick an item 
+						    i = Random.randint0(Misc.INVEN_PACK);
 
-						//    // Obtain the item 
-						//    o_ptr = &p.inventory[i];
+						    // Obtain the item 
+						    Object.Object o_ptr = p.inventory[i];
 
-						//    // Skip non-objects 
-						//    if (!o_ptr.kind) continue;
+						    // Skip non-objects 
+						    if (o_ptr.kind == null) continue;
 
-						//    // Skip artifacts 
-						//    if (o_ptr.artifact) continue;
+						    // Skip artifacts 
+						    if (o_ptr.artifact != null) continue;
 
-						//    // Get a description 
-						//    object_desc(o_name, sizeof(o_name), o_ptr, ODESC_FULL);
+						    // Get a description 
+						    o_name = o_ptr.object_desc(Object.Object.Detail.FULL);
 
-						//    // Message 
-						//    msg("%sour %s (%c) was stolen!",
-						//                ((o_ptr.number > 1) ? "One of y" : "Y"),
-						//                o_name, index_to_label(i));
+						    // Message 
+						    Utilities.msg("{0}our {1} ({2}) was stolen!",
+						                ((o_ptr.number > 1) ? "One of y" : "Y"),
+						                o_name, Object.Object.index_to_label(i));
 
-						//    // Get local object 
-						//    i_ptr = &object_type_body;
+						    // Get local object 
+						    i_ptr = new Object.Object();//&object_type_body;
 
-						//    // Obtain local object 
-						//    object_copy(i_ptr, o_ptr);
+						    // Obtain local object 
+							i_ptr = o_ptr.copy();
 
-						//    // Modify number
-						//    i_ptr.number = 1;
+						    // Modify number
+						    i_ptr.number = 1;
 
-						//    // Hack -- If a rod, staff, or wand, allocate total
-						//    // maximum timeouts or charges between those
-						//    // stolen and those missed. -LM-
-						//    distribute_charges(o_ptr, i_ptr, 1);
+						    // Hack -- If a rod, staff, or wand, allocate total
+						    // maximum timeouts or charges between those
+						    // stolen and those missed. -LM-
+						    o_ptr.distribute_charges(i_ptr, 1);
 
-						//    // Carry the object
-						//    (void)monster_carry(m_ptr, i_ptr);
+						    // Carry the object
+						    carry(i_ptr);
 
-						//    // Steal the items
-						//    inven_item_increase(i, -1);
-						//    inven_item_optimize(i);
+						    // Steal the items
+						    Object.Object.inven_item_increase(i, -1);
+						    Object.Object.inven_item_optimize(i);
 
-						//    // Obvious
-						//    obvious = true;
+						    // Obvious
+						    obvious = true;
 
-						//    // Blink away
-						//    blinked = true;
+						    // Blink away
+						    blinked = true;
 
-						//    // Done
-						//    break;
-						//}
+						    // Done
+						    break;
+						}
 			        } else if (effect.value == RBE.EAT_FOOD.value)
 			        {
 						throw new NotImplementedException();
@@ -948,7 +947,7 @@ namespace CSAngband.Monster {
 
 					        // Message
 					        //Utilities.msg("%^s misses you.", m_name);
-							Utilities.msg("%s misses you.", m_name);
+							Utilities.msg("{0} misses you.", m_name);
 					    }
 					}
 			    }

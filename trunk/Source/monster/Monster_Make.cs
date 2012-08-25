@@ -1207,12 +1207,12 @@ namespace CSAngband.Monster {
 			    if (note != null)
 			    {
 			        /* Hack -- allow message suppression */
-			        if (note.Length <= 1)
-			        {
-			            /* Be silent */
-			        }
-
-			        else Utilities.msgt(soundfx, "%^s%s", m_name, note);
+					if(note.Length <= 1) {
+						/* Be silent */
+					} else {
+						string temp = Char.ToUpper(m_name[0]) + m_name.Substring(1);
+						Utilities.msgt(soundfx, "{0}{1}", temp, note);
+					}
 			    }
 
 			    /* Death by physical attack -- invisible monster */
@@ -1307,13 +1307,13 @@ namespace CSAngband.Monster {
 			    /* Cure a little fear */
 			    if (tmp < m_ptr.m_timed[(int)Misc.MON_TMD.FEAR])
 			        /* Reduce fear */
-			        Monster.mon_dec_timed(m_idx, (int)Misc.MON_TMD.FEAR, tmp, Misc.MON_TMD_FLG_NOMESSAGE, false);
+			        Monster.mon_dec_timed(m_idx, Misc.MON_TMD.FEAR, tmp, Misc.MON_TMD_FLG_NOMESSAGE, false);
 
 			    /* Cure all the fear */
 			    else
 			    {
 			        /* Cure fear */
-			        Monster.mon_clear_timed(m_idx, (int)Misc.MON_TMD.FEAR, Misc.MON_TMD_FLG_NOMESSAGE, false);
+			        Monster.mon_clear_timed(m_idx, Misc.MON_TMD.FEAR, Misc.MON_TMD_FLG_NOMESSAGE, false);
 
 			        /* No more fear */
 			        fear = false;
@@ -1341,7 +1341,7 @@ namespace CSAngband.Monster {
 			        /* Hack -- note fear */
 			        fear = true;
 
-			        Monster.mon_inc_timed(m_idx, (int)Misc.MON_TMD.FEAR, timer, Misc.MON_TMD_FLG_NOMESSAGE | Misc.MON_TMD_FLG_NOFAIL, false);
+			        Monster.mon_inc_timed(m_idx, Misc.MON_TMD.FEAR, timer, Misc.MON_TMD_FLG_NOMESSAGE | Misc.MON_TMD_FLG_NOFAIL, false);
 			    }
 			}
 

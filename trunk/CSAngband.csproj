@@ -274,7 +274,6 @@
     <Content Include="Source\Monster\mon-lore.h" />
     <Content Include="Source\Monster\mon-make.c" />
     <Content Include="Source\Monster\mon-make.h" />
-    <Content Include="Source\Monster\mon-msg.c" />
     <Content Include="Source\Monster\mon-util.c" />
     <Content Include="Source\Monster\mon-util.h" />
     <Content Include="Source\Monster\monster.h" />

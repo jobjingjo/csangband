@@ -147,18 +147,6 @@ void object_notice_effect(object_type *o_ptr)
 }
 
 
-/*
- * Notice stuff when firing or throwing objects.
- *
- */
-/* XXX Eddie perhaps some stuff from do_cmd_fire and do_cmd_throw should be moved here */
-void object_notice_on_firing(object_type *o_ptr)
-{
-	if (object_add_ident_flags(o_ptr, IDENT_FIRED))
-		object_check_for_ident(o_ptr);
-}
-
-
 
 /*
  * Determine whether a weapon or missile weapon is obviously {excellent} when
