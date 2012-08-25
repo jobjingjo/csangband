@@ -1660,42 +1660,41 @@ namespace CSAngband {
 		 * Rest (restores hit points and mana and such)
 		 */
 		public static void rest(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			///* 
-			// * A little sanity checking on the input - only the specified negative 
-			// * values are valid. 
-			// */
-			//if ((args[0].choice < 0) &&
-			//    ((args[0].choice != REST_COMPLETE) &&
-			//     (args[0].choice != REST_ALL_POINTS) &&
-			//     (args[0].choice != REST_SOME_POINTS))) 
-			//{
-			//    return;
-			//}
+			/* 
+			 * A little sanity checking on the input - only the specified negative 
+			 * values are valid. 
+			 */
+			if ((args[0].value < 0) &&
+			    ((args[0].value != (int)Misc.REST.COMPLETE) &&
+			     (args[0].value != (int)Misc.REST.ALL_POINTS) &&
+			     (args[0].value != (int)Misc.REST.SOME_POINTS))) 
+			{
+			    return;
+			}
 
-			///* Save the rest code */
-			//p_ptr.resting = args[0].choice;
+			/* Save the rest code */
+			Misc.p_ptr.resting = (short)args[0].value;
 
-			///* Truncate overlarge values */
-			//if (p_ptr.resting > 9999) p_ptr.resting = 9999;
+			/* Truncate overlarge values */
+			if (Misc.p_ptr.resting > 9999) Misc.p_ptr.resting = 9999;
 
-			///* Take a turn XXX XXX XXX (?) */
-			//p_ptr.energy_use = 100;
+			/* Take a turn XXX XXX XXX (?) */
+			Misc.p_ptr.energy_use = 100;
 
-			///* Cancel searching */
-			//p_ptr.searching = false;
+			/* Cancel searching */
+			Misc.p_ptr.searching = 0; //false
 
-			///* Recalculate bonuses */
-			//p_ptr.update |= (PU_BONUS);
+			/* Recalculate bonuses */
+			Misc.p_ptr.update |= (Misc.PU_BONUS);
 
-			///* Redraw the state */
-			//p_ptr.redraw |= (PR_STATE);
+			/* Redraw the state */
+			Misc.p_ptr.redraw |= (Misc.PR_STATE);
 
-			///* Handle stuff */
-			//handle_stuff(p_ptr);
+			/* Handle stuff */
+			Misc.p_ptr.handle_stuff();
 
-			///* Refresh XXX XXX XXX */
-			//Term_fresh();
+			/* Refresh XXX XXX XXX */
+			Term.fresh();
 		}
 
 
