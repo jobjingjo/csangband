@@ -722,6 +722,7 @@ namespace CSAngband.Object {
 
 			    /* Get the object */
 			    o_ptr = Object.byid((short)this_o_idx);
+				if (o_ptr == null) break;
 
 			    /* Get the next object */
 			    next_o_idx = o_ptr.next_o_idx;

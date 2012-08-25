@@ -2324,122 +2324,123 @@ namespace CSAngband {
 		 * Buy the item with the given index from the current store's inventory.
 		 */
 		public static void buy(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			//int item = args[0].item;
-			//int amt = args[1].number;
+			int item = args[0].value;
+			int amt = args[1].value;
 
-			//object_type *o_ptr;	
+			Object.Object o_ptr;	
 			//object_type object_type_body;
-			//object_type *i_ptr = &object_type_body;
+			Object.Object i_ptr = new Object.Object();//&object_type_body;
 
 			//char o_name[80];
-			//int price, item_new;
+			string o_name;
+			int price, item_new;
 
-			//struct store *store = current_store();
+			Store store = Store.current_store();
 
-			//if (!store) {
-			//    msg("You cannot purchase items when not in a store.");
-			//    return;
-			//}
+			if (store == null) {
+			    Utilities.msg("You cannot purchase items when not in a store.");
+			    return;
+			}
 
-			///* Get the actual object */
-			//o_ptr = &store.stock[item];
+			/* Get the actual object */
+			o_ptr = store.stock[item];
 
-			///* Get desired object */
-			//object_copy_amt(i_ptr, o_ptr, amt);
+			/* Get desired object */
+			Object.Object.copy_amt(ref i_ptr, o_ptr, amt);
 
-			///* Ensure we have room */
-			//if (!inven_carry_okay(i_ptr))
-			//{
-			//    msg("You cannot carry that many items.");
-			//    return;
-			//}
+			/* Ensure we have room */
+			if (!i_ptr.inven_carry_okay())
+			{
+			    Utilities.msg("You cannot carry that many items.");
+			    return;
+			}
 
-			///* Describe the object (fully) */
-			//object_desc(o_name, sizeof(o_name), i_ptr, ODESC_PREFIX | ODESC_FULL);
+			/* Describe the object (fully) */
+			o_name = i_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
 
-			///* Extract the price for the entire stack */
-			//price = price_item(i_ptr, false, i_ptr.number);
+			/* Extract the price for the entire stack */
+			price = Store.price_item(i_ptr, false, i_ptr.number);
 
-			//if (price > p_ptr.au)
-			//{
-			//    msg("You cannot afford that purchase.");
-			//    return;
-			//}
+			if (price > Misc.p_ptr.au)
+			{
+			    Utilities.msg("You cannot afford that purchase.");
+			    return;
+			}
 
-			///* Spend the money */
-			//p_ptr.au -= price;
+			/* Spend the money */
+			Misc.p_ptr.au -= price;
 
-			///* Update the display */
-			//store_flags |= STORE_GOLD_CHANGE;
+			/* Update the display */
+			Store.store_flags |= Store.STORE_GOLD_CHANGE;
 
-			///* ID objects on buy */
-			//object_notice_everything(i_ptr);
+			/* ID objects on buy */
+			i_ptr.notice_everything();
 
-			///* Combine / Reorder the pack (later) */
-			//p_ptr.notice |= (PN_COMBINE | PN_REORDER | PN_SORT_QUIVER | PN_SQUELCH);
+			/* Combine / Reorder the pack (later) */
+			Misc.p_ptr.notice |= (Misc.PN_COMBINE | Misc.PN_REORDER | Misc.PN_SORT_QUIVER | Misc.PN_SQUELCH);
 
-			///* The object no longer belongs to the store */
-			//i_ptr.ident &= ~(IDENT_STORE);
+			/* The object no longer belongs to the store */
+			i_ptr.ident &= ~(Object.Object.IDENT_STORE);
 
-			///* Message */
-			//if (one_in_(3)) msgt(MSG_STORE5, "%s", ONE_OF(comment_accept));
-			//msg("You bought %s for %ld gold.", o_name, (long)price);
+			/* Message */
+			if (Random.one_in_(3)) Utilities.msgt(Message_Type.MSG_STORE5, "{0}", Store.comment_accept[Random.randint0(Store.comment_accept.Length)]);
+			Utilities.msg("You bought {0} for {1} gold.", o_name, (long)price);
 
-			///* Erase the inscription */
-			//i_ptr.note = 0;
+			/* Erase the inscription */
+			i_ptr.note = null;
 
-			///* Give it to the player */
-			//item_new = inven_carry(p_ptr, i_ptr);
+			/* Give it to the player */
+			item_new = i_ptr.inven_carry(Misc.p_ptr);
 
-			///* Message */
-			//object_desc(o_name, sizeof(o_name), &p_ptr.inventory[item_new],
-			//            ODESC_PREFIX | ODESC_FULL);
-			//msg("You have %s (%c).", o_name, index_to_label(item_new));
 
-			///* Hack - Reduce the number of charges in the original stack */
-			//if (o_ptr.tval == TV_WAND || o_ptr.tval == TV_STAFF)
-			//{
-			//    o_ptr.pval[DEFAULT_PVAL] -= i_ptr.pval[DEFAULT_PVAL];
-			//}
+			/* Message */
+			o_name = Misc.p_ptr.inventory[item_new].object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
+			Utilities.msg("You have {0} ({1}).", o_name, Object.Object.index_to_label(item_new));
 
-			///* Handle stuff */
-			//handle_stuff(p_ptr);
+			/* Hack - Reduce the number of charges in the original stack */
+			if (o_ptr.tval == TVal.TV_WAND || o_ptr.tval == TVal.TV_STAFF)
+			{
+			    o_ptr.pval[Misc.DEFAULT_PVAL] -= i_ptr.pval[Misc.DEFAULT_PVAL];
+			}
 
-			///* Remove the bought objects from the store */
-			//store_item_increase(store, item, -amt);
-			//store_item_optimize(store, item);
+			/* Handle stuff */
+			Misc.p_ptr.handle_stuff();
 
-			///* Store is empty */
-			//if (store.stock_num == 0)
-			//{
-			//    int i;
+			/* Remove the bought objects from the store */
+			
+			store.item_increase(item, -amt);
+			store.item_optimize(item);
 
-			//    /* Shuffle */
-			//    if (one_in_(STORE_SHUFFLE))
-			//    {
-			//        /* Message */
-			//        msg("The shopkeeper retires.");
+			/* Store is empty */
+			if (store.stock_num == 0)
+			{
+			    int i;
 
-			//        /* Shuffle the store */
-			//        store_shuffle(store);
-			//        store_flags |= STORE_FRAME_CHANGE;
-			//    }
+			    /* Shuffle */
+			    if (Random.one_in_(Store.SHUFFLE))
+			    {
+			        /* Message */
+			        Utilities.msg("The shopkeeper retires.");
 
-			//    /* Maintain */
-			//    else
-			//    {
-			//        /* Message */
-			//        msg("The shopkeeper brings out some new stock.");
-			//    }
+			        /* Shuffle the store */
+			        store.store_shuffle();
+			        Store.store_flags |= Store.STORE_FRAME_CHANGE;
+			    }
 
-			//    /* New inventory */
-			//    for (i = 0; i < 10; ++i)
-			//        store_maint(store);
-			//}
+			    /* Maintain */
+			    else
+			    {
+			        /* Message */
+			        Utilities.msg("The shopkeeper brings out some new stock.");
+			    }
 
-			//event_signal(EVENT_INVENTORY);
-			//event_signal(EVENT_EQUIPMENT);
+			    /* New inventory */
+			    for (i = 0; i < 10; ++i)
+			        store.store_maint();
+			}
+
+			Game_Event.signal(Game_Event.Event_Type.INVENTORY);
+			Game_Event.signal(Game_Event.Event_Type.EQUIPMENT);
 		}
 
 		/*

@@ -312,10 +312,9 @@ namespace CSAngband {
 		 */
 		static int cmp_object_trait(int bonus, random_value Base)
 		{
-			throw new NotImplementedException();
-			//int amt = randcalc(base, 0, MINIMISE);
-			//if (amt > 0) amt = 0;
-			//return CMP(bonus, amt);
+			int amt = Random.randcalc(Base, 0, aspect.MINIMISE);
+			if (amt > 0) amt = 0;
+			return Basic.CMP(bonus, amt);
 		}
 
 		/**
@@ -327,12 +326,11 @@ namespace CSAngband {
 		 */
 		static int is_object_good(Object.Object o_ptr)
 		{
-			throw new NotImplementedException();
-			//int good = 0;
-			//good += 4 * cmp_object_trait(o_ptr.to_d, o_ptr.kind.to_d);
-			//good += 2 * cmp_object_trait(o_ptr.to_h, o_ptr.kind.to_h);
-			//good += 1 * cmp_object_trait(o_ptr.to_a, o_ptr.kind.to_a);
-			//return good;
+			int good = 0;
+			good += 4 * cmp_object_trait(o_ptr.to_d, o_ptr.kind.to_d);
+			good += 2 * cmp_object_trait(o_ptr.to_h, o_ptr.kind.to_h);
+			good += 1 * cmp_object_trait(o_ptr.to_a, o_ptr.kind.to_a);
+			return good;
 		}
 
 

@@ -241,7 +241,9 @@ namespace CSAngband {
 
 		public Game_Command(Command_Code cmd, cmd_arg_type[] args, cmd_handler_fn func, bool r, int ar) {
 			this.command = cmd;
-			this.arg_type = args;
+			for(int i = 0; args != null && i < args.Length; i++) {
+				this.arg_type[i] = args[i];
+			}
 			this.fn = func;
 			this.repeat_allowed = r;
 			this.nrepeats = ar;
@@ -249,7 +251,7 @@ namespace CSAngband {
 
 		public Game_Command() {
 			this.command = Command_Code.NULL;
-			this.arg_type = new cmd_arg_type[]{cmd_arg_type.arg_NONE};
+			this.arg_type = new cmd_arg_type[]{cmd_arg_type.arg_NONE, cmd_arg_type.arg_NONE};
 			this.fn = null;
 			this.repeat_allowed = false;
 			this.nrepeats = 0;
