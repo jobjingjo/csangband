@@ -582,16 +582,15 @@ namespace CSAngband.Monster {
 						//update_smart_learn(m_ptr, p, OF_RES_BLIND);
 			        } else if (effect.value == RBE.CONFUSE.value)
 			        {
-						throw new NotImplementedException();
-						//// Take damage
-						//take_hit(p, damage, ddesc);
+						// Take damage
+						Spell.take_hit(p, damage, ddesc);
 
-						//// Increase "confused"
-						//if (player_inc_timed(p, TMD_CONFUSED, 3 + randint1(rlev), true, true))
-						//    obvious = true;
+						// Increase "confused"
+						if (p.inc_timed(Timed_Effect.CONFUSED, 3 + Random.randint1(rlev), true, true))
+						    obvious = true;
 
-						//// Learn about the player
-						//update_smart_learn(m_ptr, p, OF_RES_CONFU);
+						// Learn about the player
+						update_smart_learn(p, Object.Object_Flag.RES_CONFU.value);
 			        } else if (effect.value == RBE.TERRIFY.value)
 			        {
 						throw new NotImplementedException();
@@ -894,7 +893,7 @@ namespace CSAngband.Monster {
 
 						// Apply the cut
 						if (k != 0) {
-							p.inc_timed((int)Timed_Effect.CUT, k, true, true);
+							p.inc_timed(Timed_Effect.CUT, k, true, true);
 						}
 			        }
 
@@ -921,7 +920,7 @@ namespace CSAngband.Monster {
 
 						// Apply the stun
 						if (k != 0){
-							p.inc_timed((int)Timed_Effect.STUN, k, true, true);
+							p.inc_timed(Timed_Effect.STUN, k, true, true);
 						}
 			        }
 			    }

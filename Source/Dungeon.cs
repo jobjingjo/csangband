@@ -1061,7 +1061,7 @@ namespace CSAngband {
 			        Cave.disturb(Misc.p_ptr, 1, 0);
 
 			        /* Faint (bypass free action) */
-			        Misc.p_ptr.inc_timed((int)Timed_Effect.PARALYZED, 1 + Random.randint0(5), true, false);
+			        Misc.p_ptr.inc_timed(Timed_Effect.PARALYZED, 1 + Random.randint0(5), true, false);
 			    }
 			}
 

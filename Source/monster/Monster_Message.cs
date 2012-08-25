@@ -187,134 +187,223 @@ namespace CSAngband.Monster {
 		 */
 		static void flush_monster_messages(bool delay)
 		{
-			throw new NotImplementedException();
-		   //int i, r_idx, count;
-		   //monster_race *r_ptr;
-		   //char buf[512];
-		   //char *action;
-		   //bool action_only;
+			int i, r_idx, count;
+			Monster_Race r_ptr;
+			//char buf[512];
+			string buf;
+			string action;
+			bool action_only;
 
-		   ///* We use either ascii or system-specific encoding */
-		   //int encoding = (OPT(xchars_to_file)) ? SYSTEM_SPECIFIC : ASCII;
+			/* We use either ascii or system-specific encoding */
+			//int encoding = (Option.xchars_to_file.value) ? SYSTEM_SPECIFIC : ASCII;
 
-		   ///* Show every message */
-		   //for (i = 0; i < size_mon_msg; i++)
-		   //{
-		   //    if (mon_msg[i].delay != delay) continue;
+			/* Show every message */
+			for (i = 0; i < size_mon_msg; i++)
+			{
+		       if (mon_msg[i].delay != delay) continue;
    
-		   //    /* Cache the monster count */
-		   //    count = mon_msg[i].mon_count;
+		       /* Cache the monster count */
+		       count = mon_msg[i].mon_count;
  
-		   //    /* Paranoia */
-		   //    if (count < 1) continue;
+		       /* Paranoia */
+		       if (count < 1) continue;
 
-		   //    /* Start with an empty string */
-		   //    buf[0] = '\0';
+		       /* Start with an empty string */
+		       buf = "";
 
-		   //    /* Cache the race index */
-		   //    r_idx = mon_msg[i].mon_race;
+		       /* Cache the race index */
+		       r_idx = mon_msg[i].mon_race;
            
-		   //    /* Get the proper message action */
-		   //    action = get_mon_msg_action(mon_msg[i].msg_code, (count > 1),
-		   //             &r_info[r_idx]);
+		       /* Get the proper message action */
+		       action = get_mon_msg_action((byte)mon_msg[i].msg_code, (count > 1), Misc.r_info[r_idx]);
 
-		   //    /* Is it a regular race? */
-		   //    if (r_idx > 0)
-		   //    {
-		   //        /* Get the race */
-		   //        r_ptr = &r_info[r_idx];
-		   //    }
-		   //    /* It's the special mark for non-visible monsters */
-		   //    else
-		   //    {
-		   //        /* No race */
-		   //        r_ptr = null;
-		   //    }
+		       /* Is it a regular race? */
+		       if (r_idx > 0)
+		       {
+		           /* Get the race */
+		           r_ptr = Misc.r_info[r_idx];
+		       }
+		       /* It's the special mark for non-visible monsters */
+		       else
+		       {
+		           /* No race */
+		           r_ptr = null;
+		       }
 
-		   //    /* Monster is marked as invisible */
-		   //    if(mon_msg[i].mon_flags & 0x04) r_ptr = null;
+		       /* Monster is marked as invisible */
+		       if((mon_msg[i].mon_flags & 0x04) != 0) r_ptr = null;
 	   
-		   //    /* Special message? */
-		   //    action_only = (*action == '~');
+		       /* Special message? */
+		       action_only = (action[0] == '~');
 
-		   //    /* Format the proper message for visible monsters */
-		   //    if (r_ptr && !action_only)
-		   //    {
-		   //        char race_name[80];
- 
-		   //        /* Get the race name */
-		   //        my_strcpy(race_name, r_ptr.name, sizeof(race_name));
+		       /* Format the proper message for visible monsters */
+		       if (r_ptr != null && !action_only)
+		       {
+		           /* Get the race name */
+				   string race_name = r_ptr.Name;
 
-		   //        /* Uniques */
-		   //        if (rf_has(r_ptr.flags, RF_UNIQUE))
-		   //        {
-		   //            /* Just copy the race name */
-		   //            my_strcpy(buf, (r_ptr.name), sizeof(buf));
-		   //        }
-		   //        /* We have more than one monster */
-		   //        else if (count > 1)
-		   //        {
-		   //            /* Get the plural of the race name */
-		   //            plural_aux(race_name, sizeof(race_name));
+		           /* Uniques */
+		           if (r_ptr.flags.has(Monster_Flag.UNIQUE.value))
+		           {
+		               /* Just copy the race name */
+					   buf = r_ptr.Name;
+		           }
+		           /* We have more than one monster */
+		           else if (count > 1)
+		           {
+		               /* Get the plural of the race name */
+		               race_name = Monster.plural_aux(race_name);
 
-		   //            /* Put the count and the race name together */
-		   //            strnfmt(buf, sizeof(buf), "%d %s", count, race_name);
-		   //        }
-		   //        /* Normal lonely monsters */
-		   //        else
-		   //        {
-		   //            /* Just add a slight flavor */
-		   //            strnfmt(buf, sizeof(buf), "the %s", race_name);
-		   //        }
+		               /* Put the count and the race name together */
+					   buf = String.Format("{0} {1}", count, race_name);
+		           }
+		           /* Normal lonely monsters */
+		           else
+		           {
+		               /* Just add a slight flavor */
+					   buf = String.Format("the {0}", race_name);
+		           }
 
-		   //    }
-		   //    /* Format the message for non-viewable monsters if necessary */
-		   //    else if (!r_ptr && !action_only)
-		   //    {
-		   //        if (count > 1)
-		   //        {
-		   //            /* Show the counter */
-		   //            strnfmt(buf, sizeof(buf), "%d monsters", count);
-		   //        }
-		   //        else
-		   //        {
-		   //            /* Just one non-visible monster */
-		   //            my_strcpy(buf, "it", sizeof(buf));
-		   //        }
-		   //    }
+		       }
+		       /* Format the message for non-viewable monsters if necessary */
+		       else if (r_ptr == null && !action_only)
+		       {
+		           if (count > 1)
+		           {
+		               /* Show the counter */
+					   buf = String.Format("{0} monsters", count);
+		           }
+		           else
+		           {
+		               /* Just one non-visible monster */
+					   buf = "it";
+		           }
+		       }
 
-		   //    /* Special message. Nuke the mark */
-		   //    if (action_only)
-		   //    {   
-		   //        ++action;
-		   //    }
-		   //    /* Regular message */
-		   //    else
-		   //    {
-		   //        /* Add special mark. Monster is offscreen */
-		   //        if (mon_msg[i].mon_flags & 0x02) my_strcat(buf, " (offscreen)", sizeof(buf));
+		       /* Special message. Nuke the mark */
+		       if (action_only)
+		       {   
+		           action = action.Substring(1);
+		       }
+		       /* Regular message */
+		       else
+		       {
+		           /* Add special mark. Monster is offscreen */
+		           if ((mon_msg[i].mon_flags & 0x02) != 0) buf += " (offscreen)";
         
-		   //        /* Add the separator */
-		   //        my_strcat(buf, " ", sizeof(buf));
+		           /* Add the separator */
+				   buf += " ";
+		       }
+
+		       /* Append the action to the message */
+				buf += action;
+       
+		       /* Translate to accented characters */
+		       /* Translate the note to the desired encoding */
+		       //xstr_trans(buf, encoding);
+
+		       /* Capitalize the message */
+		       buf = Char.ToUpper(buf[0]) + buf.Substring(1);
+
+		       /* Hack - play sound for fear message */
+				//Nick: How about later...
+				//if (mon_msg[i].msg_code == MON_MSG_FLEE_IN_TERROR)
+			   //     sound(MSG_FLEE);
+	   
+		       /* Show the message */
+		       Utilities.msg(buf);
+		   }
+		}
+
+		/*
+		 * Returns a pointer to a statically allocatted string containing a formatted
+		 * message based on the given message code and the quantity flag.
+		 * The contents of the returned value will change with the next call
+		 * to this function
+		 */
+		static string get_mon_msg_action(byte msg_code, bool do_plural, Monster_Race race)
+		{
+			throw new NotImplementedException();
+		   // static char buf[200];
+		   // const char *action = msg_repository[msg_code];
+		   // u16b n = 0;
+
+		   // /* Regular text */
+		   // byte flag = 0;
+
+		   // assert(race.base && race.base.pain);
+
+		   // if (race.base && race.base.pain) {
+		   //     switch (msg_code) {
+		   //         case MON_MSG_95: action = race.base.pain.messages[0];
+		   //             break;
+		   //         case MON_MSG_75: action = race.base.pain.messages[1];
+		   //             break;
+		   //         case MON_MSG_50: action = race.base.pain.messages[2];
+		   //             break;
+		   //         case MON_MSG_35: action = race.base.pain.messages[3];
+		   //             break;
+		   //         case MON_MSG_20: action = race.base.pain.messages[4];
+		   //             break;
+		   //         case MON_MSG_10: action = race.base.pain.messages[5];
+		   //             break;
+		   //         case MON_MSG_0: action = race.base.pain.messages[6];
+		   //             break;
+		   //     }
+		   // }
+
+		   ///* Put the message characters in the buffer */
+		   //for (; *action; action++)
+		   //{
+		   //    /* Check available space */
+		   //    if (n >= (sizeof(buf) - 1)) break;
+
+		   //    /* Are we parsing a quantity modifier? */
+		   //    if (flag)
+		   //    {
+		   //        /* Check the presence of the modifier's terminator */
+		   //        if (*action == ']')
+		   //        {
+		   //            /* Go back to parsing regular text */
+		   //            flag = 0;
+
+		   //            /* Skip the mark */
+		   //            continue;
+		   //        }
+
+		   //        /* Check if we have to parse the plural modifier */
+		   //        if (*action == '|')
+		   //        {
+		   //            /* Switch to plural modifier */
+		   //            flag = PLURAL_MON;
+
+		   //            /* Skip the mark */
+		   //            continue;
+		   //        }
+
+		   //        /* Ignore the character if we need the other part */
+		   //        if ((flag == PLURAL_MON) != do_plural) continue;
+		   //    }
+           
+		   //    /* Do we need to parse a new quantity modifier? */
+		   //    else if (*action == '[')
+		   //    {
+		   //        /* Switch to singular modifier */
+		   //        flag = SINGULAR_MON;
+    
+		   //        /* Skip the mark */
+		   //        continue;
 		   //    }
 
-		   //    /* Append the action to the message */
-		   //    my_strcat(buf, action, sizeof(buf));
-       
-		   //    /* Translate to accented characters */
-		   //    /* Translate the note to the desired encoding */
-		   //    xstr_trans(buf, encoding);
-
-		   //    /* Capitalize the message */
-		   //    *buf = my_toupper((unsigned char)*buf);
-
-		   //    /* Hack - play sound for fear message */
-		   //    if (mon_msg[i].msg_code == MON_MSG_FLEE_IN_TERROR)
-		   //         sound(MSG_FLEE);
-	   
-		   //    /* Show the message */
-		   //    msg(buf);
+		   //    /* Append the character to the buffer */
+		   //    buf[n++] = *action;
 		   //}
+
+		   ///* Terminate the buffer */
+		   //buf[n] = '\0';
+
+		   ///* Done */
+		   //return (buf);
 		}
 
 

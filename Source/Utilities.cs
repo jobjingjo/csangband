@@ -1804,7 +1804,7 @@ namespace CSAngband {
 			    }
 
 			    /* Build the default */
-				buf = String.Format("%d", amt);
+				buf = String.Format("{0}", amt);
 
 			    /* Ask for a quantity */
 			    if (!get_string(prompt, ref buf, 7)) return (0);
