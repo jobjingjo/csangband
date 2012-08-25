@@ -502,7 +502,7 @@ namespace CSAngband.Object {
 		            case (keycode_t)'7': case (keycode_t)'8': case (keycode_t)'9':
 		            {
 		                /* Look up the tag */
-		                if (get_tag(ref k, (char)which.code, cmd, quiver_tags) == 0)
+		                if (!get_tag(ref k, (char)which.code, cmd, quiver_tags))
 		                {
 		                    Utilities.bell("Illegal object choice (tag)!");
 		                    break;
@@ -1167,68 +1167,69 @@ namespace CSAngband.Object {
 		 * Also, the tag "@xn" will work as well, where "n" is a tag-char,
 		 * and "x" is the action that tag will work for.
 		 */
-		static int get_tag(ref int cp, char tag, Command_Code cmd, bool quiver_tags)
+		static bool get_tag(ref int cp, char tag, Command_Code cmd, bool quiver_tags)
 		{
-			throw new NotImplementedException();
-			//int i;
-			//const char *s;
+			int i;
 
-			///* (f)ire is handled differently from all others, due to the quiver */
-			//if (quiver_tags)
-			//{
-			//    i = QUIVER_START + tag - '0';
-			//    if (p_ptr.inventory[i].kind)
-			//    {
-			//        *cp = i;
-			//        return (true);
-			//    }
-			//    return (false);
-			//}
+			/* (f)ire is handled differently from all others, due to the quiver */
+			if (quiver_tags)
+			{
+			    i = Misc.QUIVER_START + tag - '0';
+			    if (Misc.p_ptr.inventory[i].kind != null)
+			    {
+			        cp = i;
+			        return (true);
+			    }
+			    return (false);
+			}
 
-			///* Check every object */
-			//for (i = 0; i < ALL_INVEN_TOTAL; ++i)
-			//{
-			//    object_type *o_ptr = &p_ptr.inventory[i];
+			/* Check every object */
+			for (i = 0; i < Misc.ALL_INVEN_TOTAL; ++i)
+			{
+			    Object o_ptr = Misc.p_ptr.inventory[i];
 
-			//    /* Skip non-objects */
-			//    if (!o_ptr.kind) continue;
+			    /* Skip non-objects */
+			    if (o_ptr.kind == null) continue;
 
-			//    /* Skip empty inscriptions */
-			//    if (!o_ptr.note) continue;
+			    /* Skip empty inscriptions */
+			    if (o_ptr.note == null) continue;
 
-			//    /* Find a '@' */
-			//    s = strchr(quark_str(o_ptr.note), '@');
+			    /* Find a '@' */
+				string[] tags = o_ptr.note.ToString().Split('@');
+				int tagat = 0;
+				//strchr(quark_str(o_ptr.note), '@');
 
-			//    /* Process all tags */
-			//    while (s)
-			//    {
-			//        /* Check the normal tags */
-			//        if (s[1] == tag)
-			//        {
-			//            /* Save the actual inventory ID */
-			//            *cp = i;
+			    /* Process all tags */
+			    while (tagat < tags.Length)
+			    {
+					string s = tags[tagat++];
+			        /* Check the normal tags */
+			        if (s[0] == tag)
+			        {
+			            /* Save the actual inventory ID */
+			            cp = i;
 
-			//            /* Success */
-			//            return (true);
-			//        }
+			            /* Success */
+			            return (true);
+			        }
 
-			//        /* Check the special tags */
-			//        if ((cmd_lookup(s[1]) == cmd) && (s[2] == tag))
-			//        {
-			//            /* Save the actual inventory ID */
-			//            *cp = i;
+			        /* Check the special tags */
+			        if ((Command.lookup(s[1]) == cmd) && (s[2] == tag))
+			        {
+			            /* Save the actual inventory ID */
+			            cp = i;
 
-			//            /* Success */
-			//            return (true);
-			//        }
+			            /* Success */
+			            return (true);
+			        }
 
-			//        /* Find another '@' */
-			//        s = strchr(s + 1, '@');
-			//    }
-			//}
+			        /* Find another '@' */
+			        //s = strchr(s + 1, '@');
+			    }
+			}
 
-			///* No such tag */
-			//return (false);
+			/* No such tag */
+			return (false);
 		}
 
 		/*
