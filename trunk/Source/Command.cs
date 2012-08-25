@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CSAngband.Object;
 
 namespace CSAngband {
 	class Command {
@@ -510,116 +511,124 @@ namespace CSAngband {
 		 */
 		static void py_pickup_gold()
 		{
-			throw new NotImplementedException();
-			//int py = p_ptr.py;
-			//int px = p_ptr.px;
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
 
-			//s32b total_gold = 0L;
-			//byte *treasure;
+			int total_gold = 0;
+			byte[] treasure;
 
-			//s16b this_o_idx = 0;
-			//s16b next_o_idx = 0;
+			short this_o_idx = 0;
+			short next_o_idx = 0;
 
-			//object_type *o_ptr;
+			Object.Object o_ptr;
 
-			//int sound_msg;
-			//bool verbal = false;
+			Message_Type sound_msg;
+			bool verbal = false;
 
-			///* Allocate an array of ordinary gold objects */
-			//treasure = C_ZNEW(SV_GOLD_MAX, byte);
+			/* Allocate an array of ordinary gold objects */
+			treasure = new byte[(int)Object.SVal.sval_gold.SV_GOLD_MAX];
 
 
-			///* Pick up all the ordinary gold objects */
-			//for (this_o_idx = cave.o_idx[py][px]; this_o_idx; this_o_idx = next_o_idx)
-			//{
-			//    /* Get the object */
-			//    o_ptr = object_byid(this_o_idx);
+			/* Pick up all the ordinary gold objects */
+			for (this_o_idx = Cave.cave.o_idx[py][px]; this_o_idx != 0; this_o_idx = next_o_idx)
+			{
+			    /* Get the object */
+			    o_ptr = Object.Object.byid(this_o_idx);
 
-			//    /* Get the next object */
-			//    next_o_idx = o_ptr.next_o_idx;
+			    /* Get the next object */
+			    next_o_idx = o_ptr.next_o_idx;
 
-			//    /* Ignore if not legal treasure */
-			//    if ((o_ptr.tval != TV_GOLD) ||
-			//        (o_ptr.sval >= SV_GOLD_MAX)) continue;
+			    /* Ignore if not legal treasure */
+			    if ((o_ptr.tval != TVal.TV_GOLD) ||
+			        (o_ptr.sval >= (int)SVal.sval_gold.SV_GOLD_MAX)) continue;
 
-			//    /* Note that we have this kind of treasure */
-			//    treasure[o_ptr.sval]++;
+			    /* Note that we have this kind of treasure */
+			    treasure[o_ptr.sval]++;
 
-			//    /* Remember whether feedback message is in order */
-			//    if (!squelch_item_ok(o_ptr))
-			//        verbal = true;
+			    /* Remember whether feedback message is in order */
+			    if (!Squelch.item_ok(o_ptr))
+			        verbal = true;
 
-			//    /* Increment total value */
-			//    total_gold += (s32b)o_ptr.pval[DEFAULT_PVAL];
+			    /* Increment total value */
+			    total_gold += (int)o_ptr.pval[Misc.DEFAULT_PVAL];
 
-			//    /* Delete the gold */
-			//    delete_object_idx(this_o_idx);
-			//}
+			    /* Delete the gold */
+			    Object.Object.delete_object_idx(this_o_idx);
+			}
 
-			///* Pick up the gold, if present */
-			//if (total_gold)
-			//{
-			//    char buf[1024];
-			//    char tmp[80];
-			//    int i, count, total;
-			//    object_kind *kind;
+			/* Pick up the gold, if present */
+			if (total_gold != 0)
+			{
+				//char buf[1024];
+				//char tmp[80];
+				string buf;
+				string tmp;
+			    int i, count, total;
+			    Object_Kind kind;
 
-			//    /* Build a message */
-			//    (void)strnfmt(buf, sizeof(buf), "You have found %ld gold pieces worth of ", (long)total_gold);
+			    /* Build a message */
+				buf = String.Format("You have found {0} gold pieces worth of ", total_gold);
 
-			//    /* Count the types of treasure present */
-			//    for (total = 0, i = 0; i < SV_GOLD_MAX; i++)
-			//    {
-			//        if (treasure[i]) total++;
-			//    }
+			    /* Count the types of treasure present */
+			    for (total = 0, i = 0; i < (int)SVal.sval_gold.SV_GOLD_MAX; i++)
+			    {
+			        if (treasure[i] != 0) total++;
+			    }
 
-			//    /* List the treasure types */
-			//    for (count = 0, i = 0; i < SV_GOLD_MAX; i++)
-			//    {
-			//        /* Skip if no treasure of this type */
-			//        if (!treasure[i]) continue;
+			    /* List the treasure types */
+			    for (count = 0, i = 0; i < (int)SVal.sval_gold.SV_GOLD_MAX; i++)
+			    {
+			        /* Skip if no treasure of this type */
+			        if (treasure[i] == 0) continue;
 
-			//        /* Get this object index */
-			//        kind = lookup_kind(TV_GOLD, i);
-			//        if (!kind) continue;
+			        /* Get this object index */
+			        kind = Object_Kind.lookup_kind(TVal.TV_GOLD, i);
+			        if (kind == null) continue;
 
-			//        /* Get the object name */
-			//        object_kind_name(tmp, sizeof tmp, kind, true);
+			        /* Get the object name */
+			        tmp = Object.Object.object_kind_name(kind, true);
 
-			//        /* Build up the pickup string */
-			//        my_strcat(buf, tmp, sizeof(buf));
+					/* Build up the pickup string */
+					buf = buf + tmp;
+			        
+			        /* Added another kind of treasure */
+			        count++;
 
-			//        /* Added another kind of treasure */
-			//        count++;
+			        /* Add a comma if necessary */
+					if((total > 2) && (count < total)) {
+						buf += ",";
+					}
 
-			//        /* Add a comma if necessary */
-			//        if ((total > 2) && (count < total)) my_strcat(buf, ",", sizeof(buf));
+			        /* Add an "and" if necessary */
+					if((total >= 2) && (count == total - 1)) {
+						buf += " and";
+					}
 
-			//        /* Add an "and" if necessary */
-			//        if ((total >= 2) && (count == total-1)) my_strcat(buf, " and", sizeof(buf));
+			        /* Add a space or period if necessary */
+					if(count < total) {
+						buf += " ";
+					} else {
+						buf += ".";
+					}
+			    }
 
-			//        /* Add a space or period if necessary */
-			//        if (count < total) my_strcat(buf, " ", sizeof(buf));
-			//        else               my_strcat(buf, ".", sizeof(buf));
-			//    }
+			    /* Determine which sound to play */
+			    if      (total_gold < 200) sound_msg = Message_Type.MSG_MONEY1;
+			    else if (total_gold < 600) sound_msg = Message_Type.MSG_MONEY2;
+			    else                       sound_msg = Message_Type.MSG_MONEY3;
 
-			//    /* Determine which sound to play */
-			//    if      (total_gold < 200) sound_msg = MSG_MONEY1;
-			//    else if (total_gold < 600) sound_msg = MSG_MONEY2;
-			//    else                       sound_msg = MSG_MONEY3;
+			    /* Display the message */
+			    if (verbal)
+			        Utilities.msgt(sound_msg, "{0}", buf);
 
-			//    /* Display the message */
-			//    if (verbal)
-			//        msgt(sound_msg, "%s", buf);
+			    /* Add gold to purse */
+			    Misc.p_ptr.au += total_gold;
 
-			//    /* Add gold to purse */
-			//    p_ptr.au += total_gold;
+			    /* Redraw gold */
+			    Misc.p_ptr.redraw |= (Misc.PR_GOLD);
+			}
 
-			//    /* Redraw gold */
-			//    p_ptr.redraw |= (PR_GOLD);
-			//}
-
-			///* Free the gold array */
+			/* Free the gold array */
 			//FREE(treasure);
 		}
 
