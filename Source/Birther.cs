@@ -364,9 +364,12 @@ namespace CSAngband {
 			    num = is_ammo ? o_ptr.number : 1;
 
 			    /* Get local object */
-			    //i_ptr = object_type_body;
-				p.inventory[slot] = o_ptr; //object_copy(i_ptr, o_ptr); //This might not work...
-				i_ptr = o_ptr;  //If wonky equips happen, check here
+				i_ptr = new Object.Object();
+				i_ptr = o_ptr.copy();
+				//This entire bit was uber shadey... Rewrote above
+				////i_ptr = object_type_body;
+				//p.inventory[slot] = o_ptr; //object_copy(i_ptr, o_ptr); //This might not work...
+				//i_ptr = o_ptr;  //If wonky equips happen, check here
 
 			    /* Modify quantity */
 			    i_ptr.number = (byte)num;
