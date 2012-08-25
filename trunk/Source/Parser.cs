@@ -82,6 +82,18 @@ namespace CSAngband {
 			}
 
 			string[] tok = line.Split(new char[]{':'});
+			//If we have an empty, remove it and add ":" to the next entry
+			//This also has the side effect of concatinating two empties into a single :, which is what we want.
+			//since two empties means it was a ":::" which mean a ":" char.
+			List<string> temp_tok = new List<string>(tok);
+			for(int i = 0; i < temp_tok.Count() - 1; i++) {
+				if(temp_tok[i].Length == 0) {
+					temp_tok[i + 1] = ":" + temp_tok[i + 1];
+					temp_tok.RemoveAt(i);
+				}
+			}
+			tok = temp_tok.ToArray();
+
 			int tat = 0;
 
 			if (tok.Length == 0) {
@@ -111,8 +123,10 @@ namespace CSAngband {
 				PARSE_T type = s.type & ~PARSE_T.OPT;
 
 				if(type == PARSE_T.INT) {
-					int t;
-					if(!Int32.TryParse(val, out t)) {
+					int t = 0;
+					if(val.StartsWith("0x")) {
+						t = Convert.ToInt32(val.Substring(2), 16);
+					} else if(!Int32.TryParse(val, out t)) {
 						return Error.INVALID_VALUE;
 					}
 					v.value = t;
@@ -381,8 +395,13 @@ namespace CSAngband {
 			FileStream fs = File.OpenRead(path);
 
 			StreamReader sr = new StreamReader(fs);
+			int line_number = 0;
 			while(!sr.EndOfStream) {
-				Parse(sr.ReadLine());
+				string line = sr.ReadLine();
+				line_number++;
+				if(Parse(line) != Error.NONE) {
+					throw new Exception("Error parsing file!");
+				}
 			}
 
 			fs.Close();

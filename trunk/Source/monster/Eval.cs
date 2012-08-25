@@ -107,6 +107,7 @@ namespace CSAngband.Monster {
 
 			/* Check attacks */
 			for(i = 0; i < 4; i++) {
+				if (r_ptr.blow[i] == null) continue;
 				/* Extract the attack infomation */
 				Monster_Blow.RBE effect = r_ptr.blow[i].effect;
 				Monster_Blow.RBM method = r_ptr.blow[i].method;

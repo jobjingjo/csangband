@@ -801,16 +801,6 @@ static int stats_dump_lists(void)
 		null
 	};
 
-	struct mon_spell mon_spell_table[] =
-	{
-		#define RSF(a, b, c, d, e, f, g, h, i, j, k, l, m) \
-			{ RSF_##a, b, #a, d, e, f, g, h, i, j, k, l, m },
-		#define RV(b, x, y, m) {b, x, y, m}
-		#include "monster/list-mon-spells.h"
-		#undef RV
-		#undef RSF
-	};
-
 	struct object_flag object_flag_table[] =
 	{
 		#define OF(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s) \

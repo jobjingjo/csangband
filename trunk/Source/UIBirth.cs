@@ -219,22 +219,18 @@ namespace CSAngband {
 		}
 
 		static string get_pflag_desc(int flag) {
-			throw new NotImplementedException();
-			//switch (flag)
-			//{
-			//    case PF_EXTRA_SHOT: return "Gains extra shots with bow";
-			//    case PF_BRAVERY_30: return "Gains immunity to fear";
-			//    case PF_BLESS_WEAPON: return "Prefers blunt/blessed weapons";
-			//    case PF_CUMBER_GLOVE: return null;
-			//    case PF_ZERO_FAIL: return "Advanced spellcasting";
-			//    case PF_BEAM: return null;
-			//    case PF_CHOOSE_SPELLS: return null;
-			//    case PF_PSEUDO_ID_IMPROV: return null;
-			//    case PF_KNOW_MUSHROOM: return "Identifies mushrooms";
-			//    case PF_KNOW_ZAPPER: return "Identifies magic devices";
-			//    case PF_SEE_ORE: return "Senses ore/minerals";
-			//    default: return "Undocumented pflag";
-			//}
+			if (flag == Misc.PF.EXTRA_SHOT.value) return "Gains extra shots with bow";
+			else if (flag == Misc.PF.BRAVERY_30.value) return "Gains immunity to fear";
+			else if (flag == Misc.PF.BLESS_WEAPON.value) return "Prefers blunt/blessed weapons";
+			else if (flag == Misc.PF.CUMBER_GLOVE.value) return null;
+			else if (flag == Misc.PF.ZERO_FAIL.value) return "Advanced spellcasting";
+			else if (flag == Misc.PF.BEAM.value) return null;
+			else if (flag == Misc.PF.CHOOSE_SPELLS.value) return null;
+			else if (flag == Misc.PF.PSEUDO_ID_IMPROV.value) return null;
+			else if (flag == Misc.PF.KNOW_MUSHROOM.value) return "Identifies mushrooms";
+			else if (flag == Misc.PF.KNOW_ZAPPER.value) return "Identifies magic devices";
+			else if (flag == Misc.PF.SEE_ORE.value) return "Senses ore/minerals";
+			else return "Undocumented pflag";
 		}
 
 		static void race_help(int i, object db, Region l) {
@@ -343,7 +339,7 @@ namespace CSAngband {
 			    if (n_flags >= flag_space) break;
 			    if (!c.pflags.has(k)) continue;
 			    s = get_pflag_desc(k);
-			    if (s.Length == 0) continue;
+			    if (s == null) continue;
 			    Utilities.text_out_e("\n{0}", s);
 			    n_flags++;
 			}

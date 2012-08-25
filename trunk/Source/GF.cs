@@ -6,6 +6,7 @@ using CSAngband.Object;
 using CSAngband.Monster;
 namespace CSAngband {
 	class GF {
+		public static List<GF> list = new List<GF>();
 
 		int value;
 		private static int counter = 0;
@@ -27,6 +28,8 @@ namespace CSAngband {
 			this.mon_vuln = mon_vuln;
 			this.obj_hates = obj_hates;
 			this.obj_imm = obj_imm;
+
+			list.Add(this);
 		}
 
 		public string name;

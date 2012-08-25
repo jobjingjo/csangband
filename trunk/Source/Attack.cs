@@ -19,7 +19,7 @@ namespace CSAngband {
 		/**
 		 * Determine if the player "hits" a monster.
 		 */
-		public static bool test_hit(int chance, int ac, int vis) {
+		public static bool test_hit(int chance, int ac, bool vis) {
 			int k = Random.randint0(100);
 
 			/* There is an automatic 12% chance to hit,
@@ -28,7 +28,7 @@ namespace CSAngband {
 			if (k < 17) return k < 12;
 
 			/* Penalize invisible targets */
-			if (vis == 0) chance /= 2;
+			if (vis == false) chance /= 2;
 
 			/* Starting a bit higher up on the scale */
 			if (chance < 9) chance = 9;
@@ -81,7 +81,7 @@ namespace CSAngband {
 			Monster.Monster.mon_clear_timed(Cave.cave.m_idx[y][x], (int)Misc.MON_TMD.SLEEP, Misc.MON_TMD_FLG_NOMESSAGE,false);
 
 			/* See if the player hit */
-			success = test_hit(chance, (int)r_ptr.ac, m_ptr.ml?1:0);
+			success = test_hit(chance, (int)r_ptr.ac, m_ptr.ml);
 
 			/* If a miss, skip this hit */
 			if (!success) {

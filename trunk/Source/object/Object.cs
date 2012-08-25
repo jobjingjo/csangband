@@ -2185,50 +2185,49 @@ namespace CSAngband.Object
 		 */
 		public static void delete_object_idx(int o_idx)
 		{
-			throw new NotImplementedException();
-			//object_type *j_ptr;
+			Object j_ptr;
 
-			///* Excise */
-			//excise_object_idx(o_idx);
+			/* Excise */
+			excise_object_idx(o_idx);
 
-			///* Object */
-			//j_ptr = object_byid(o_idx);
+			/* Object */
+			j_ptr = byid((short)o_idx);
 
-			///* Dungeon floor */
-			//if (!(j_ptr.held_m_idx))
-			//{
-			//    int y, x;
+			/* Dungeon floor */
+			if ((j_ptr.held_m_idx) == 0)
+			{
+			    int y, x;
 
-			//    /* Location */
-			//    y = j_ptr.iy;
-			//    x = j_ptr.ix;
+			    /* Location */
+			    y = j_ptr.iy;
+			    x = j_ptr.ix;
 
-			//    cave_light_spot(cave, y, x);
-			//}
+			    Cave.cave_light_spot(Cave.cave, y, x);
+			}
 	
-			///* Delete the mimicking monster if necessary */
-			//if (j_ptr.mimicking_m_idx) {
-			//    monster_type *m_ptr;
+			/* Delete the mimicking monster if necessary */
+			if (j_ptr.mimicking_m_idx != 0) {
+			    Monster.Monster m_ptr;
 		
-			//    m_ptr = cave_monster(cave, j_ptr.mimicking_m_idx);
+			    m_ptr = Cave.cave_monster(Cave.cave, j_ptr.mimicking_m_idx);
 		
-			//    /* Clear the mimicry */
-			//    m_ptr.mimicked_o_idx = 0;
+			    /* Clear the mimicry */
+			    m_ptr.mimicked_o_idx = 0;
 		
-			//    delete_monster_idx(j_ptr.mimicking_m_idx);
-			//}
+			    Monster.Monster_Make.delete_monster_idx(j_ptr.mimicking_m_idx);
+			}
 
-			///* Wipe the object */
-			//object_wipe(j_ptr);
+			/* Wipe the object */
+			j_ptr.WIPE();
 
-			///* Count objects */
-			//o_cnt--;
+			/* Count objects */
+			Misc.o_cnt--;
 
-			///* Stop tracking deleted objects if necessary */
-			//if (tracked_object_is(0 - o_idx))
-			//{
-			//    track_object(NO_OBJECT);
-			//}
+			/* Stop tracking deleted objects if necessary */
+			if (Cave.tracked_object_is(0 - o_idx))
+			{
+			    Cave.track_object(Misc.NO_OBJECT);
+			}
 		}
 
 		/**

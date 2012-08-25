@@ -40,7 +40,6 @@ void spell_learn(int spell);
 bool spell_cast(int spell, int dir);
 
 /* timed.c */
-bool player_inc_timed(struct player *p, int idx, int v, bool notify, bool check);
 bool player_clear_timed(struct player *p, int idx, bool notify);
 
 #endif /* !PLAYER_PLAYER_H */

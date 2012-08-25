@@ -32,17 +32,19 @@ namespace CSAngband {
 				z.a_max = value;
 			else if (label == "E")
 				z.e_max = value;
-			else if (label == "R")
+			else if(label == "R") {
 				z.r_max = value;
-			else if (label == "P")
+				//HACK! This is literally the earliest we can instatiate it, so that later on, we can do it again @_@
+				Misc.l_list = new Monster_Lore[value];
+			} else if(label == "P")
 				z.mp_max = value;
-			else if (label == "S")
+			else if(label == "S")
 				z.s_max = value;
-			else if (label == "O")
+			else if(label == "O")
 				z.o_max = value;
-			else if (label == "M")
+			else if(label == "M")
 				z.m_max = value;
-			else if (label == "I")
+			else if(label == "I")
 				z.pit_max = value;
 			else
 				return Parser.Error.UNDEFINED_DIRECTIVE;
@@ -175,7 +177,7 @@ namespace CSAngband {
 			uint priority = p.getuint("priority");
 			Feature f = p.priv as Feature;
 
-			if (f != null)
+			if (f == null)
 				return Parser.Error.MISSING_RECORD_HEADER;
 			f.priority = (byte)priority;
 			return Parser.Error.NONE;
@@ -1298,7 +1300,7 @@ namespace CSAngband {
 			Monster_Pain mp = p.priv as Monster_Pain;
 			int i;
 
-			if (mp != null)
+			if (mp == null)
 			    return Parser.Error.MISSING_RECORD_HEADER;
 			for (i = 0; i < 7; i++)
 			    if (mp.Messages[i] == null)
@@ -1477,7 +1479,7 @@ namespace CSAngband {
 		static int lookup_flag_msf(List<Monster_Spell_Flag> flag_table, string flag_name) {
 			int i = 0;
 
-			while ( i < flag_table.Count && flag_table[i].desc != flag_name)
+			while ( i < flag_table.Count && flag_table[i].name != flag_name)
 				i++;
 
 			/* End of table reached without match */
@@ -1705,7 +1707,7 @@ namespace CSAngband {
 
 		static Monster_Blow.RBM find_blow_method(string name) {
 			foreach(Monster_Blow.RBM i in Monster_Blow.RBM.list) {
-				if(i.text == name) {
+				if(i.name == name) {
 					return i;
 				}
 			}
@@ -1714,7 +1716,7 @@ namespace CSAngband {
 
 		static Monster_Blow.RBE find_blow_effect(string name) {
 			foreach(Monster_Blow.RBE i in Monster_Blow.RBE.list) {
-				if(i.text == name) {
+				if(i.name == name) {
 					return i;
 				}
 			}
@@ -2514,7 +2516,7 @@ namespace CSAngband {
 		static int lookup_flag5(List<Misc.PF> flag_table, string flag_name) {
 			int i = 0;
 
-			while ( i < flag_table.Count && flag_table[i].text != flag_name)
+			while ( i < flag_table.Count && flag_table[i].name != flag_name)
 				i++;
 
 			/* End of table reached without match */

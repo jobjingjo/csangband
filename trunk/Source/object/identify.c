@@ -197,48 +197,6 @@ void object_notice_effect(object_type *o_ptr)
 }
 
 
-static void object_notice_defence_plusses(struct player *p, object_type *o_ptr)
-{
-	assert(o_ptr && o_ptr.kind);
-
-	if (object_defence_plusses_are_visible(o_ptr))
-		return;
-
-	if (object_add_ident_flags(o_ptr, IDENT_DEFENCE))
-		object_check_for_ident(o_ptr);
-
-	if (o_ptr.ac || o_ptr.to_a)
-	{
-		char o_name[80];
-
-		object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
-		msgt(MSG_PSEUDOID,
-				"You know more about the %s you are wearing.",
-				o_name);
-	}
-
-	p.update |= (PU_BONUS);
-	event_signal(EVENT_INVENTORY);
-	event_signal(EVENT_EQUIPMENT);
-}
-
-
-/**
- * Notice things which happen on defending.
- */
-void object_notice_on_defend(struct player *p)
-{
-	int i;
-
-	for (i = INVEN_WIELD; i < INVEN_TOTAL; i++)
-		if (p.inventory[i].kind)
-			object_notice_defence_plusses(p, &p.inventory[i]);
-
-	event_signal(EVENT_INVENTORY);
-	event_signal(EVENT_EQUIPMENT);
-}
-
-
 /*
  * Notice stuff when firing or throwing objects.
  *

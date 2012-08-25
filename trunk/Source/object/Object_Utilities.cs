@@ -1203,5 +1203,168 @@ namespace CSAngband.Object {
 
 			return "In pack";
 		}
+
+		/*
+		 * Excise a dungeon object from any stacks
+		 */
+		public static void excise_object_idx(int o_idx)
+		{
+			throw new NotImplementedException();
+			//object_type *j_ptr;
+
+			//s16b this_o_idx, next_o_idx = 0;
+
+			//s16b prev_o_idx = 0;
+
+
+			///* Object */
+			//j_ptr = object_byid(o_idx);
+
+			///* Monster */
+			//if (j_ptr.held_m_idx)
+			//{
+			//    monster_type *m_ptr;
+
+			//    /* Monster */
+			//    m_ptr = cave_monster(cave, j_ptr.held_m_idx);
+
+			//    /* Scan all objects in the grid */
+			//    for (this_o_idx = m_ptr.hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
+			//    {
+			//        object_type *o_ptr;
+
+			//        /* Get the object */
+			//        o_ptr = object_byid(this_o_idx);
+
+			//        /* Get the next object */
+			//        next_o_idx = o_ptr.next_o_idx;
+
+			//        /* Done */
+			//        if (this_o_idx == o_idx)
+			//        {
+			//            /* No previous */
+			//            if (prev_o_idx == 0)
+			//            {
+			//                /* Remove from list */
+			//                m_ptr.hold_o_idx = next_o_idx;
+			//            }
+
+			//            /* Real previous */
+			//            else
+			//            {
+			//                object_type *i_ptr;
+
+			//                /* Previous object */
+			//                i_ptr = object_byid(prev_o_idx);
+
+			//                /* Remove from list */
+			//                i_ptr.next_o_idx = next_o_idx;
+			//            }
+
+			//            /* Forget next pointer */
+			//            o_ptr.next_o_idx = 0;
+
+			//            /* Done */
+			//            break;
+			//        }
+
+			//        /* Save prev_o_idx */
+			//        prev_o_idx = this_o_idx;
+			//    }
+			//}
+
+			///* Dungeon */
+			//else
+			//{
+			//    int y = j_ptr.iy;
+			//    int x = j_ptr.ix;
+
+			//    /* Scan all objects in the grid */
+			//    for (this_o_idx = cave.o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
+			//    {
+			//        object_type *o_ptr;
+
+			//        /* Get the object */
+			//        o_ptr = object_byid(this_o_idx);
+
+			//        /* Get the next object */
+			//        next_o_idx = o_ptr.next_o_idx;
+
+			//        /* Done */
+			//        if (this_o_idx == o_idx)
+			//        {
+			//            /* No previous */
+			//            if (prev_o_idx == 0)
+			//            {
+			//                /* Remove from list */
+			//                cave.o_idx[y][x] = next_o_idx;
+			//            }
+
+			//            /* Real previous */
+			//            else
+			//            {
+			//                object_type *i_ptr;
+
+			//                /* Previous object */
+			//                i_ptr = object_byid(prev_o_idx);
+
+			//                /* Remove from list */
+			//                i_ptr.next_o_idx = next_o_idx;
+			//            }
+
+			//            /* Forget next pointer */
+			//            o_ptr.next_o_idx = 0;
+
+			//            /* Done */
+			//            break;
+			//        }
+
+			//        /* Save prev_o_idx */
+			//        prev_o_idx = this_o_idx;
+			//    }
+			//}
+		}
+
+		
+		/*
+		 * Prepare an object `dst` representing `amt` objects,  based on an existing 
+		 * object `src` representing at least `amt` objects.
+		 *
+		 * Takes care of the charge redistribution concerns of stacked items.
+		 */
+		public void copy_amt(Object src, int amt)
+		{
+			throw new NotImplementedException();
+			//this is the dest
+			//int charge_time = randcalc(src.kind.time, 0, AVERAGE), max_time;
+
+			///* Get a copy of the object */
+			//object_copy(dst, src);
+
+			///* Modify quantity */
+			//dst.number = amt;
+			//dst.note = src.note;
+
+			///* 
+			// * If the item has charges/timeouts, set them to the correct level 
+			// * too. We split off the same amount as distribute_charges.
+			// */
+			//if (src.tval == TV_WAND || src.tval == TV_STAFF)
+			//{
+			//    dst.pval[DEFAULT_PVAL] =
+			//        src.pval[DEFAULT_PVAL] * amt / src.number;
+			//}
+
+			//if (src.tval == TV_ROD)
+			//{
+			//    max_time = charge_time * amt;
+
+			//    if (src.timeout > max_time)
+			//        dst.timeout = max_time;
+			//    else
+			//        dst.timeout = src.timeout;
+			//}
+		}
+
 	}
 }

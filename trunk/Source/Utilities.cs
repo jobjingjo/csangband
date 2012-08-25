@@ -1764,6 +1764,66 @@ namespace CSAngband {
 			}
 		}
 
+		/*
+		 * Request a "quantity" from the user
+		 *
+		 * Allow "p_ptr.command_arg" to specify a quantity
+		 */
+		public static short get_quantity(string prompt, int max)
+		{
+			throw new NotImplementedException();
+			//int amt = 1;
+
+
+			///* Use "command_arg" */
+			//if (p_ptr.command_arg)
+			//{
+			//    /* Extract a number */
+			//    amt = p_ptr.command_arg;
+
+			//    /* Clear "command_arg" */
+			//    p_ptr.command_arg = 0;
+			//}
+
+			///* Prompt if needed */
+			//else if ((max != 1))
+			//{
+			//    char tmp[80];
+
+			//    char buf[80];
+
+			//    /* Build a prompt if needed */
+			//    if (!prompt)
+			//    {
+			//        /* Build a prompt */
+			//        strnfmt(tmp, sizeof(tmp), "Quantity (0-%d, *=all): ", max);
+
+			//        /* Use that prompt */
+			//        prompt = tmp;
+			//    }
+
+			//    /* Build the default */
+			//    strnfmt(buf, sizeof(buf), "%d", amt);
+
+			//    /* Ask for a quantity */
+			//    if (!get_string(prompt, buf, 7)) return (0);
+
+			//    /* Extract a number */
+			//    amt = atoi(buf);
+
+			//    /* A star or letter means "all" */
+			//    if ((buf[0] == '*') || isalpha((unsigned char)buf[0])) amt = max;
+			//}
+
+			///* Enforce the maximum */
+			//if (amt > max) amt = max;
+
+			///* Enforce the minimum */
+			//if (amt < 0) amt = 0;
+
+			///* Return the result */
+			//return (amt);
+		}
 
 	}
 }

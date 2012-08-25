@@ -276,18 +276,31 @@ namespace CSAngband.Object {
 
 			        /* e.g. kni|fe|ves|
 			         *          ^  ^  ^ */
-			        string singular = fmt.Substring(1);
-			        string plural   = fmt.Substring(fmt.IndexOf('|'));
+					string skip = fmt.Substring(1);
+					string singular;
+					if(skip.Contains('|')) {
+						singular = skip.Substring(0, skip.IndexOf('|'));
+					} else {
+						singular = skip;
+					}
+
+			        string plural   = skip.Substring(skip.IndexOf('|'));
 			        string endmark  = null;
 
 			        if (plural.Length > 0)
 			        {
 						plural = plural.Substring(1);
-			            endmark = plural.Substring(plural.IndexOf('|'));
+			            plural = plural.Substring(0, plural.IndexOf('|'));
 			        }
 
+					//The endmark is what remains. It should be everthing after the plural terminator,
+					//so we have to skip 2 more bars.
+					endmark = skip.Substring(skip.IndexOf('|') + 1);
+					endmark = endmark.Substring(endmark.IndexOf('|') + 1);
+
 					//Not sure what this is optimizing...
-			        if (singular.Length == 0 || plural.Length == 0 || endmark.Length == 0) return end;
+					//Nick: I just commented it out, screw it...
+			        //if (singular.Length == 0 || plural.Length == 0 || endmark.Length == 0) return end;
 
 					//fuck it, I'm guessing on this next part. Originals are commented out.
 					//For %.*s look at http://www.cplusplus.com/reference/clibrary/cstdio/printf/
@@ -312,8 +325,10 @@ namespace CSAngband.Object {
 					buf = buf + fmt[0];
 			        //buf[end++] = *fmt;
 
-				prev = fmt[0];
-			    fmt = fmt.Substring(1);
+				if(fmt.Length > 0) {
+					prev = fmt[0];
+					fmt = fmt.Substring(1);
+				}
 			}
 
 			//buf[end] = 0;
@@ -530,27 +545,33 @@ namespace CSAngband.Object {
 
 		static int obj_desc_pval(Object o_ptr, string buf, int max, int end, bool spoil)
 		{
-			throw new NotImplementedException();
-			//bitflag f[OF_SIZE], f2[OF_SIZE];
-			//int i;
+			Bitflag f = new Bitflag(Object_Flag.SIZE);
+			Bitflag f2 = new Bitflag(Object_Flag.SIZE);
+			int i;
 
-			//object_flags(o_ptr, f);
-			//create_mask(f2, false, OFT_PVAL, OFT_STAT, OFT_MAX);
+			o_ptr.object_flags(ref f);
+			Object_Flag.create_mask(f2, false, Object_Flag.object_flag_type.PVAL, Object_Flag.object_flag_type.STAT);
 
-			//if (!of_is_inter(f, f2)) return end;
+			if (!f.is_inter(f2)) return end;
 
+			buf += " <";
 			//strnfcat(buf, max, &end, " <");
-			//for (i = 0; i < o_ptr.num_pvals; i++) {
-			//    if (spoil || object_this_pval_is_visible(o_ptr, i)) {
-			//        if (i > 0)
-			//            strnfcat(buf, max, &end, ", ");
-			//        strnfcat(buf, max, &end, "%+d", o_ptr.pval[i]);
-			//    }
-			//}
+			for (i = 0; i < o_ptr.num_pvals; i++) {
+			    if (spoil || o_ptr.this_pval_is_visible(i)) {
+					if(i > 0) {
+						buf += ", ";
+						//strnfcat(buf, max, &end, ", ");
+					}
+					buf += o_ptr.pval[i] > 0 ? "+" + o_ptr.pval[i] : o_ptr.pval[i].ToString();
+			        //strnfcat(buf, max, &end, "%+d", o_ptr.pval[i]);
+			    }
+			}
 
+			buf += ">";
+			end = buf.Length; //fuck it.
 			//strnfcat(buf, max, &end, ">");
 
-			//return end;
+			return end;
 		}
 
 		static int obj_desc_charges(Object o_ptr, ref string buf, int max, int end)

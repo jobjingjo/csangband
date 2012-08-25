@@ -30,38 +30,103 @@ namespace CSAngband {
 		 */
 		public static int adjust_dam(Player.Player p, GF type, int dam, aspect dam_aspect, int resist)
 		{
-			throw new NotImplementedException();
-			//const struct gf_type *gf_ptr = &gf_table[type];
-			//int i, denom;
+			GF gf_ptr = type;
+			int i, denom;
 
-			//if (resist == 3) /* immune */
-			//    return 0;
+			if (resist == 3) /* immune */
+			    return 0;
 
-			///* Hack - acid damage is halved by armour, holy orb is halved */
-			//if ((type == GF_ACID && minus_ac(p)) || type == GF_HOLY_ORB)
-			//    dam = (dam + 1) / 2;
+			/* Hack - acid damage is halved by armour, holy orb is halved */
+			if ((type == GF.ACID && minus_ac(p)) || type == GF.HOLY_ORB)
+			    dam = (dam + 1) / 2;
 
-			//if (resist == -1) /* vulnerable */
-			//    return (dam * 4 / 3);
+			if (resist == -1) /* vulnerable */
+			    return (dam * 4 / 3);
 
-			///* Variable resists vary the denominator, so we need to invert the logic
-			// * of dam_aspect. (m_bonus is unused) */
-			//switch (dam_aspect) {
-			//    case MINIMISE:
-			//        denom = randcalc(gf_ptr.denom, 0, MAXIMISE);
-			//        break;
-			//    case MAXIMISE:
-			//        denom = randcalc(gf_ptr.denom, 0, MINIMISE);
-			//        break;
-			//    default:
-			//        denom = randcalc(gf_ptr.denom, 0, dam_aspect);
-			//}
+			/* Variable resists vary the denominator, so we need to invert the logic
+			 * of dam_aspect. (m_bonus is unused) */
+			switch (dam_aspect) {
+			    case aspect.MINIMISE:
+			        denom = Random.randcalc(gf_ptr.denom, 0, aspect.MAXIMISE);
+			        break;
+			    case aspect.MAXIMISE:
+			        denom = Random.randcalc(gf_ptr.denom, 0, aspect.MINIMISE);
+			        break;
+			    default:
+			        denom = Random.randcalc(gf_ptr.denom, 0, dam_aspect);
+					break;
+			}
 
-			//for (i = resist; i > 0; i--)
-			//    if (denom)
-			//        dam = dam * gf_ptr.num / denom;
+			for (i = resist; i > 0; i--)
+			    if (denom != 0)
+			        dam = dam * gf_ptr.num / denom;
 
-			//return dam;
+			return dam;
+		}
+
+		/*
+		 * Acid has hit the player, attempt to affect some armor.
+		 *
+		 * Note that the "base armor" of an object never changes.
+		 *
+		 * If any armor is damaged (or resists), the player takes less damage.
+		 */
+		static bool minus_ac(Player.Player p)
+		{
+			Object.Object o_ptr = null;
+
+			Bitflag f = new Bitflag(Object.Object_Flag.SIZE);
+
+			//char o_name[80];
+			string o_name;
+
+			/* Avoid crash during monster power calculations */
+			if (p.inventory == null) return false;
+
+			/* Pick a (possibly empty) inventory slot */
+			switch (Random.randint1(6))
+			{
+				case 1: o_ptr = p.inventory[Misc.INVEN_BODY]; break;
+				case 2: o_ptr = p.inventory[Misc.INVEN_ARM]; break;
+				case 3: o_ptr = p.inventory[Misc.INVEN_OUTER]; break;
+				case 4: o_ptr = p.inventory[Misc.INVEN_HANDS]; break;
+				case 5: o_ptr = p.inventory[Misc.INVEN_HEAD]; break;
+				case 6: o_ptr = p.inventory[Misc.INVEN_FEET]; break;
+				//default: Misc.assert(0); //Nick: DA FUQ is this doing here C???
+			}
+
+			/* Nothing to damage */
+			if (o_ptr.kind == null) return (false);
+
+			/* No damage left to be done */
+			if (o_ptr.ac + o_ptr.to_a <= 0) return (false);
+
+			/* Describe */
+			o_name = o_ptr.object_desc(Object.Object.Detail.BASE);
+			//object_desc(o_name, sizeof(o_name), o_ptr, ODESC_BASE);
+
+			/* Extract the flags */
+			o_ptr.object_flags(ref f);
+
+			/* Object resists */
+			if (f.has(Object.Object_Flag.IGNORE_ACID.value))
+			{
+				Utilities.msg("Your %s is unaffected!", o_name);
+
+				return (true);
+			}
+
+			/* Message */
+			Utilities.msg("Your %s is damaged!", o_name);
+
+			/* Damage the item */
+			o_ptr.to_a--;
+
+			p.update |= Misc.PU_BONUS;
+			p.redraw |= (Misc.PR_EQUIP);
+
+			/* Item was damaged */
+			return (true);
 		}
 
 		/*
@@ -150,64 +215,63 @@ namespace CSAngband {
 		 */
 		public static void take_hit(Player.Player p, int dam, string kb_str)
 		{
-			throw new NotImplementedException();
-			//int old_chp = p.chp;
+			int old_chp = p.chp;
 
-			//int warning = (p.mhp * op_ptr.hitpoint_warn / 10);
-
-
-			///* Paranoia */
-			//if (p.is_dead) return;
+			int warning = (p.mhp * Player.Player_Other.instance.hitpoint_warn / 10);
 
 
-			///* Disturb */
-			//disturb(p, 1, 0);
+			/* Paranoia */
+			if (p.is_dead) return;
 
-			///* Mega-Hack -- Apply "invulnerability" */
-			//if (p.timed[TMD_INVULN] && (dam < 9000)) return;
 
-			///* Hurt the player */
-			//p.chp -= dam;
+			/* Disturb */
+			Cave.disturb(p, 1, 0);
 
-			///* Display the hitpoints */
-			//p.redraw |= (PR_HP);
+			/* Mega-Hack -- Apply "invulnerability" */
+			if (p.timed[(int)Timed_Effect.INVULN] != 0 && (dam < 9000)) return;
 
-			///* Dead player */
-			//if (p.chp < 0)
-			//{
-			//    /* Hack -- Note death */
-			//    msgt(MSG_DEATH, "You die.");
-			//    message_flush();
+			/* Hurt the player */
+			p.chp -= (short)dam;
 
-			//    /* Note cause of death */
-			//    my_strcpy(p.died_from, kb_str, sizeof(p.died_from));
+			/* Display the hitpoints */
+			p.redraw |= (Misc.PR_HP);
 
-			//    /* No longer a winner */
-			//    p.total_winner = false;
+			/* Dead player */
+			if (p.chp < 0)
+			{
+			    /* Hack -- Note death */
+			    Utilities.msgt(Message_Type.MSG_DEATH, "You die.");
+			    Utilities.message_flush();
 
-			//    /* Note death */
-			//    p.is_dead = true;
+			    /* Note cause of death */
+				p.died_from = kb_str;
 
-			//    /* Leaving */
-			//    p.leaving = true;
+			    /* No longer a winner */
+			    p.total_winner = 0;
 
-			//    /* Dead */
-			//    return;
-			//}
+			    /* Note death */
+			    p.is_dead = true;
 
-			///* Hitpoint warning */
-			//if (p.chp < warning)
-			//{
-			//    /* Hack -- bell on first notice */
-			//    if (old_chp > warning)
-			//    {
-			//        bell("Low hitpoint warning!");
-			//    }
+			    /* Leaving */
+			    p.leaving = true;
 
-			//    /* Message */
-			//    msgt(MSG_HITPOINT_WARN, "*** LOW HITPOINT WARNING! ***");
-			//    message_flush();
-			//}
+			    /* Dead */
+			    return;
+			}
+
+			/* Hitpoint warning */
+			if (p.chp < warning)
+			{
+			    /* Hack -- bell on first notice */
+			    if (old_chp > warning)
+			    {
+			        Utilities.bell("Low hitpoint warning!");
+			    }
+
+			    /* Message */
+			    Utilities.msgt(Message_Type.MSG_HITPOINT_WARN, "*** LOW HITPOINT WARNING! ***");
+			    Utilities.message_flush();
+			}
 		}
 
 	}
