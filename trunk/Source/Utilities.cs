@@ -1475,7 +1475,7 @@ namespace CSAngband {
 		 * 'keypress_h') for an example.
 		 */
 		public delegate bool keypress_func(ref string s, ref int i, ref int j, keypress k, bool tf);
-		public static bool askfor_aux(ref string buf, int len, keypress_func keypress_h)
+		public static bool askfor_aux(ref string buf, int max_len, keypress_func keypress_h)
 		{
 			int k = 0;		/* Cursor position */
 			int nul = 0;		/* Position of the null byte in the string */
@@ -1500,18 +1500,19 @@ namespace CSAngband {
 
 
 			/* Restrict the length */
-			if (x + len > 80) len = 80 - x;
+			if (x + buf.Length > 80) buf = buf.Substring(0, 80 - x);
 
 			/* Truncate the default entry */
-			if(buf.Length > len) {
-				buf = buf.Substring(0, len);
-			}
+			//Nick: Just did this above.
+			//if(buf.Length > len) {
+			//    buf = buf.Substring(0, len);
+			//}
 
 			/* Get the position of the null byte */
 			nul = buf.Length;
 
 			/* Display the default answer */
-			Term.erase(x, y, (int)len);
+			Term.erase(x, y, max_len);
 			Term.putstr(x, y, -1, ConsoleColor.Yellow, buf);
 
 			/* Process input */
@@ -1527,7 +1528,7 @@ namespace CSAngband {
 			    done = keypress_h(ref buf, ref k, ref nul, ch, firsttime);
 
 			    /* Update the entry */
-			    Term.erase(x, y, (int)len);
+			    Term.erase(x, y, max_len);
 			    Term.putstr(x, y, -1, ConsoleColor.White, buf);
 
 			    /* Not the first time round anymore */
@@ -1834,7 +1835,7 @@ namespace CSAngband {
 		 * See "askfor_aux" for some notes about "buf" and "len", and about
 		 * the return value of this function.
 		 */
-		public static bool get_string(string prompt, ref string buf, int len)
+		public static bool get_string(string prompt, ref string buf, int max_length)
 		{
 			bool res;
 
@@ -1845,7 +1846,7 @@ namespace CSAngband {
 			prt(prompt, 0, 0);
 
 			/* Ask the user for a string */
-			res = askfor_aux(ref buf, len, null);
+			res = askfor_aux(ref buf, max_length, null);
 
 			/* Translate it to 8-bit (Latin-1) */
 			//Nick: uhh.... let's ignore this...

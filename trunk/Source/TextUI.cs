@@ -663,49 +663,49 @@ namespace CSAngband {
 
 		public static void cmd_rest()
 		{
-			throw new NotImplementedException();
-			///* Prompt for time if needed */
-			//if (p_ptr.command_arg <= 0)
-			//{
-			//    const char *p = "Rest (0-9999, '!' for HP or SP, '*' for HP and SP, '&' as needed): ";
+			/* Prompt for time if needed */
+			if (Misc.p_ptr.command_arg <= 0)
+			{
+			    string p = "Rest (0-9999, '!' for HP or SP, '*' for HP and SP, '&' as needed): ";
 
-			//    char out_val[5] = "& ";
+				string out_val = "& ";
+			    //char out_val[5] = "& ";
 
-			//    /* Ask for duration */
-			//    if (!get_string(p, out_val, sizeof(out_val))) return;
+			    /* Ask for duration */
+			    if (!Utilities.get_string(p, ref out_val, 4)) return;
 
-			//    /* Rest until done */
-			//    if (out_val[0] == '&')
-			//    {
-			//        cmd_insert(CMD_REST);
-			//        cmd_set_arg_choice(cmd_get_top(), 0, REST_COMPLETE);
-			//    }
+			    /* Rest until done */
+			    if (out_val[0] == '&')
+			    {
+					Game_Command.insert(Command_Code.REST);
+					Game_Command.get_top().set_arg_choice(0, (int)Misc.REST.COMPLETE);
+			    }
 
-			//    /* Rest a lot */
-			//    else if (out_val[0] == '*')
-			//    {
-			//        cmd_insert(CMD_REST);
-			//        cmd_set_arg_choice(cmd_get_top(), 0, REST_ALL_POINTS);
-			//    }
+			    /* Rest a lot */
+			    else if (out_val[0] == '*')
+			    {
+			        Game_Command.insert(Command_Code.REST);
+			        Game_Command.get_top().set_arg_choice(0, (int)Misc.REST.ALL_POINTS);
+			    }
 
-			//    /* Rest until HP or SP filled */
-			//    else if (out_val[0] == '!')
-			//    {
-			//        cmd_insert(CMD_REST);
-			//        cmd_set_arg_choice(cmd_get_top(), 0, REST_SOME_POINTS);
-			//    }
+			    /* Rest until HP or SP filled */
+			    else if (out_val[0] == '!')
+			    {
+			        Game_Command.insert(Command_Code.REST);
+			        Game_Command.get_top().set_arg_choice(0, (int)Misc.REST.SOME_POINTS);
+			    }
 		
-			//    /* Rest some */
-			//    else
-			//    {
-			//        int turns = atoi(out_val);
-			//        if (turns <= 0) return;
-			//        if (turns > 9999) turns = 9999;
+			    /* Rest some */
+			    else
+			    {
+			        int turns = int.Parse(out_val);
+			        if (turns <= 0) return;
+			        if (turns > 9999) turns = 9999;
 			
-			//        cmd_insert(CMD_REST);
-			//        cmd_set_arg_choice(cmd_get_top(), 0, turns);
-			//    }
-			//}
+			        Game_Command.insert(Command_Code.REST);
+			        Game_Command.get_top().set_arg_choice(0, (int)turns);
+			    }
+			}
 		}
 
 		/**
