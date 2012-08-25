@@ -547,74 +547,99 @@ namespace CSAngband.Object {
 		 */
 		static bool make_artifact_special(ref Object o_ptr, int level)
 		{
-			throw new NotImplementedException();
-			//int i;
-			//object_kind *kind;
+			int i;
+			Object_Kind kind;
 
-			///* No artifacts, do nothing */
-			//if (OPT(birth_no_artifacts)) return false;
+			/* No artifacts, do nothing */
+			if (Option.birth_no_artifacts.value) return false;
 
-			///* No artifacts in the town */
-			//if (!p_ptr.depth) return false;
+			/* No artifacts in the town */
+			if (Misc.p_ptr.depth == 0) return false;
 
-			///* Check the special artifacts */
-			//for (i = 0; i < ART_MIN_NORMAL; ++i) {
-			//    artifact_type *a_ptr = &a_info[i];
+			/* Check the special artifacts */
+			for (i = 0; i < Misc.ART_MIN_NORMAL; ++i) {
+			    Artifact a_ptr = Misc.a_info[i];
 
-			//    /* Skip "empty" artifacts */
-			//    if (!a_ptr.name) continue;
+			    /* Skip "empty" artifacts */
+			    if (a_ptr == null) continue;
 
-			//    /* Cannot make an artifact twice */
-			//    if (a_ptr.created) continue;
+			    /* Cannot make an artifact twice */
+			    if (a_ptr.created) continue;
 
-			//    /* Enforce minimum "depth" (loosely) */
-			//    if (a_ptr.alloc_min > p_ptr.depth) {
-			//        /* Get the "out-of-depth factor" */
-			//        int d = (a_ptr.alloc_min - p_ptr.depth) * 2;
+			    /* Enforce minimum "depth" (loosely) */
+			    if (a_ptr.alloc_min > Misc.p_ptr.depth) {
+			        /* Get the "out-of-depth factor" */
+			        int d = (a_ptr.alloc_min - Misc.p_ptr.depth) * 2;
 
-			//        /* Roll for out-of-depth creation */
-			//        if (randint0(d) != 0) continue;
-			//    }
+			        /* Roll for out-of-depth creation */
+			        if (Random.randint0(d) != 0) continue;
+			    }
 
-			//    /* Enforce maximum depth (strictly) */
-			//    if (a_ptr.alloc_max < p_ptr.depth) continue;
+			    /* Enforce maximum depth (strictly) */
+			    if (a_ptr.alloc_max < Misc.p_ptr.depth) continue;
 
-			//    /* Artifact "rarity roll" */
-			//    if (randint1(100) > a_ptr.alloc_prob) continue;
+			    /* Artifact "rarity roll" */
+			    if (Random.randint1(100) > a_ptr.alloc_prob) continue;
 
-			//    /* Find the base object */
-			//    kind = lookup_kind(a_ptr.tval, a_ptr.sval);
+			    /* Find the base object */
+			    kind = Object_Kind.lookup_kind(a_ptr.tval, a_ptr.sval);
 
-			//    /* Make sure the kind was found */
-			//    if (!kind) continue;
+			    /* Make sure the kind was found */
+			    if (kind == null) continue;
 
-			//    /* Enforce minimum "object" level (loosely) */
-			//    if (kind.level > level) {
-			//        /* Get the "out-of-depth factor" */
-			//        int d = (kind.level - level) * 5;
+			    /* Enforce minimum "object" level (loosely) */
+			    if (kind.level > level) {
+			        /* Get the "out-of-depth factor" */
+			        int d = (kind.level - level) * 5;
 
-			//        /* Roll for out-of-depth creation */
-			//        if (randint0(d) != 0) continue;
-			//    }
+			        /* Roll for out-of-depth creation */
+			        if (Random.randint0(d) != 0) continue;
+			    }
 
-			//    /* Assign the template */
-			//    object_prep(o_ptr, kind, a_ptr.alloc_min, RANDOMISE);
+			    /* Assign the template */
+			    o_ptr.prep(kind, a_ptr.alloc_min, aspect.RANDOMISE);
 
-			//    /* Mark the item as an artifact */
-			//    o_ptr.artifact = a_ptr;
+			    /* Mark the item as an artifact */
+			    o_ptr.artifact = a_ptr;
 
-			//    /* Copy across all the data from the artifact struct */
-			//    copy_artifact_data(o_ptr, a_ptr);
+			    /* Copy across all the data from the artifact struct */
+			    o_ptr.copy_artifact_data(a_ptr);
 
-			//    /* Mark the artifact as "created" */
-			//    a_ptr.created = 1;
+			    /* Mark the artifact as "created" */
+			    a_ptr.created = true;
 
-			//    /* Success */
-			//    return true;
-			//}
+			    /* Success */
+			    return true;
+			}
 
-			///* Failure */
-			//return false;
+			/* Failure */
+			return false;
+		}
+
+		/**
+		 * Copy artifact data to a normal object, and set various slightly hacky
+		 * globals.
+		 */
+		public void copy_artifact_data(Artifact a_ptr)
+		{
+			int i;
+
+			/* Extract the data */
+			for(i = 0; i < a_ptr.num_pvals; i++) {
+				if(a_ptr.pval[i] != 0) {
+					pval[i] = a_ptr.pval[i];
+					pval_flags[i].copy(a_ptr.pval_flags[i]);
+				}
+			}
+			num_pvals = a_ptr.num_pvals;
+			ac = a_ptr.ac;
+			dd = a_ptr.dd;
+			ds = a_ptr.ds;
+			to_a = a_ptr.to_a;
+			to_h = a_ptr.to_h;
+			to_d = a_ptr.to_d;
+			weight = a_ptr.weight;
+			flags.union(a_ptr.flags);
 		}
 	}
 }

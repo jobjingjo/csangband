@@ -229,7 +229,7 @@ namespace CSAngband.Player {
 		 * Check for resistance to the effect if `check` is true.
 		 */
 		//formerly player_inc_timed
-		public bool inc_timed(int idx, int v, bool notify, bool check)
+		public bool inc_timed(Timed_Effect idx, int v, bool notify, bool check)
 		{
 			throw new NotImplementedException();
 			//timed_effect *effect;

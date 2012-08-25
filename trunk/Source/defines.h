@@ -55,12 +55,7 @@
 #define ART_GROND			111
 #define ART_PALANTIR			7
 
-/*
- * Hack -- first "normal" artifact in the artifact list.  All of
- * the artifacts with indexes from 1 to 15 are "special" (lights,
- * rings, amulets), and the ones from 16 to 127 are "normal".
- */
-#define ART_MIN_NORMAL		16
+
 
 
 /*** Function flags ***/

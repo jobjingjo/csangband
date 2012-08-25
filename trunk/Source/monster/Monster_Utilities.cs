@@ -603,5 +603,198 @@ namespace CSAngband.Monster {
 			//    p_ptr.redraw |= (PR_MONLIST | PR_ITEMLIST);
 			//}
 		}
+
+		/*
+		 * Learn about an "observed" resistance or other player state property, or
+		 * lack of it.
+		 */
+		public void update_smart_learn(Player.Player p, int what)
+		{
+			throw new NotImplementedException();
+			//monster_race *r_ptr = &r_info[m.r_idx];
+
+			///* Sanity check */
+			//if (!what) return;
+
+			///* anything a monster might learn, the player should learn */
+			//wieldeds_notice_flag(p, what);
+
+			///* Not allowed to learn */
+			//if (!OPT(birth_ai_learn)) return;
+
+			///* Too stupid to learn anything */
+			//if (rf_has(r_ptr.flags, RF_STUPID)) return;
+
+			///* Not intelligent, only learn sometimes */
+			//if (!rf_has(r_ptr.flags, RF_SMART) && one_in_(2)) return;
+
+			///* Analyze the knowledge; fail very rarely */
+			//if (check_state(p, what, p.state.flags) && !one_in_(100))
+			//    of_on(m.known_pflags, what);
+			//else
+			//    of_off(m.known_pflags, what);
+		}
+
+		/*
+		 * Mega-hack - Fix plural names of monsters
+		 *
+		 * Taken from PernAngband via EY, modified to fit NPP monster list
+		 *
+		 * Note: It should handle all regular Angband monsters.
+		 */
+		public static string plural_aux(string name)
+		{
+			//just make it return the new string
+			throw new NotImplementedException();
+			//int name_len = strlen(name);
+
+			//if (strstr(name, " of "))
+			//{
+			//    char *aider = strstr(name, " of ");
+			//    char dummy[80];
+			//    int i = 0;
+			//    char *ctr = name;
+
+			//    while (ctr < aider)
+			//    {
+			//        dummy[i] = *ctr;
+			//        ctr++;
+			//        i++;
+			//    }
+
+			//    if (dummy[i - 1] == 's')
+			//    {
+			//        strcpy (&(dummy[i]), "es");
+			//        i++;
+			//    }
+			//    else
+			//    {
+			//        strcpy (&(dummy[i]), "s");
+			//    }
+
+			//    strcpy(&(dummy[i + 1]), aider);
+			//    my_strcpy(name, dummy, max);
+			//}
+			//else if ((strstr(name, "coins")) || (strstr(name, "gems")))
+			//{
+			//    char dummy[80];
+			//    strcpy (dummy, "Piles of c");
+			//    my_strcat (dummy, &(name[1]), sizeof(dummy));
+			//    my_strcpy (name, dummy, max);
+			//    return;
+			//}
+
+			//else if (strstr(name, "Greater Servant of"))
+			//{
+			//    char dummy[80];
+			//    strcpy (dummy, "Greater Servants of ");
+			//    my_strcat (dummy, &(name[1]), sizeof(dummy));
+			//    my_strcpy (name, dummy, max);
+			//    return;
+			//}
+			//else if (strstr(name, "Lesser Servant of"))
+			//{
+			//    char dummy[80];
+			//    strcpy (dummy, "Greater Servants of ");
+			//    my_strcat (dummy, &(name[1]), sizeof(dummy));
+			//    my_strcpy (name, dummy, max);
+			//    return;
+			//}
+			//else if (strstr(name, "Servant of"))
+			//{
+			//    char dummy[80];
+			//    strcpy (dummy, "Servants of ");
+			//    my_strcat (dummy, &(name[1]), sizeof(dummy));
+			//    my_strcpy (name, dummy, max);
+			//    return;
+			//}
+			//else if (strstr(name, "Great Wyrm"))
+			//{
+			//    char dummy[80];
+			//    strcpy (dummy, "Great Wyrms ");
+			//    my_strcat (dummy, &(name[1]), sizeof(dummy));
+			//    my_strcpy (name, dummy, max);
+			//    return;
+			//}
+			//else if (strstr(name, "Spawn of"))
+			//{
+			//    char dummy[80];
+			//    strcpy (dummy, "Spawn of ");
+			//    my_strcat (dummy, &(name[1]), sizeof(dummy));
+			//    my_strcpy (name, dummy, max);
+			//    return;
+			//}
+			//else if (strstr(name, "Descendant of"))
+			//{
+			//    char dummy[80];
+			//    strcpy (dummy, "Descendant of ");
+			//    my_strcat (dummy, &(name[1]), sizeof(dummy));
+			//    my_strcpy (name, dummy, max);
+			//    return;
+			//}
+			//else if ((strstr(name, "Manes")) || (name[name_len-1] == 'u') || (strstr(name, "Yeti")) ||
+			//    (streq(&(name[name_len-2]), "ua")) || (streq(&(name[name_len-3]), "nee")) ||
+			//    (streq(&(name[name_len-4]), "idhe")))
+			//{
+			//    return;
+			//}
+			//else if (name[name_len-1] == 'y')
+			//{
+			//    strcpy(&(name[name_len - 1]), "ies");
+			//}
+			//else if (streq(&(name[name_len - 4]), "ouse"))
+			//{
+			//    strcpy (&(name[name_len - 4]), "ice");
+			//}
+			//else if (streq(&(name[name_len - 4]), "lung"))
+			//{
+			//    strcpy (&(name[name_len - 4]), "lungen");
+			//}
+			//else if (streq(&(name[name_len - 3]), "sus"))
+			//{
+			//    strcpy (&(name[name_len - 3]), "si");
+			//}
+			//else if (streq(&(name[name_len - 4]), "star"))
+			//{
+			//    strcpy (&(name[name_len - 4]), "stari");
+			//}
+			//else if (streq(&(name[name_len - 3]), "aia"))
+			//{
+			//    strcpy (&(name[name_len - 3]), "aiar");
+			//}
+			//else if (streq(&(name[name_len - 3]), "inu"))
+			//{
+			//    strcpy (&(name[name_len - 3]), "inur");
+			//}
+			//else if (streq(&(name[name_len - 5]), "culus"))
+			//{
+			//    strcpy (&(name[name_len - 5]), "culi");
+			//}
+			//else if (streq(&(name[name_len - 4]), "sman"))
+			//{
+			//    strcpy (&(name[name_len - 4]), "smen");
+			//}
+			//else if (streq(&(name[name_len - 4]), "lman"))
+			//{
+			//    strcpy (&(name[name_len - 4]), "lmen");
+			//}
+			//else if (streq(&(name[name_len - 2]), "ex"))
+			//{
+			//    strcpy (&(name[name_len - 2]), "ices");
+			//}
+			//else if ((name[name_len - 1] == 'f') && (!streq(&(name[name_len - 2]), "ff")))
+			//{
+			//    strcpy (&(name[name_len - 1]), "ves");
+			//}
+			//else if (((streq(&(name[name_len - 2]), "ch")) || (name[name_len - 1] == 's')) &&
+			//        (!streq(&(name[name_len - 5]), "iarch")))
+			//{
+			//    strcpy (&(name[name_len]), "es");
+			//}
+			//else
+			//{
+			//    strcpy (&(name[name_len]), "s");
+			//}
+		}
 	}
 }

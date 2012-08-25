@@ -851,5 +851,12 @@ namespace CSAngband {
 		 * Normal levels get at least 14 monsters
 		 */
 		public const int MIN_M_ALLOC_LEVEL = 14;
+
+		/*
+		 * Hack -- first "normal" artifact in the artifact list.  All of
+		 * the artifacts with indexes from 1 to 15 are "special" (lights,
+		 * rings, amulets), and the ones from 16 to 127 are "normal".
+		 */
+		public const int ART_MIN_NORMAL = 16;
 	}
 }
