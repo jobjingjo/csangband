@@ -588,10 +588,9 @@ namespace CSAngband {
 				 * this needs to be expanded into a general safety-check
 				 * on args */
 				if ((game_cmds[idx].arg_type[0] == cmd_arg_type.arg_ITEM) && cmd.arg_present[0]) {
-					throw new NotImplementedException();
-					//Object.Object o_ptr = object_from_item_idx(cmd.arg[0].item);
-					//if (!o_ptr.kind)
-					//    return;
+					Object.Object o_ptr = Object.Object.object_from_item_idx(cmd.arg[0].value);
+					if (o_ptr.kind == null)
+					    return;
 				}
 
 				/* Do some sanity checking on those arguments that might have 
@@ -728,34 +727,35 @@ namespace CSAngband {
 					case Command_Code.FIRE:
 					case Command_Code.THROW:
 					{
-						throw new NotImplementedException();
-						//bool get_target = false;
-						//object_type *o_ptr = object_from_item_idx(cmd.arg[0].choice);
+						bool get_target = false;
+						Object.Object o_ptr = Object.Object.object_from_item_idx(cmd.arg[0].value);
 
-						///* If we couldn't resolve the item, then abort this */
-						//if (!o_ptr.kind) break;
+						/* If we couldn't resolve the item, then abort this */
+						if (o_ptr.kind == null) break;
 
-						///* Thrown objects always need an aim, others might, depending
-						// * on the object */
-						//if (obj_needs_aim(o_ptr) || cmd.command == Command_Code.THROW)
-						//{
-						//    if (!cmd.arg_present[1])
-						//        get_target = true;
+						/* Thrown objects always need an aim, others might, depending
+						 * on the object */
+						if (o_ptr.needs_aim() || cmd.command == Command_Code.THROW)
+						{
+							if(!cmd.arg_present[1]) {
+								get_target = true;
+							} else if(cmd.arg[1].value == (int)Direction.UNKNOWN) {
+								get_target = true;
+							} else if(cmd.arg[1].value == (int)Direction.TARGET && !Target.okay()) {
+								get_target = true;
+							}
+						}
 
-						//    if (cmd.arg[1].direction == DIR_UNKNOWN)
-						//        get_target = true;
+						cmd.arg[1] = new cmd_arg();
+						cmd.arg[1].value = 0;
 
-						//    if (cmd.arg[1].direction == DIR_TARGET && !target_okay())
-						//        get_target = true;
-						//}
+						if (get_target && !Xtra2.get_aim_dir(ref cmd.arg[1].value))
+						        return;
 
-						//if (get_target && !get_aim_dir(&cmd.arg[1].direction))
-						//        return;
+						Misc.p_ptr.confuse_dir(ref cmd.arg[1].value, false);
+						cmd.arg_present[1] = true;
 
-						//player_confuse_dir(p_ptr, &cmd.arg[1].direction, false);
-						//cmd.arg_present[1] = true;
-
-						//break;
+						break;
 					}
 			
 					/* This takes a choice and a direction. */
@@ -886,15 +886,15 @@ namespace CSAngband {
 
 		public void set_arg_item(int n, int item)
 		{
-			throw new NotImplementedException();
-			//int idx = cmd_idx(cmd.command);
+			int idx = cmd_idx(command);
 
-			//assert(n <= CMD_MAX_ARGS);
-			//assert(game_cmds[idx].arg_type[n] & arg_ITEM);
+			Misc.assert(n <= CMD_MAX_ARGS);
+			Misc.assert((game_cmds[idx].arg_type[n] & cmd_arg_type.arg_ITEM) != 0);
 
-			//cmd.arg[n].item = item;
-			//cmd.arg_type[n] = arg_ITEM;
-			//cmd.arg_present[n] = true;
+			arg[n] = new cmd_arg();
+			arg[n].value = item;
+			arg_type[n] = cmd_arg_type.arg_ITEM;
+			arg_present[n] = true;
 		}
 
 	}

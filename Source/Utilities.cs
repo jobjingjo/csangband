@@ -1771,58 +1771,117 @@ namespace CSAngband {
 		 */
 		public static short get_quantity(string prompt, int max)
 		{
-			throw new NotImplementedException();
-			//int amt = 1;
+			int amt = 1;
 
 
-			///* Use "command_arg" */
-			//if (p_ptr.command_arg)
-			//{
-			//    /* Extract a number */
-			//    amt = p_ptr.command_arg;
+			/* Use "command_arg" */
+			if (Misc.p_ptr.command_arg != 0)
+			{
+			    /* Extract a number */
+			    amt = Misc.p_ptr.command_arg;
 
-			//    /* Clear "command_arg" */
-			//    p_ptr.command_arg = 0;
-			//}
+			    /* Clear "command_arg" */
+			    Misc.p_ptr.command_arg = 0;
+			}
 
-			///* Prompt if needed */
-			//else if ((max != 1))
-			//{
-			//    char tmp[80];
+			/* Prompt if needed */
+			else if ((max != 1))
+			{
+			    //char tmp[80];
+				string tmp;
+			    //char buf[80];
+				string buf;
 
-			//    char buf[80];
+			    /* Build a prompt if needed */
+			    if (prompt == null)
+			    {
+			        /* Build a prompt */
+			        //strnfmt(tmp, sizeof(tmp), "Quantity (0-%d, *=all): ", max);
+					tmp = String.Format("Quantity (0-{0}, *=all): ", max);
 
-			//    /* Build a prompt if needed */
-			//    if (!prompt)
-			//    {
-			//        /* Build a prompt */
-			//        strnfmt(tmp, sizeof(tmp), "Quantity (0-%d, *=all): ", max);
+			        /* Use that prompt */
+			        prompt = tmp;
+			    }
 
-			//        /* Use that prompt */
-			//        prompt = tmp;
-			//    }
+			    /* Build the default */
+				buf = String.Format("%d", amt);
 
-			//    /* Build the default */
-			//    strnfmt(buf, sizeof(buf), "%d", amt);
+			    /* Ask for a quantity */
+			    if (!get_string(prompt, ref buf, 7)) return (0);
 
-			//    /* Ask for a quantity */
-			//    if (!get_string(prompt, buf, 7)) return (0);
+				/* A star or letter means "all" */
+			    if ((buf[0] == '*') || Char.IsLetter(buf[0])) 
+					amt = max; 
+				else 
+					/* Extract a number */
+					amt = int.Parse(buf);
+			}
 
-			//    /* Extract a number */
-			//    amt = atoi(buf);
+			/* Enforce the maximum */
+			if (amt > max) amt = max;
 
-			//    /* A star or letter means "all" */
-			//    if ((buf[0] == '*') || isalpha((unsigned char)buf[0])) amt = max;
-			//}
+			/* Enforce the minimum */
+			if (amt < 0) amt = 0;
 
-			///* Enforce the maximum */
-			//if (amt > max) amt = max;
+			/* Return the result */
+			return (short)(amt);
+		}
 
-			///* Enforce the minimum */
-			//if (amt < 0) amt = 0;
+		/*
+		 * Prompt for a string from the user.
+		 *
+		 * The "prompt" should take the form "Prompt: ".
+		 *
+		 * See "askfor_aux" for some notes about "buf" and "len", and about
+		 * the return value of this function.
+		 */
+		public static bool get_string(string prompt, ref string buf, int len)
+		{
+			bool res;
 
-			///* Return the result */
-			//return (amt);
+			/* Paranoia XXX XXX XXX */
+			message_flush();
+
+			/* Display prompt */
+			prt(prompt, 0, 0);
+
+			/* Ask the user for a string */
+			res = askfor_aux(ref buf, len, null);
+
+			/* Translate it to 8-bit (Latin-1) */
+			//Nick: uhh.... let's ignore this...
+			//xstr_trans(buf, LATIN1);
+
+			/* Clear prompt */
+			prt("", 0, 0);
+
+			/* Result */
+			return (res);
+		}
+
+		public static bool get_com_ex(string prompt, out ui_event command)
+		{
+			ui_event ke;
+
+			/* Paranoia XXX XXX XXX */
+			message_flush();
+
+			/* Display a prompt */
+			prt(prompt, 0, 0);
+
+			/* Get a key */
+			ke = inkey_ex();
+
+			/* Clear the prompt */
+			prt("", 0, 0);
+
+			/* Save the command */
+			command = ke;
+
+			/* Done */
+			if (ke.type == ui_event_type.EVT_KBRD && ke.key.code == keycode_t.ESCAPE)
+				return false;
+			return true;
 		}
 
 	}

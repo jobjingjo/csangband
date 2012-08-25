@@ -255,5 +255,115 @@ namespace CSAngband {
 			/* Success */
 			return (true);
 		}
+
+		/*
+		 * Get an "aiming direction" (1,2,3,4,6,7,8,9 or 5) from the user.
+		 *
+		 * Return true if a direction was chosen, otherwise return false.
+		 *
+		 * The direction "5" is special, and means "use current target".
+		 *
+		 * This function tracks and uses the "global direction", and uses
+		 * that as the "desired direction", if it is set.
+		 *
+		 * Note that "Force Target", if set, will pre-empt user interaction,
+		 * if there is a usable target already set.
+		 */
+		public static bool get_aim_dir(ref int dp)
+		{
+			/* Global direction */
+			int dir = 0;
+	
+			ui_event ke;
+
+			string p;
+
+			/* Initialize */
+			dp = 0;
+
+			/* Hack -- auto-target if requested */
+			if (Option.use_old_target.value && Target.okay() && dir == 0) dir = 5;
+
+			/* Ask until satisfied */
+			while (dir == 0)
+			{
+			    /* Choose a prompt */
+			    if (!Target.okay())
+			        p = "Direction ('*' or <click> to target, \"'\" for closest, Escape to cancel)? ";
+			    else
+			        p = "Direction ('5' for target, '*' or <click> to re-target, Escape to cancel)? ";
+
+			    /* Get a command (or Cancel) */
+			    if (!Utilities.get_com_ex(p, out ke)) break;
+
+			    if (ke.type == ui_event_type.EVT_MOUSE)
+			    {
+					throw new NotImplementedException();
+					//if (target_set_interactive(TARGET_KILL, KEY_GRID_X(ke), KEY_GRID_Y(ke)))
+					//    dir = 5;
+			    }
+			    else if (ke.type == ui_event_type.EVT_KBRD)
+			    {
+			        if (ke.key.code == (keycode_t)'*')
+			        {
+			            /* Set new target, use target if legal */
+			            if (Target.set_interactive(Target.KILL, -1, -1))
+			                dir = 5;
+			        }
+			        else if (ke.key.code == (keycode_t)'\'')
+			        {
+			            /* Set to closest target */
+			            if (Target.set_closest(Target.KILL))
+			                dir = 5;
+			        }
+			        else if (ke.key.code == (keycode_t)'t' || ke.key.code == (keycode_t)'5' ||
+			                ke.key.code == (keycode_t)'0' || ke.key.code == (keycode_t)'.')
+			        {
+			            if (Target.okay())
+			                dir = 5;
+			        }
+			        else
+			        {
+			            /* Possible direction */
+			            int keypresses_handled = 0;
+				
+			            while (ke.key.code != 0)
+			            {
+			                int this_dir;
+					
+			                /* XXX Ideally show and move the cursor here to indicate 
+			                   the currently "Pending" direction. XXX */
+			                this_dir = Utilities.target_dir(ke.key);
+					
+			                if (this_dir != 0)
+			                    dir = dir_transitions[dir][this_dir];
+			                else
+			                    break;
+					
+			                if (Misc.lazymove_delay == 0 || ++keypresses_handled > 1)
+			                    break;
+				
+			                /* See if there's a second keypress within the defined
+			                   period of time. */
+							Utilities.inkey_scan = Misc.lazymove_delay; 
+			                ke = Utilities.inkey_ex();
+			            }
+			        }
+			    }
+
+			    /* Error */
+			    if (dir == 0) Utilities.bell("Illegal aim direction!");
+			}
+
+			/* No direction */
+			if (dir == 0) return (false);
+
+			/* Save direction */
+			dp = dir;
+
+			/* A "valid" direction was entered */
+			return (true);
+		}
+
 	}
 }

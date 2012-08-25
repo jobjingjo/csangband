@@ -1673,146 +1673,145 @@ namespace CSAngband {
 		 */
 		static int find_inven(Object.Object o_ptr)
 		{
-			throw new NotImplementedException();
-			//int i, j;
-			//int num = 0;
+			int i, j;
+			int num = 0;
 
-			///* Similar slot? */
-			//for (j = 0; j < QUIVER_END; j++)
-			//{
-			//    object_type *j_ptr = &p_ptr.inventory[j];
+			/* Similar slot? */
+			for (j = 0; j < Misc.QUIVER_END; j++)
+			{
+			    Object.Object j_ptr = Misc.p_ptr.inventory[j];
 
-			//    /* Check only the inventory and the quiver */
-			//    if (j >= INVEN_WIELD && j < QUIVER_START) continue;
+			    /* Check only the inventory and the quiver */
+			    if (j >= Misc.INVEN_WIELD && j < Misc.QUIVER_START) continue;
 
-			//    /* Require identical object types */
-			//    if (o_ptr.kind != j_ptr.kind) continue;
+			    /* Require identical object types */
+			    if (o_ptr.kind != j_ptr.kind) continue;
 
-			//    /* Analyze the items */
-			//    switch (o_ptr.tval)
-			//    {
-			//        /* Chests */
-			//        case TV_CHEST:
-			//        {
-			//            /* Never okay */
-			//            return 0;
-			//        }
+			    /* Analyze the items */
+			    switch (o_ptr.tval)
+			    {
+			        /* Chests */
+			        case TVal.TV_CHEST:
+			        {
+			            /* Never okay */
+			            return 0;
+			        }
 
-			//        /* Food and Potions and Scrolls */
-			//        case TV_FOOD:
-			//        case TV_POTION:
-			//        case TV_SCROLL:
-			//        {
-			//            /* Assume okay */
-			//            break;
-			//        }
+			        /* Food and Potions and Scrolls */
+			        case TVal.TV_FOOD:
+			        case TVal.TV_POTION:
+			        case TVal.TV_SCROLL:
+			        {
+			            /* Assume okay */
+			            break;
+			        }
 
-			//        /* Staves and Wands */
-			//        case TV_STAFF:
-			//        case TV_WAND:
-			//        {
-			//            /* Assume okay */
-			//            break;
-			//        }
+			        /* Staves and Wands */
+			        case TVal.TV_STAFF:
+			        case TVal.TV_WAND:
+			        {
+			            /* Assume okay */
+			            break;
+			        }
 
-			//        /* Rods */
-			//        case TV_ROD:
-			//        {
-			//            /* Assume okay */
-			//            break;
-			//        }
+			        /* Rods */
+			        case TVal.TV_ROD:
+			        {
+			            /* Assume okay */
+			            break;
+			        }
 
-			//        /* Weapons and Armor */
-			//        case TV_BOW:
-			//        case TV_DIGGING:
-			//        case TV_HAFTED:
-			//        case TV_POLEARM:
-			//        case TV_SWORD:
-			//        case TV_BOOTS:
-			//        case TV_GLOVES:
-			//        case TV_HELM:
-			//        case TV_CROWN:
-			//        case TV_SHIELD:
-			//        case TV_CLOAK:
-			//        case TV_SOFT_ARMOR:
-			//        case TV_HARD_ARMOR:
-			//        case TV_DRAG_ARMOR:
-			//        {
-			//            /* Fall through */
-			//        }
+			        /* Weapons and Armor */
+			        case TVal.TV_BOW:
+			        case TVal.TV_DIGGING:
+			        case TVal.TV_HAFTED:
+			        case TVal.TV_POLEARM:
+			        case TVal.TV_SWORD:
+			        case TVal.TV_BOOTS:
+			        case TVal.TV_GLOVES:
+			        case TVal.TV_HELM:
+			        case TVal.TV_CROWN:
+			        case TVal.TV_SHIELD:
+			        case TVal.TV_CLOAK:
+			        case TVal.TV_SOFT_ARMOR:
+			        case TVal.TV_HARD_ARMOR:
+			        case TVal.TV_DRAG_ARMOR:
+			        /* Fall through */
 
-			//        /* Rings, Amulets, Lights */
-			//        case TV_RING:
-			//        case TV_AMULET:
-			//        case TV_LIGHT:
-			//        {
-			//            /* Require both items to be known */
-			//            if (!object_is_known(o_ptr) || !object_is_known(j_ptr)) continue;
+			        /* Rings, Amulets, Lights */
+			        case TVal.TV_RING:
+			        case TVal.TV_AMULET:
+			        case TVal.TV_LIGHT:
+			        {
+			            /* Require both items to be known */
+			            if (!o_ptr.is_known() || !j_ptr.is_known()) continue;
 
-			//            /* Fall through */
-			//        }
+			            /* Fall through */
+						goto fucking_fallthroughs;
+			        }
 
-			//        /* Missiles */
-			//        case TV_BOLT:
-			//        case TV_ARROW:
-			//        case TV_SHOT:
-			//        {
-			//            /* Require identical knowledge of both items */
-			//            if (object_is_known(o_ptr) != object_is_known(j_ptr)) continue;
+			        /* Missiles */
+			        case TVal.TV_BOLT:
+			        case TVal.TV_ARROW:
+			        case TVal.TV_SHOT:
+			        fucking_fallthroughs:
+					{
+			            /* Require identical knowledge of both items */
+			            if (o_ptr.is_known() != j_ptr.is_known()) continue;
 
-			//            /* Require identical "bonuses" */
-			//            if (o_ptr.to_h != j_ptr.to_h) continue;
-			//            if (o_ptr.to_d != j_ptr.to_d) continue;
-			//            if (o_ptr.to_a != j_ptr.to_a) continue;
+			            /* Require identical "bonuses" */
+			            if (o_ptr.to_h != j_ptr.to_h) continue;
+			            if (o_ptr.to_d != j_ptr.to_d) continue;
+			            if (o_ptr.to_a != j_ptr.to_a) continue;
 
-			//            /* Require identical "pval" codes */
-			//            for (i = 0; i < MAX_PVALS; i++)
-			//                if (o_ptr.pval[i] != j_ptr.pval[i])
-			//                    continue;
+			            /* Require identical "pval" codes */
+			            for (i = 0; i < Misc.MAX_PVALS; i++)
+			                if (o_ptr.pval[i] != j_ptr.pval[i])
+			                    continue;
 
-			//            if (o_ptr.num_pvals != j_ptr.num_pvals)
-			//                continue;
+			            if (o_ptr.num_pvals != j_ptr.num_pvals)
+			                continue;
 
-			//            /* Require identical "artifact" names */
-			//            if (o_ptr.artifact != j_ptr.artifact) continue;
+			            /* Require identical "artifact" names */
+			            if (o_ptr.artifact != j_ptr.artifact) continue;
 
-			//            /* Require identical "ego-item" names */
-			//            if (o_ptr.ego != j_ptr.ego) continue;
+			            /* Require identical "ego-item" names */
+			            if (o_ptr.ego != j_ptr.ego) continue;
 
-			//            /* Lights must have same amount of fuel */
-			//            else if (o_ptr.timeout != j_ptr.timeout && o_ptr.tval == TV_LIGHT)
-			//                continue;
+			            /* Lights must have same amount of fuel */
+			            else if (o_ptr.timeout != j_ptr.timeout && o_ptr.tval == TVal.TV_LIGHT)
+			                continue;
 
-			//            /* Require identical "values" */
-			//            if (o_ptr.ac != j_ptr.ac) continue;
-			//            if (o_ptr.dd != j_ptr.dd) continue;
-			//            if (o_ptr.ds != j_ptr.ds) continue;
+			            /* Require identical "values" */
+			            if (o_ptr.ac != j_ptr.ac) continue;
+			            if (o_ptr.dd != j_ptr.dd) continue;
+			            if (o_ptr.ds != j_ptr.ds) continue;
 
-			//            /* Probably okay */
-			//            break;
-			//        }
+			            /* Probably okay */
+			            break;
+			        }
 
-			//        /* Various */
-			//        default:
-			//        {
-			//            /* Require knowledge */
-			//            if (!object_is_known(o_ptr) || !object_is_known(j_ptr)) continue;
+			        /* Various */
+			        default:
+			        {
+			            /* Require knowledge */
+			            if (!o_ptr.is_known() || !j_ptr.is_known()) continue;
 
-			//            /* Probably okay */
-			//            break;
-			//        }
-			//    }
+			            /* Probably okay */
+			            break;
+			        }
+			    }
 
 
-			//    /* Different flags */
-			//    if (!of_is_equal(o_ptr.flags, j_ptr.flags))
-			//        continue;
+			    /* Different flags */
+			    if (!o_ptr.flags.is_equal(j_ptr.flags))
+			        continue;
 
-			//    /* They match, so add up */
-			//    num += j_ptr.number;
-			//}
+			    /* They match, so add up */
+			    num += j_ptr.number;
+			}
 
-			//return num;
+			return num;
 		}
 
 		/*

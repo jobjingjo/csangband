@@ -2939,35 +2939,35 @@ namespace CSAngband {
 		 * Fire an object from the quiver, pack or floor at a target.
 		 */
 		public static void fire(Command_Code code, cmd_arg[] args) {
+			int item = args[0].value;
+			int dir = args[1].value;
+			int range = 6 + 2 * Misc.p_ptr.state.ammo_mult;
+			int shots = Misc.p_ptr.state.num_shots;
+
+			Attack.ranged_attack attack = Attack.make_ranged_shot;
+
+			Object.Object j_ptr = Misc.p_ptr.inventory[Misc.INVEN_BOW];
+			Object.Object o_ptr = Object.Object.object_from_item_idx(item);
+
+			/* Require a usable launcher */
+			if (j_ptr.tval == 0 || Misc.p_ptr.state.ammo_tval == 0) {
+			    Utilities.msg("You have nothing to fire with.");
+			    return;
+			}
+
+			/* Check the item being fired is usable by the player. */
+			if (!Object.Object.item_is_available(item, null, Misc.USE_EQUIP | Misc.USE_INVEN | Misc.USE_FLOOR)) {
+			    Utilities.msg("That item is not within your reach.");
+			    return;
+			}
+
+			/* Check the ammo can be used with the launcher */
+			if (o_ptr.tval != Misc.p_ptr.state.ammo_tval) {
+			    Utilities.msg("That ammo cannot be fired by your current weapon.");
+			    return;
+			}
+
 			throw new NotImplementedException();
-			//int item = args[0].item;
-			//int dir = args[1].direction;
-			//int range = 6 + 2 * p_ptr.state.ammo_mult;
-			//int shots = p_ptr.state.num_shots;
-
-			//ranged_attack attack = make_ranged_shot;
-
-			//object_type *j_ptr = &p_ptr.inventory[INVEN_BOW];
-			//object_type *o_ptr = object_from_item_idx(item);
-
-			///* Require a usable launcher */
-			//if (!j_ptr.tval || !p_ptr.state.ammo_tval) {
-			//    msg("You have nothing to fire with.");
-			//    return;
-			//}
-
-			///* Check the item being fired is usable by the player. */
-			//if (!item_is_available(item, null, USE_EQUIP | USE_INVEN | USE_FLOOR)) {
-			//    msg("That item is not within your reach.");
-			//    return;
-			//}
-
-			///* Check the ammo can be used with the launcher */
-			//if (o_ptr.tval != p_ptr.state.ammo_tval) {
-			//    msg("That ammo cannot be fired by your current weapon.");
-			//    return;
-			//}
-
 			//ranged_helper(item, dir, range, shots, attack);
 		}
 	}
