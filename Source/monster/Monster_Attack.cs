@@ -22,11 +22,10 @@ namespace CSAngband.Monster {
 
 			/* if the monster checks vs ac, the player learns ac bonuses */
 			/* XXX Eddie should you only learn +ac on miss, -ac on hit?  who knows */
-			throw new NotImplementedException();
-			//object_notice_on_defend(p);
+			Object.Object.object_notice_on_defend(p);
 
-			///* Check if the player was hit */
-			//return test_hit(chance, ac, true);
+			/* Check if the player was hit */
+			return Attack.test_hit(chance, ac, true);
 		}
 
 		/*
@@ -40,7 +39,7 @@ namespace CSAngband.Monster {
 
 			Monster_Lore l_ptr = Misc.l_list[r_idx];
 
-			int i, k, tmp;
+			int i, tmp;
 
 			short gold;
 
@@ -78,6 +77,10 @@ namespace CSAngband.Monster {
 
 			    string act = null;
 
+				if(r_ptr.blow[ap_cnt] == null) {
+					continue;
+				}
+
 			    // Extract the attack infomation
 			    RBE effect = r_ptr.blow[ap_cnt].effect;
 			    RBM method = r_ptr.blow[ap_cnt].method;
@@ -95,7 +98,7 @@ namespace CSAngband.Monster {
 			    if (ml) visible = true;
 
 			    // Extract visibility from carrying light
-			    if (Race.flags.has(Monster_Flag.HAS_LIGHT.value)) visible = true;
+			    if (r_ptr.flags.has(Monster_Flag.HAS_LIGHT.value)) visible = true;
 
 			    power = effect.power;
 
@@ -144,8 +147,10 @@ namespace CSAngband.Monster {
 			        }
 
 			        // Message
-			        if (act != null)
-			            Utilities.msgt(sound_msg, "%^s %s", m_name, act);
+					if(act != null) {
+						string name = Char.ToUpper(m_name[0]) + m_name.Substring(1);
+						Utilities.msgt(sound_msg, "{0} {1}", name, act);
+					}
 
 
 			        // Hack -- assume all attacks are obvious
@@ -164,21 +169,16 @@ namespace CSAngband.Monster {
 
 			            // Hack -- No damage
 			            damage = 0;
-
-			            break;
 			        } else if (effect.value == RBE.HURT.value)
 			        {
-						throw new NotImplementedException();
-						//// Obvious
-						//obvious = true;
+						// Obvious
+						obvious = true;
 
-						//// Hack -- Player armor reduces total damage
-						//damage -= (damage * ((ac < 240) ? ac : 240) / 400);
+						// Hack -- Player armor reduces total damage
+						damage -= (damage * ((ac < 240) ? ac : 240) / 400);
 
-						//// Take damage
-						//take_hit(p, damage, ddesc);
-
-						//break;
+						// Take damage
+						Spell.take_hit(p, damage, ddesc);
 			        } else if ( effect.value == RBE.POISON.value)
 			        {
 						throw new NotImplementedException();
@@ -194,8 +194,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//monster_learn_resists(m_ptr, p, GF_POIS);
-
-						//break;
 			        } else if (effect.value == RBE.UN_BONUS.value)
 			        {
 						throw new NotImplementedException();
@@ -211,8 +209,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//monster_learn_resists(m_ptr, p, GF_DISEN);
-
-						//break;
 			        } else if (effect.value == RBE.UN_POWER.value)
 			        {
 						throw new NotImplementedException();
@@ -280,8 +276,6 @@ namespace CSAngband.Monster {
 						//        break;
 						//    }
 						//}
-
-						//break;
 			        } else if (effect.value == RBE.EAT_GOLD.value)
 			        {
 						throw new NotImplementedException();
@@ -349,8 +343,6 @@ namespace CSAngband.Monster {
 						//    // Blink away
 						//    blinked = true;
 						//}
-
-						//break;
 			        } else if (effect.value == RBE.EAT_ITEM.value)
 			        {
 						throw new NotImplementedException();
@@ -431,8 +423,6 @@ namespace CSAngband.Monster {
 						//    // Done
 						//    break;
 						//}
-
-						//break;
 			        } else if (effect.value == RBE.EAT_FOOD.value)
 			        {
 						throw new NotImplementedException();
@@ -473,8 +463,6 @@ namespace CSAngband.Monster {
 						//    // Done
 						//    break;
 						//}
-
-						//break;
 			        } else if (effect.value == RBE.EAT_LIGHT.value)
 			        {
 						throw new NotImplementedException();
@@ -504,8 +492,6 @@ namespace CSAngband.Monster {
 						//    // Redraw stuff
 						//    p.redraw |= (PR_EQUIP);
 						//}
-
-						//break;
 			        } else if (effect.value == RBE.ACID.value)
 			        {
 						throw new NotImplementedException();
@@ -525,8 +511,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//monster_learn_resists(m_ptr, p, GF_ACID);
-
-						//break;
 			        } else if (effect.value == RBE.ELEC.value)
 			        {
 						throw new NotImplementedException();
@@ -546,8 +530,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//monster_learn_resists(m_ptr, p, GF_ELEC);
-
-						//break;
 			        } else if (effect.value == RBE.FIRE.value)
 			        {
 						throw new NotImplementedException();
@@ -567,8 +549,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//monster_learn_resists(m_ptr, p, GF_FIRE);
-
-						//break;
 			        } else if (effect.value == RBE.COLD.value)
 			        {
 						throw new NotImplementedException();
@@ -588,8 +568,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//monster_learn_resists(m_ptr, p, GF_COLD);
-
-						//break;
 			        } else if (effect.value == RBE.BLIND.value)
 			        {
 						throw new NotImplementedException();
@@ -602,8 +580,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//update_smart_learn(m_ptr, p, OF_RES_BLIND);
-
-						//break;
 			        } else if (effect.value == RBE.CONFUSE.value)
 			        {
 						throw new NotImplementedException();
@@ -616,8 +592,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//update_smart_learn(m_ptr, p, OF_RES_CONFU);
-
-						//break;
 			        } else if (effect.value == RBE.TERRIFY.value)
 			        {
 						throw new NotImplementedException();
@@ -639,8 +613,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//update_smart_learn(m_ptr, p, OF_RES_FEAR);
-
-						//break;
 			        } else if(effect.value == RBE.PARALYZE.value)
 			        {
 						throw new NotImplementedException();
@@ -665,8 +637,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//update_smart_learn(m_ptr, p, OF_FREE_ACT);
-
-						//break;
 			        } else if (effect.value == RBE.LOSE_STR.value)
 			        {
 						throw new NotImplementedException();
@@ -675,8 +645,6 @@ namespace CSAngband.Monster {
 
 						//// Damage (stat)
 						//if (do_dec_stat(A_STR, false)) obvious = true;
-
-						//break;
 			        } else if (effect.value == RBE.LOSE_INT.value)
 			        {
 						throw new NotImplementedException();
@@ -685,8 +653,6 @@ namespace CSAngband.Monster {
 
 						//// Damage (stat)
 						//if (do_dec_stat(A_INT, false)) obvious = true;
-
-						//break;
 			        } else if (effect.value == RBE.LOSE_WIS.value)
 			        {
 						throw new NotImplementedException();
@@ -695,8 +661,6 @@ namespace CSAngband.Monster {
 
 						//// Damage (stat)
 						//if (do_dec_stat(A_WIS, false)) obvious = true;
-
-						//break;
 			        } else if (effect.value == RBE.LOSE_DEX.value)
 			        {
 						throw new NotImplementedException();
@@ -705,8 +669,6 @@ namespace CSAngband.Monster {
 
 						//// Damage (stat)
 						//if (do_dec_stat(A_DEX, false)) obvious = true;
-
-						//break;
 			        } else if (effect.value == RBE.LOSE_CON.value)
 			        {
 						throw new NotImplementedException();
@@ -715,8 +677,6 @@ namespace CSAngband.Monster {
 
 						//// Damage (stat)
 						//if (do_dec_stat(A_CON, false)) obvious = true;
-
-						//break;
 			        } else if (effect.value == RBE.LOSE_CHR.value)
 			        {
 						throw new NotImplementedException();
@@ -725,8 +685,6 @@ namespace CSAngband.Monster {
 
 						//// Damage (stat)
 						//if (do_dec_stat(A_CHR, false)) obvious = true;
-
-						//break;
 			        } else if (effect.value == RBE.LOSE_ALL.value)
 			        {
 						throw new NotImplementedException();
@@ -740,8 +698,6 @@ namespace CSAngband.Monster {
 						//if (do_dec_stat(A_INT, false)) obvious = true;
 						//if (do_dec_stat(A_WIS, false)) obvious = true;
 						//if (do_dec_stat(A_CHR, false)) obvious = true;
-
-						//break;
 			        } else if (effect.value == RBE.SHATTER.value)
 			        {
 						throw new NotImplementedException();
@@ -767,7 +723,6 @@ namespace CSAngband.Monster {
 						//        (py_old != p.py))
 						//        do_break = true;
 						//}
-						//break;
 			        } else if (effect.value == RBE.EXP_10.value)
 			        {
 						throw new NotImplementedException();
@@ -796,8 +751,6 @@ namespace CSAngband.Monster {
 						//        player_exp_lose(p, d, false);
 						//    }
 						//}
-
-						//break;
 			        } else if (effect.value == RBE.EXP_20.value)
 			        {
 						throw new NotImplementedException();
@@ -827,7 +780,6 @@ namespace CSAngband.Monster {
 						//        player_exp_lose(p, d, false);
 						//    }
 						//}
-						//break;
 			        } else if (effect.value == RBE.EXP_40.value)
 			        {
 						throw new NotImplementedException();
@@ -857,7 +809,6 @@ namespace CSAngband.Monster {
 						//        player_exp_lose(p, d, false);
 						//    }
 						//}
-						//break;
 			        } else if (effect.value == RBE.EXP_80.value)
 			        {
 						throw new NotImplementedException();
@@ -887,7 +838,6 @@ namespace CSAngband.Monster {
 						//        player_exp_lose(p, d, false);
 						//    }
 						//}
-						//break;
 			        } else if (effect.value == RBE.HALLU.value)
 			        {
 						throw new NotImplementedException();
@@ -900,8 +850,6 @@ namespace CSAngband.Monster {
 
 						//// Learn about the player
 						//monster_learn_resists(m_ptr, p, GF_CHAOS);
-
-						//break;
 			        } else {
 						throw new NotImplementedException();
 					}
@@ -926,86 +874,84 @@ namespace CSAngband.Monster {
 			        // Handle cut
 			        if (do_cut)
 			        {
-						throw new NotImplementedException();
-						//int k;
+						int k = 0;
 
-						//// Critical hit (zero if non-critical)
-						//tmp = monster_critical(d_dice, d_side, damage);
+						// Critical hit (zero if non-critical)
+						tmp = monster_critical(d_dice, d_side, damage);
 
-						//// Roll for damage
-						//switch (tmp)
-						//{
-						//    case 0: k = 0; break;
-						//    case 1: k = randint1(5); break;
-						//    case 2: k = randint1(5) + 5; break;
-						//    case 3: k = randint1(20) + 20; break;
-						//    case 4: k = randint1(50) + 50; break;
-						//    case 5: k = randint1(100) + 100; break;
-						//    case 6: k = 300; break;
-						//    default: k = 500; break;
-						//}
+						// Roll for damage
+						switch (tmp)
+						{
+						    case 0: k = 0; break;
+						    case 1: k = Random.randint1(5); break;
+						    case 2: k = Random.randint1(5) + 5; break;
+						    case 3: k = Random.randint1(20) + 20; break;
+						    case 4: k = Random.randint1(50) + 50; break;
+						    case 5: k = Random.randint1(100) + 100; break;
+						    case 6: k = 300; break;
+						    default: k = 500; break;
+						}
 
-						//// Apply the cut
-						//if (k) (void)player_inc_timed(p, TMD_CUT, k, true, true);
+						// Apply the cut
+						if (k != 0) {
+							p.inc_timed((int)Timed_Effect.CUT, k, true, true);
+						}
 			        }
 
 			        // Handle stun
 			        if (do_stun)
 			        {
-						throw new NotImplementedException();
-						//int k;
+						int k;
 
-						//// Critical hit (zero if non-critical)
-						//tmp = monster_critical(d_dice, d_side, damage);
+						// Critical hit (zero if non-critical)
+						tmp = monster_critical(d_dice, d_side, damage);
 
-						//// Roll for damage
-						//switch (tmp)
-						//{
-						//    case 0: k = 0; break;
-						//    case 1: k = randint1(5); break;
-						//    case 2: k = randint1(10) + 10; break;
-						//    case 3: k = randint1(20) + 20; break;
-						//    case 4: k = randint1(30) + 30; break;
-						//    case 5: k = randint1(40) + 40; break;
-						//    case 6: k = 100; break;
-						//    default: k = 200; break;
-						//}
+						// Roll for damage
+						switch (tmp)
+						{
+						    case 0: k = 0; break;
+						    case 1: k = Random.randint1(5); break;
+						    case 2: k = Random.randint1(10) + 10; break;
+						    case 3: k = Random.randint1(20) + 20; break;
+						    case 4: k = Random.randint1(30) + 30; break;
+						    case 5: k = Random.randint1(40) + 40; break;
+						    case 6: k = 100; break;
+						    default: k = 200; break;
+						}
 
-						//// Apply the stun
-						//if (k) (void)player_inc_timed(p, TMD_STUN, k, true, true);
+						// Apply the stun
+						if (k != 0){
+							p.inc_timed((int)Timed_Effect.STUN, k, true, true);
+						}
 			        }
 			    }
 
 			    // Monster missed player
 			    else
 			    {
-					throw new NotImplementedException();
-					//// Analyze failed attacks
-					//switch (method)
-					//{
-					//    case RBM_HIT:
-					//    case RBM_TOUCH:
-					//    case RBM_PUNCH:
-					//    case RBM_KICK:
-					//    case RBM_CLAW:
-					//    case RBM_BITE:
-					//    case RBM_STING:
-					//    case RBM_BUTT:
-					//    case RBM_CRUSH:
-					//    case RBM_ENGULF:
+					// Analyze failed attacks
+					if (method == RBM.HIT ||
+						method == RBM.TOUCH || 
+					    method == RBM.PUNCH || 
+					    method == RBM.KICK || 
+					    method == RBM.CLAW || 
+					    method == RBM.BITE || 
+					    method == RBM.STING || 
+					    method == RBM.BUTT || 
+					    method == RBM.CRUSH || 
+					    method == RBM.ENGULF){
 
-					//    // Visible monsters
-					//    if (ml)
-					//    {
-					//        // Disturbing
-					//        disturb(p, 1, 0);
+					    // Visible monsters
+					    if (ml)
+					    {
+					        // Disturbing
+					        Cave.disturb(p, 1, 0);
 
-					//        // Message
-					//        msg("%^s misses you.", m_name);
-					//    }
-
-					//    break;
-					//}
+					        // Message
+					        //Utilities.msg("%^s misses you.", m_name);
+							Utilities.msg("%s misses you.", m_name);
+					    }
+					}
 			    }
 
 

@@ -158,28 +158,30 @@ namespace CSAngband {
 		{
 			public static List<PF> list = new List<PF>();
 
+			public string name;
 			public string text;
 			public int value;
 
-			public PF(int value, string text){
+			public PF(string name, int value, string text){
+				this.name = name;
 				this.text = text;
 				this.value = value;
 
 				list.Add(this);
 			}
-			public static PF NONE = new PF(0,             "");
-			public static PF EXTRA_SHOT = new PF(1,       "receive extra shots with tension bows at levels 20 and 40");
-			public static PF BRAVERY_30 = new PF(2,       "become immune to fear at level 30");
-			public static PF BLESS_WEAPON = new PF(3,     "may only wield blessed or hafted weapons");
-			public static PF CUMBER_GLOVE = new PF(4,     "have difficulty using magic with covered hands");
-			public static PF ZERO_FAIL = new PF(5,        "may obtain a perfect success rate with magic");
-			public static PF BEAM = new PF(6,             "frequently turn bolt spells into beams");
-			public static PF CHOOSE_SPELLS = new PF(7,    "may choose their own spells to study");
-			public static PF PSEUDO_ID_IMPROV = new PF(8, "get better at psudo id with experience");
-			public static PF KNOW_MUSHROOM = new PF(9,    "easily recognize mushrooms");
-			public static PF KNOW_ZAPPER = new PF(10,      "easily recognize magic devices");
-			public static PF SEE_ORE = new PF(11,          "can sense ore in the walls");
-			public static PF MAX = new PF(12, "ERROR: PF.MAX SHOULD NEVER BE SHOWN TO THE PLAYER");
+			public static PF NONE = new PF("NONE", 0,             "");
+			public static PF EXTRA_SHOT = new PF("EXTRA_SHOT", 1,       "receive extra shots with tension bows at levels 20 and 40");
+			public static PF BRAVERY_30 = new PF("BRAVERY_30", 2,       "become immune to fear at level 30");
+			public static PF BLESS_WEAPON = new PF("BLESS_WEAPON", 3,     "may only wield blessed or hafted weapons");
+			public static PF CUMBER_GLOVE = new PF("CUMBER_GLOVE", 4,     "have difficulty using magic with covered hands");
+			public static PF ZERO_FAIL = new PF("ZERO_FAIL", 5,        "may obtain a perfect success rate with magic");
+			public static PF BEAM = new PF("BEAM", 6,             "frequently turn bolt spells into beams");
+			public static PF CHOOSE_SPELLS = new PF("CHOOSE_SPELLS", 7,    "may choose their own spells to study");
+			public static PF PSEUDO_ID_IMPROV = new PF("PSEUDO_ID_IMPROV", 8, "get better at psudo id with experience");
+			public static PF KNOW_MUSHROOM = new PF("KNOW_MUSHROOM", 9,    "easily recognize mushrooms");
+			public static PF KNOW_ZAPPER = new PF("KNOW_ZAPPER", 10,      "easily recognize magic devices");
+			public static PF SEE_ORE = new PF("SEE_ORE", 11,          "can sense ore in the walls");
+			public static PF MAX = new PF("MAX", 12, "ERROR: PF.MAX SHOULD NEVER BE SHOWN TO THE PLAYER");
 		};
 
 		public static int PF_SIZE{

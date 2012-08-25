@@ -241,26 +241,25 @@ namespace CSAngband.Monster {
 		 * \param aspect is the damage calc required (min, avg, max, random)
 		 */
 		//dam_aspect was type "aspect"
-		static int nonhp_dam(int spell, int rlev, int dam_aspect)
+		static int nonhp_dam(int spell, int rlev, aspect dam_aspect)
 		{
-			throw new NotImplementedException();
-			//const struct mon_spell *rs_ptr = &mon_spell_table[spell];
-			//int dam;
+			Monster_Spell_Flag rs_ptr = Monster_Spell_Flag.list[spell];
+			int dam;
 
-			///* base damage is X + YdZ (m_bonus is not used) */
-			//dam = randcalc(rs_ptr.base_dam, 0, dam_aspect);
+			/* base damage is X + YdZ (m_bonus is not used) */
+			dam = Random.randcalc(rs_ptr.base_dam, 0, dam_aspect);
 
-			///* rlev-dependent damage (m_bonus is used as a switch) */
-			//dam += (rlev * rs_ptr.rlev_dam.base / 100);
+			/* rlev-dependent damage (m_bonus is used as a switch) */
+			dam += (rlev * rs_ptr.rlev_dam.Base / 100);
 
-			//if (rs_ptr.rlev_dam.m_bonus == 1) /* then rlev affects dice */
-			//    dam += damcalc(MIN(1, rs_ptr.rlev_dam.dice * rlev / 100), 
-			//            rs_ptr.rlev_dam.sides, dam_aspect);
-			//else /* rlev affects sides */
-			//    dam += damcalc(rs_ptr.rlev_dam.dice, rs_ptr.rlev_dam.sides *
-			//            rlev / 100, dam_aspect);
+			if (rs_ptr.rlev_dam.m_bonus == 1) /* then rlev affects dice */
+			    dam += Random.damcalc(Math.Min(1, rs_ptr.rlev_dam.dice * rlev / 100), 
+			            rs_ptr.rlev_dam.sides, dam_aspect);
+			else /* rlev affects sides */
+			    dam += Random.damcalc(rs_ptr.rlev_dam.dice, rs_ptr.rlev_dam.sides *
+			            rlev / 100, dam_aspect);
 
-			//return dam;
+			return dam;
 		}
 
 		/**
@@ -271,18 +270,17 @@ namespace CSAngband.Monster {
 		 */
 		static int hp_dam(int spell, int hp)
 		{
-			throw new NotImplementedException();
-			//const struct mon_spell *rs_ptr = &mon_spell_table[spell];
-			//int dam;
+			Monster_Spell_Flag rs_ptr = Monster_Spell_Flag.list[spell];
+			int dam;
 
-			///* Damage is based on monster's current hp */
-			//dam = hp / rs_ptr.div;
+			/* Damage is based on monster's current hp */
+			dam = hp / rs_ptr.div;
 
-			///* Check for maximum damage */
-			//if (dam > rs_ptr.cap)
-			//    dam = rs_ptr.cap;
+			/* Check for maximum damage */
+			if (dam > rs_ptr.cap)
+			    dam = rs_ptr.cap;
 
-			//return dam;
+			return dam;
 		}
 
 		/**
@@ -665,13 +663,13 @@ namespace CSAngband.Monster {
 		 */
 		static int mon_spell_dam(int spell, int hp, int rlev, aspect dam_aspect)
 		{
-			throw new NotImplementedException();
+			Monster_Spell_Flag rs_ptr = Monster_Spell_Flag.list[spell];
 			//const struct mon_spell *rs_ptr = &mon_spell_table[spell];
 
-			//if (rs_ptr.div)
-			//    return hp_dam(spell, hp);
-			//else
-			//    return nonhp_dam(spell, rlev, dam_aspect);
+			if (rs_ptr.div != 0)
+			    return hp_dam(spell, hp);
+			else
+			    return nonhp_dam(spell, rlev, dam_aspect);
 		}
 
 

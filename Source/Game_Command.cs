@@ -477,6 +477,19 @@ namespace CSAngband {
 			arg_present[n] = true;
 		}
 
+		public void set_arg_number(int n, int num)
+		{
+			int idx = cmd_idx(command);
+
+			Misc.assert(n <= CMD_MAX_ARGS);
+			Misc.assert((game_cmds[idx].arg_type[n] & cmd_arg_type.arg_NUMBER) != 0);
+
+			arg[n] = new cmd_arg();
+			arg[n].value = num;
+			arg_type[n] = cmd_arg_type.arg_NUMBER;
+			arg_present[n] = true;
+		}
+
 		public void set_arg_choice(int n, string choice)
 		{
 			int idx = cmd_idx(command);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CSAngband.Object;
 
 namespace CSAngband {
 	class Prefs {
@@ -539,21 +540,20 @@ namespace CSAngband {
 
 		static Parser.Error parse_prefs_e(Parser p)
 		{
-			throw new NotImplementedException();
-			//int tvi, a;
+			int tvi, a;
 
-			//prefs_data d = p.priv as prefs_data;
-			//Misc.assert(d != null);
-			//if (d.bypass) return Parser.Error.NONE;
+			prefs_data d = p.priv as prefs_data;
+			Misc.assert(d != null);
+			if (d.bypass) return Parser.Error.NONE;
 
-			//tvi = tval_find_idx(p.getsym("tval"));
-			//if (tvi < 0 || tvi >= (long)N_ELEMENTS(tval_to_attr))
-			//    return Parser.Error.UNRECOGNISED_TVAL;
+			tvi = TVal.find_idx(p.getsym("tval"));
+			if (tvi < 0 || tvi >= Misc.tval_to_attr.Length)
+			    return Parser.Error.UNRECOGNISED_TVAL;
 
-			//a = p.getint("attr");
-			//if (a) tval_to_attr[tvi] = (byte) a;
+			a = p.getint("attr");
+			if (a != 0) Misc.tval_to_attr[tvi] = Utilities.num_to_attr(a);
 
-			//return Parser.Error.NONE;
+			return Parser.Error.NONE;
 		}
 
 		static Parser.Error parse_prefs_q(Parser p)

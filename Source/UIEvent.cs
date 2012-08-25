@@ -359,10 +359,6 @@ namespace CSAngband {
 			/* Analyze the "ascii" string */
 			while (cur < str.Length)
 			{
-				buf.Add(new ui_event());
-				buf[bufat].type = ui_event_type.EVT_KBRD;
-				buf[bufat].key = new keypress();
-
 				if (str[cur] == '\\')
 				{
 					cur++;
@@ -403,9 +399,12 @@ namespace CSAngband {
 					end = str.Substring(cur, str.Length - cur).IndexOf(']');
 					if (end == -1) return buf.ToArray();
 
-					kc = keycode_find_code(str);
+					kc = keycode_find_code(str.Substring(cur, str.IndexOf(']') - cur));
 					if (kc == 0) return buf.ToArray();
 
+					buf.Add(new ui_event());
+					buf[bufat].type = ui_event_type.EVT_KBRD;
+					buf[bufat].key = new keypress();
 					STORE(buf, bufat++, mods, kc);
 					mods = 0;
 					cur += end + 1;
@@ -436,6 +435,10 @@ namespace CSAngband {
 					mods |= (byte)keycode_t.KC_MOD_CONTROL;
 					cur++;
 				} else {
+					buf.Add(new ui_event());
+					buf[bufat].type = ui_event_type.EVT_KBRD;
+					buf[bufat].key = new keypress();
+
 					/* everything else */
 					STORE(buf, bufat++, mods, (keycode_t)str[cur++]);
 					mods = 0;

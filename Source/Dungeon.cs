@@ -1566,11 +1566,10 @@ namespace CSAngband {
 			/* Notice changes */
 			if (old_chp != Misc.p_ptr.chp)
 			{
-				throw new NotImplementedException();
-				///* Redraw */
-				//Misc.p_ptr.redraw |= (Misc.PR_HP);
-				//wieldeds_notice_flag(Misc.p_ptr, OF_REGEN);
-				//wieldeds_notice_flag(Misc.p_ptr, OF_IMPAIR_HP);
+				/* Redraw */
+				Misc.p_ptr.redraw |= (Misc.PR_HP);
+				Object.Object.wieldeds_notice_flag(Misc.p_ptr, Object_Flag.REGEN.value);
+				Object.Object.wieldeds_notice_flag(Misc.p_ptr, Object_Flag.IMPAIR_HP.value);
 			}
 		}
 

@@ -744,39 +744,6 @@ static int compare_monsters(const monster_type *m_ptr, const monster_type *n_ptr
 	return (0);
 }
 
-/*
- * Critical blow.  All hits that do 95% of total possible damage,
- * and which also do at least 20 damage, or, sometimes, N damage.
- * This is used only to determine "cuts" and "stuns".
- */
-static int monster_critical(int dice, int sides, int dam)
-{
-	int max = 0;
-	int total = dice * sides;
-
-	/* Must do at least 95% of perfect */
-	if (dam < total * 19 / 20) return (0);
-
-	/* Weak blows rarely work */
-	if ((dam < 20) && (randint0(100) >= dam)) return (0);
-
-	/* Perfect damage */
-	if (dam == total) max++;
-
-	/* Super-charge */
-	if (dam >= 20)
-	{
-		while (randint0(100) < 2) max++;
-	}
-
-	/* Critical damage */
-	if (dam > 45) return (6 + max);
-	if (dam > 33) return (5 + max);
-	if (dam > 25) return (4 + max);
-	if (dam > 18) return (3 + max);
-	if (dam > 11) return (2 + max);
-	return (1 + max);
-}
 
 
 #define MAX_DESC_INSULT 8

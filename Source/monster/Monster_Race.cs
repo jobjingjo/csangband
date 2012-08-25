@@ -25,7 +25,7 @@ namespace CSAngband.Monster {
 	class Monster_Race {
 		public Monster_Race() {
 			for (int i = 0; i < blow.Length; i++){
-				blow[i] = new Monster_Blow();
+				blow[i] = null;//Aparently this should be null...
 			}
 		}
 

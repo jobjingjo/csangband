@@ -70,50 +70,6 @@ void get_mon_num_prep(void)
 	/* Success */
 	return;
 }
-
-/*
- * Maximum size of a group of monsters
- */
-#define GROUP_MAX	25
-
-/*
- * Pick a monster group size. Used for monsters with the FRIENDS
- * flag and monsters with the ESCORT/ESCORTS flags.
- */
-static int group_size_1(int r_idx)
-{
-	monster_race *r_ptr = &r_info[r_idx];
-
-	int total, extra = 0;
-
-	/* Pick a group size */
-	total = randint1(13);
-
-	/* Hard monsters, small groups */
-	if (r_ptr.level > p_ptr.depth)
-	{
-		extra = r_ptr.level - p_ptr.depth;
-		extra = 0 - randint1(extra);
-	}
-
-	/* Easy monsters, large groups */
-	else if (r_ptr.level < p_ptr.depth)
-	{
-		extra = p_ptr.depth - r_ptr.level;
-		extra = randint1(extra);
-	}
-
-	/* Modify the group size */
-	total += extra;
-
-	/* Minimum size */
-	if (total < 1) total = 1;
-
-	/* Maximum size */
-	if (total > GROUP_MAX) total = GROUP_MAX;
-
-	return total;
-}
 		
 /*
  * Pick a monster group size. Used for monsters with the FRIEND
@@ -145,51 +101,7 @@ static int group_size_2(int r_idx)
 }
 
 		
-/*
- * Attempt to place a "group" of monsters around the given location
- */
-static bool place_new_monster_group(struct cave *c, int y, int x, int r_idx,
-	bool slp, int total, byte origin)
-{
-	int n, i;
 
-	int hack_n;
-
-	byte hack_y[GROUP_MAX];
-	byte hack_x[GROUP_MAX];
-
-	/* Start on the monster */
-	hack_n = 1;
-	hack_x[0] = x;
-	hack_y[0] = y;
-
-	/* Puddle monsters, breadth first, up to total */
-	for (n = 0; (n < hack_n) && (hack_n < total); n++) {
-		/* Grab the location */
-		int hx = hack_x[n];
-		int hy = hack_y[n];
-
-		/* Check each direction, up to total */
-		for (i = 0; (i < 8) && (hack_n < total); i++) {
-			int mx = hx + ddx_ddd[i];
-			int my = hy + ddy_ddd[i];
-
-			/* Walls and Monsters block flow */
-			if (!cave_empty_bold(my, mx)) continue;
-
-			/* Attempt to place another monster */
-			if (place_new_monster_one(my, mx, r_idx, slp, origin)) {
-				/* Add it to the "hack" set */
-				hack_y[hack_n] = my;
-				hack_x[hack_n] = mx;
-				hack_n++;
-			}
-		}
-	}
-
-	/* Success */
-	return (true);
-}
 
 
 /*

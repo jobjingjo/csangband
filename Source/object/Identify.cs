@@ -490,5 +490,42 @@ namespace CSAngband.Object {
 			//else
 			//    return false;
 		}
+
+		/**
+		 * Notice things which happen on defending.
+		 */
+		public static void object_notice_on_defend(Player.Player p)
+		{
+			int i;
+
+			for (i = Misc.INVEN_WIELD; i < Misc.INVEN_TOTAL; i++)
+				if (p.inventory[i].kind != null)
+					p.inventory[i].notice_defence_plusses(p);
+
+			Game_Event.signal(Game_Event.Event_Type.INVENTORY);
+			Game_Event.signal(Game_Event.Event_Type.EQUIPMENT);
+		}
+
+		void notice_defence_plusses(Player.Player p)
+		{
+			Misc.assert(kind != null);
+
+			if (defence_plusses_are_visible())
+				return;
+
+			if (add_ident_flags(IDENT_DEFENCE))
+				check_for_ident();
+
+			if (ac != 0 || to_a != 0)
+			{
+				//char o_name[80];
+				string o_name = object_desc(Detail.BASE);
+				Utilities.msgt(Message_Type.MSG_PSEUDOID, "You know more about the {0} you are wearing.", o_name);
+			}
+
+			p.update |= (Misc.PU_BONUS);
+			Game_Event.signal(Game_Event.Event_Type.INVENTORY);
+			Game_Event.signal(Game_Event.Event_Type.EQUIPMENT);
+		}
 	}
 }

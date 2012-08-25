@@ -1889,9 +1889,14 @@ namespace CSAngband {
 			/* Town is never a quest */
 			if (level == 0 || Misc.q_list == null) return false;
 
-			for (i = 0; i < Misc.MAX_Q_IDX; i++)
-			    if (Misc.q_list[i].level == level)
-			        return true;
+			for(i = 0; i < Misc.MAX_Q_IDX; i++) {
+				if(Misc.q_list[i] == null) {
+					continue;
+				}
+				if(Misc.q_list[i].level == level) {
+					return true;
+				}
+			}
 
 			return false;
 		}

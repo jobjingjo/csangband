@@ -65,17 +65,3 @@ void cmd_set_arg_point(game_command *cmd, int n, int x, int y)
 
 
 
-void cmd_set_arg_number(game_command *cmd, int n, int num)
-{
-	int idx = cmd_idx(cmd.command);
-
-	assert(n <= CMD_MAX_ARGS);
-	assert(game_cmds[idx].arg_type[n] & arg_NUMBER);
-
-	cmd.arg[n].number = num;
-	cmd.arg_type[n] = arg_NUMBER;
-	cmd.arg_present[n] = true;
-}
-
-
-

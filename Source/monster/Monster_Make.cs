@@ -555,20 +555,20 @@ namespace CSAngband.Monster {
 				//i_ptr = &object_type_body;
 				//object_wipe(i_ptr);
 
-				throw new NotImplementedException();
-				//i_ptr = new Object.Object();
+				i_ptr = new Object.Object();
 
-				//if (gold_ok && (!item_ok || (Random.randint0(100) < 50))) {
-				//    make_gold(i_ptr, level, force_coin);
-				//} else {
-				//    if (!make_object(Cave.cave, i_ptr, level, good, great, null)) continue;
-				//}
+				if (gold_ok && (!item_ok || (Random.randint0(100) < 50))) {
+				    Object.Object.make_gold(ref i_ptr, level, force_coin);
+				} else {
+					int q = 0;
+				    if (!Object.Object.make_object(Cave.cave, ref i_ptr, level, good, great, ref q)) continue;
+				}
 
-				//i_ptr.origin = origin;
-				//i_ptr.origin_depth = p_ptr.depth;
-				//i_ptr.origin_xtra = m_ptr.r_idx;
-				//if (monster_carry(m_ptr, i_ptr))
-				//    any = true;
+				i_ptr.origin = (Origin)origin;
+				i_ptr.origin_depth = (byte)Misc.p_ptr.depth;
+				i_ptr.origin_xtra = m_ptr.r_idx;
+				if (m_ptr.carry(i_ptr) != 0)
+				    any = true;
 			}
 
 			return any;
@@ -691,11 +691,10 @@ namespace CSAngband.Monster {
 
 			/* Friends for certain monsters */
 			if (r_ptr.flags.has(Monster_Flag.FRIENDS.value)) {
-				throw new NotImplementedException();
-				//int total = group_size_1(r_idx);
+				int total = group_size_1(r_idx);
 		
-				///* Attempt to place a group */
-				//(void)place_new_monster_group(c, y, x, r_idx, slp, total, origin);
+				/* Attempt to place a group */
+				place_new_monster_group(c, y, x, r_idx, slp, total, (byte)origin);
 			}
 
 			/* Escorts for certain monsters */
@@ -756,6 +755,95 @@ namespace CSAngband.Monster {
 
 			/* Success */
 			return (true);
+		}
+
+		/*
+		 * Attempt to place a "group" of monsters around the given location
+		 */
+		static bool place_new_monster_group(Cave c, int y, int x, int r_idx, bool slp, int total, byte origin)
+		{
+			int n, i;
+
+			int hack_n;
+
+			byte[] hack_y = new byte[GROUP_MAX];
+			byte[] hack_x = new byte[GROUP_MAX];
+
+			/* Start on the monster */
+			hack_n = 1;
+			hack_x[0] = (byte)x;
+			hack_y[0] = (byte)y;
+
+			/* Puddle monsters, breadth first, up to total */
+			for (n = 0; (n < hack_n) && (hack_n < total); n++) {
+				/* Grab the location */
+				int hx = hack_x[n];
+				int hy = hack_y[n];
+
+				/* Check each direction, up to total */
+				for (i = 0; (i < 8) && (hack_n < total); i++) {
+					int mx = hx + Misc.ddx_ddd[i];
+					int my = hy + Misc.ddy_ddd[i];
+
+					/* Walls and Monsters block flow */
+					if (!Cave.cave_empty_bold(my, mx)) continue;
+
+					/* Attempt to place another monster */
+					if (place_new_monster_one(my, mx, r_idx, slp, origin)) {
+						/* Add it to the "hack" set */
+						hack_y[hack_n] = (byte)my;
+						hack_x[hack_n] = (byte)mx;
+						hack_n++;
+					}
+				}
+			}
+
+			/* Success */
+			return (true);
+		}
+
+		/*
+		 * Maximum size of a group of monsters
+		 */
+		public const int GROUP_MAX = 25;
+
+		/*
+		 * Pick a monster group size. Used for monsters with the FRIENDS
+		 * flag and monsters with the ESCORT/ESCORTS flags.
+		 */
+		static int group_size_1(int r_idx)
+		{
+			Monster_Race r_ptr = Misc.r_info[r_idx];
+
+			int total, extra = 0;
+
+			/* Pick a group size */
+			total = Random.randint1(13);
+
+			/* Hard monsters, small groups */
+			if (r_ptr.level > Misc.p_ptr.depth)
+			{
+				extra = r_ptr.level - Misc.p_ptr.depth;
+				extra = 0 - Random.randint1(extra);
+			}
+
+			/* Easy monsters, large groups */
+			else if (r_ptr.level < Misc.p_ptr.depth)
+			{
+				extra = Misc.p_ptr.depth - r_ptr.level;
+				extra = Random.randint1(extra);
+			}
+
+			/* Modify the group size */
+			total += extra;
+
+			/* Minimum size */
+			if (total < 1) total = 1;
+
+			/* Maximum size */
+			if (total > GROUP_MAX) total = GROUP_MAX;
+
+			return total;
 		}
 
 		/*

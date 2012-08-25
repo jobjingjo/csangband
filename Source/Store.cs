@@ -220,6 +220,7 @@ namespace CSAngband {
 			for (st = s.stores; st != null ; st = st.next) {
 				if (st.sidx == (STORE)index) {
 					s.cur = st;
+					break;
 				}
 			}
 
@@ -1288,80 +1289,561 @@ namespace CSAngband {
 		 */
 		static bool store_menu_handle(Menu_Type m, ui_event mevent, int oid)
 		{
+			bool processed = true;
+
+			if (mevent.type == ui_event_type.EVT_SELECT)
+			{
+			    /* Nothing for now, except "handle" the event */
+			    return true;
+			    /* In future, maybe we want a display a list of what you can do. */
+			}
+			else if (mevent.type == ui_event_type.EVT_KBRD)
+			{
+				bool storechange = false;
+
+				switch ((char)mevent.key.code) {
+				    case 's':
+				    case 'd': storechange = store_sell(); break;
+				    case 'p':
+				    case 'g': storechange = store_purchase(oid); break;
+				    case 'l':
+				    case 'x': store_examine(oid); break;
+
+				    case '?': {
+				        /* Toggle help */
+				        if ((store_flags & STORE_SHOW_HELP) != 0)
+				            store_flags &= ~(STORE_SHOW_HELP);
+				        else
+				            store_flags |= STORE_SHOW_HELP;
+
+				        /* Redisplay */
+				        store_flags |= STORE_INIT_CHANGE;
+				        break;
+				    }
+
+				    case '=': {
+						Do_Command.options();
+				        store_menu_set_selections(m, false);
+				        break;
+				    }
+
+				    default:
+				        processed = store_process_command_key(mevent.key);
+						break;
+				}
+
+				if ((char)mevent.key.code == UIEvent.KTRL('R')) {
+					/* XXX redraw functionality should be another menu_iter handler */
+					Term.clear();
+					store_flags |= (STORE_FRAME_CHANGE | STORE_GOLD_CHANGE);
+				}
+
+				/* Let the game handle any core commands (equipping, etc) */
+				Game_Command.process_command(cmd_context.CMD_STORE, true);
+
+				if (storechange)
+				    store_menu_recalc(m);
+
+				if (processed) {
+					Game_Event.signal(Game_Event.Event_Type.INVENTORY);
+					Game_Event.signal(Game_Event.Event_Type.EQUIPMENT);
+				}
+
+				/* Notice and handle stuff */
+				Misc.p_ptr.notice_stuff();
+				Misc.p_ptr.handle_stuff();
+
+				/* Display the store */
+				store_display_recalc(m);
+				store_menu_recalc(m);
+				store_redraw();
+
+				return processed;
+			}
+
+			return false;
+		}
+
+		/*
+		 * Process a command in a store
+		 *
+		 * Note that we must allow the use of a few "special" commands in the stores
+		 * which are not allowed in the dungeon, and we must disable some commands
+		 * which are allowed in the dungeon but not in the stores, to prevent chaos.
+		 */
+		static bool store_process_command_key(keypress kp)
+		{
 			throw new NotImplementedException();
-			//bool processed = true;
+			//int cmd = 0;
 
-			//if (event.type == EVT_SELECT)
-			//{
-			//    /* Nothing for now, except "handle" the event */
-			//    return true;
-			//    /* In future, maybe we want a display a list of what you can do. */
+			///* Process the keycode */
+			//switch (kp.code) {
+			//    case 'T': /* roguelike */
+			//    case 't': cmd = CMD_TAKEOFF; break;
+
+			//    case KTRL('D'): /* roguelike */
+			//    case 'k': textui_cmd_destroy(); break;
+
+			//    case 'P': /* roguelike */
+			//    case 'b': textui_spell_browse(); break;
+
+			//    case '~': textui_browse_knowledge(); break;
+			//    case 'I': textui_obj_examine(); break;
+			//    case 'w': cmd = CMD_WIELD; break;
+			//    case '{': cmd = CMD_INSCRIBE; break;
+			//    case '}': cmd = CMD_UNINSCRIBE; break;
+
+			//    case 'e': do_cmd_equip(); break;
+			//    case 'i': do_cmd_inven(); break;
+			//    case KTRL('E'): toggle_inven_equip(); break;
+			//    case 'C': do_cmd_change_name(); break;
+			//    case KTRL('P'): do_cmd_messages(); break;
+			//    case ')': do_cmd_save_screen(); break;
+
+			//    default: return false;
 			//}
-			//else if (event.type == EVT_KBRD)
+
+			//if (cmd)
+			//    cmd_insert_repeated(cmd, 0);
+
+			//return true;
+		}
+
+		/*
+		 * Sell an object, or drop if it we're in the home.
+		 */
+		static bool store_sell()
+		{
+			throw new NotImplementedException();
+			//int amt;
+			//int item;
+			//int get_mode = USE_EQUIP | USE_INVEN | USE_FLOOR;
+
+			//object_type *o_ptr;
+			//object_type object_type_body;
+			//object_type *i_ptr = &object_type_body;
+
+			//char o_name[120];
+
+
+			//const char *reject = "You have nothing that I want. ";
+			//const char *prompt = "Sell which item? ";
+
+			//struct store *store = current_store();
+
+			//if (!store) {
+			//    msg("You cannot sell items when not in a store.");
+			//    return false;
+			//}
+
+			///* Clear all current messages */
+			//msg_flag = false;
+			//prt("", 0, 0);
+
+			//if (store.sidx == STORE_HOME) {
+			//    prompt = "Drop which item? ";
+			//} else {
+			//    item_tester_hook = store_will_buy_tester;
+			//    get_mode |= SHOW_PRICES;
+			//}
+
+			///* Get an item */
+			//p_ptr.command_wrk = USE_INVEN;
+
+			//if (!get_item(&item, prompt, reject, CMD_DROP, get_mode))
+			//    return false;
+
+			///* Get the item */
+			//o_ptr = object_from_item_idx(item);
+
+			///* Hack -- Cannot remove cursed objects */
+			//if ((item >= INVEN_WIELD) && cursed_p(o_ptr.flags))
 			//{
-			//    bool storechange = false;
+			//    /* Oops */
+			//    msg("Hmmm, it seems to be cursed.");
 
-			//    switch (event.key.code) {
-			//        case 's':
-			//        case 'd': storechange = store_sell(); break;
-			//        case 'p':
-			//        case 'g': storechange = store_purchase(oid); break;
-			//        case 'l':
-			//        case 'x': store_examine(oid); break;
+			//    /* Nope */
+			//    return false;
+			//}
 
-			//        /* XXX redraw functionality should be another menu_iter handler */
-			//        case KTRL('R'): {
-			//            Term_clear();
-			//            store_flags |= (STORE_FRAME_CHANGE | STORE_GOLD_CHANGE);
+			///* Get a quantity */
+			//amt = get_quantity(null, o_ptr.number);
+
+			///* Allow user abort */
+			//if (amt <= 0) return false;
+
+			///* Get a copy of the object representing the number being sold */
+			//object_copy_amt(i_ptr, object_from_item_idx(item), amt);
+
+			//if (!store_check_num(store, i_ptr))
+			//{
+			//    if (store.sidx == STORE_HOME)
+			//        msg("Your home is full.");
+
+			//    else
+			//        msg("I have not the room in my store to keep it.");
+
+			//    return false;
+			//}
+
+			///* Get a full description */
+			//object_desc(o_name, sizeof(o_name), i_ptr, ODESC_PREFIX | ODESC_FULL);
+
+			///* Real store */
+			//if (store.sidx != STORE_HOME)
+			//{
+			//    /* Extract the value of the items */
+			//    u32b price = price_item(i_ptr, true, amt);
+
+			//    screen_save();
+
+			//    /* Show price */
+			//    prt(format("Price: %d", price), 1, 0);
+
+			//    /* Confirm sale */
+			//    if (!store_get_check(format("Sell %s? [ESC, any other key to accept]", o_name)))
+			//    {
+			//        screen_load();
+			//        return false;
+			//    }
+
+			//    screen_load();
+
+			//    cmd_insert(CMD_SELL);
+			//    cmd_set_arg_item(cmd_get_top(), 0, item);
+			//    cmd_set_arg_number(cmd_get_top(), 1, amt);
+			//}
+
+			///* Player is at home */
+			//else
+			//{
+			//    cmd_insert(CMD_STASH);
+			//    cmd_set_arg_item(cmd_get_top(), 0, item);
+			//    cmd_set_arg_number(cmd_get_top(), 1, amt);
+			//}
+
+			//return true;
+		}
+
+		/*
+		 * Buy an object from a store
+		 */
+		static bool store_purchase(int item)
+		{
+			int amt, num;
+			int price;
+
+			Object.Object o_ptr;
+
+			//object_type object_type_body;
+			Object.Object i_ptr = new Object.Object();
+
+			//char o_name[80];
+			string o_name;
+
+			Store store = current_store();
+
+			if (store == null) {
+			    Utilities.msg("You cannot purchase items when not in a store.");
+			    return false;
+			}
+
+			/* Get the actual object */
+			o_ptr = store.stock[item];
+			if (item < 0) return false;
+
+			/* Clear all current messages */
+			Term.msg_flag = false;
+			Utilities.prt("", 0, 0);
+
+			if (store.sidx == STORE.HOME) {
+			    amt = o_ptr.number;
+			} else {
+			    /* Price of one */
+			    price = price_item(o_ptr, false, 1);
+
+			    /* Check if the player can afford any at all */
+			    if ((uint)Misc.p_ptr.au < (uint)price)
+			    {
+			        /* Tell the user */
+			        Utilities.msg("You do not have enough gold for this item.");
+
+			        /* Abort now */
+			        return false;
+			    }
+
+			    /* Work out how many the player can afford */
+			    amt = Misc.p_ptr.au / price;
+			    if (amt > o_ptr.number) amt = o_ptr.number;
+		
+			    /* Double check for wands/staves */
+			    if ((Misc.p_ptr.au >= price_item(o_ptr, false, amt+1)) && (amt < o_ptr.number))
+			        amt++;
+
+			}
+
+			/* Find the number of this item in the inventory */
+			if (!o_ptr.flavor_is_aware())
+			    num = 0;
+			else
+			    num = find_inven(o_ptr);
+
+			o_name = String.Format("{0} how many{1}? (max {2}) ",
+			        (store.sidx == STORE.HOME) ? "Take" : "Buy",
+			        num != 0 ? String.Format(" (you have {0})", num) : "", amt);
+
+			/* Get a quantity */
+			amt = Utilities.get_quantity(o_name, amt);
+
+			/* Allow user abort */
+			if (amt <= 0) return false;
+
+			/* Get desired object */
+			i_ptr.copy_amt(o_ptr, amt);
+
+			/* Ensure we have room */
+			if (!i_ptr.inven_carry_okay())
+			{
+			    Utilities.msg("You cannot carry that many items.");
+			    return false;
+			}
+
+			/* Describe the object (fully) */
+			o_name = i_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
+
+			/* Attempt to buy it */
+			if (store.sidx != STORE.HOME)
+			{
+			    bool response;
+
+			    /* Extract the price for the entire stack */
+			    price = price_item(i_ptr, false, i_ptr.number);
+
+			    Utilities.screen_save();
+
+			    /* Show price */
+			    Utilities.prt(String.Format("Price: {0}", price), 1, 0);
+
+			    /* Confirm purchase */
+			    response = store_get_check(String.Format("Buy {0}? [ESC, any other key to accept]", o_name));
+			    Utilities.screen_load();
+
+			    /* Negative response, so give up */
+			    if (!response) return false;
+
+				Game_Command.insert(Command_Code.BUY);
+				Game_Command.get_top().set_arg_choice(0, item);
+				Game_Command.get_top().set_arg_number(1, amt);
+			}
+
+			/* Home is much easier */
+			else
+			{
+				Game_Command.insert(Command_Code.RETRIEVE);
+				Game_Command.get_top().set_arg_choice(0, item);
+				Game_Command.get_top().set_arg_number(1, amt);
+			}
+
+			/* Not kicked out */
+			return true;
+		}
+
+		static bool store_get_check(string prompt)
+		{
+			keypress ch;
+
+			/* Prompt for it */
+			Utilities.prt(prompt, 0, 0);
+
+			/* Get an answer */
+			ch = Utilities.inkey();
+
+			/* Erase the prompt */
+			Utilities.prt("", 0, 0);
+
+			if (ch.code == keycode_t.ESCAPE) return (false);
+			if ("Nn".Contains((char)ch.code)) return (false);
+
+			/* Success */
+			return (true);
+		}
+
+		/*
+		 * Return the quantity of a given item in the pack (include quiver).
+		 */
+		static int find_inven(Object.Object o_ptr)
+		{
+			throw new NotImplementedException();
+			//int i, j;
+			//int num = 0;
+
+			///* Similar slot? */
+			//for (j = 0; j < QUIVER_END; j++)
+			//{
+			//    object_type *j_ptr = &p_ptr.inventory[j];
+
+			//    /* Check only the inventory and the quiver */
+			//    if (j >= INVEN_WIELD && j < QUIVER_START) continue;
+
+			//    /* Require identical object types */
+			//    if (o_ptr.kind != j_ptr.kind) continue;
+
+			//    /* Analyze the items */
+			//    switch (o_ptr.tval)
+			//    {
+			//        /* Chests */
+			//        case TV_CHEST:
+			//        {
+			//            /* Never okay */
+			//            return 0;
+			//        }
+
+			//        /* Food and Potions and Scrolls */
+			//        case TV_FOOD:
+			//        case TV_POTION:
+			//        case TV_SCROLL:
+			//        {
+			//            /* Assume okay */
 			//            break;
 			//        }
 
-			//        case '?': {
-			//            /* Toggle help */
-			//            if (store_flags & STORE_SHOW_HELP)
-			//                store_flags &= ~(STORE_SHOW_HELP);
-			//            else
-			//                store_flags |= STORE_SHOW_HELP;
-
-			//            /* Redisplay */
-			//            store_flags |= STORE_INIT_CHANGE;
+			//        /* Staves and Wands */
+			//        case TV_STAFF:
+			//        case TV_WAND:
+			//        {
+			//            /* Assume okay */
 			//            break;
 			//        }
 
-			//        case '=': {
-			//            do_cmd_options();
-			//            store_menu_set_selections(m, false);
+			//        /* Rods */
+			//        case TV_ROD:
+			//        {
+			//            /* Assume okay */
 			//            break;
 			//        }
 
+			//        /* Weapons and Armor */
+			//        case TV_BOW:
+			//        case TV_DIGGING:
+			//        case TV_HAFTED:
+			//        case TV_POLEARM:
+			//        case TV_SWORD:
+			//        case TV_BOOTS:
+			//        case TV_GLOVES:
+			//        case TV_HELM:
+			//        case TV_CROWN:
+			//        case TV_SHIELD:
+			//        case TV_CLOAK:
+			//        case TV_SOFT_ARMOR:
+			//        case TV_HARD_ARMOR:
+			//        case TV_DRAG_ARMOR:
+			//        {
+			//            /* Fall through */
+			//        }
+
+			//        /* Rings, Amulets, Lights */
+			//        case TV_RING:
+			//        case TV_AMULET:
+			//        case TV_LIGHT:
+			//        {
+			//            /* Require both items to be known */
+			//            if (!object_is_known(o_ptr) || !object_is_known(j_ptr)) continue;
+
+			//            /* Fall through */
+			//        }
+
+			//        /* Missiles */
+			//        case TV_BOLT:
+			//        case TV_ARROW:
+			//        case TV_SHOT:
+			//        {
+			//            /* Require identical knowledge of both items */
+			//            if (object_is_known(o_ptr) != object_is_known(j_ptr)) continue;
+
+			//            /* Require identical "bonuses" */
+			//            if (o_ptr.to_h != j_ptr.to_h) continue;
+			//            if (o_ptr.to_d != j_ptr.to_d) continue;
+			//            if (o_ptr.to_a != j_ptr.to_a) continue;
+
+			//            /* Require identical "pval" codes */
+			//            for (i = 0; i < MAX_PVALS; i++)
+			//                if (o_ptr.pval[i] != j_ptr.pval[i])
+			//                    continue;
+
+			//            if (o_ptr.num_pvals != j_ptr.num_pvals)
+			//                continue;
+
+			//            /* Require identical "artifact" names */
+			//            if (o_ptr.artifact != j_ptr.artifact) continue;
+
+			//            /* Require identical "ego-item" names */
+			//            if (o_ptr.ego != j_ptr.ego) continue;
+
+			//            /* Lights must have same amount of fuel */
+			//            else if (o_ptr.timeout != j_ptr.timeout && o_ptr.tval == TV_LIGHT)
+			//                continue;
+
+			//            /* Require identical "values" */
+			//            if (o_ptr.ac != j_ptr.ac) continue;
+			//            if (o_ptr.dd != j_ptr.dd) continue;
+			//            if (o_ptr.ds != j_ptr.ds) continue;
+
+			//            /* Probably okay */
+			//            break;
+			//        }
+
+			//        /* Various */
 			//        default:
-			//            processed = store_process_command_key(event.key);
+			//        {
+			//            /* Require knowledge */
+			//            if (!object_is_known(o_ptr) || !object_is_known(j_ptr)) continue;
+
+			//            /* Probably okay */
+			//            break;
+			//        }
 			//    }
 
-			//    /* Let the game handle any core commands (equipping, etc) */
-			//    process_command(CMD_STORE, true);
 
-			//    if (storechange)
-			//        store_menu_recalc(m);
+			//    /* Different flags */
+			//    if (!of_is_equal(o_ptr.flags, j_ptr.flags))
+			//        continue;
 
-			//    if (processed) {
-			//        event_signal(EVENT_INVENTORY);
-			//        event_signal(EVENT_EQUIPMENT);
-			//    }
-
-			//    /* Notice and handle stuff */
-			//    notice_stuff(p_ptr);
-			//    handle_stuff(p_ptr);
-
-			//    /* Display the store */
-			//    store_display_recalc(m);
-			//    store_menu_recalc(m);
-			//    store_redraw();
-
-			//    return processed;
+			//    /* They match, so add up */
+			//    num += j_ptr.number;
 			//}
 
-			//return false;
+			//return num;
+		}
+
+		/*
+		 * Examine an item in a store
+		 */
+		static void store_examine(int item)
+		{
+			throw new NotImplementedException();
+			//struct store *store = current_store();
+			//object_type *o_ptr;
+
+			//char header[120];
+
+			//textblock *tb;
+			//region area = { 0, 0, 0, 0 };
+
+			//if (item < 0) return;
+
+			///* Get the actual object */
+			//o_ptr = &store.stock[item];
+
+			///* Show full info in most stores, but normal info in player home */
+			//tb = object_info(o_ptr, (store.sidx != STORE_HOME) ? OINFO_FULL : OINFO_NONE);
+			//object_desc(header, sizeof(header), o_ptr, ODESC_PREFIX | ODESC_FULL);
+
+			//textui_textblock_show(tb, area, header);
+			//textblock_free(tb);
+
+			///* Hack -- Browse book, then prompt for a command */
+			//if (o_ptr.tval == p_ptr.class.spell_book)
+			//    textui_book_browse(o_ptr);
 		}
 
 		public static void store_menu_set_selections(Menu_Type menu, bool knowledge_menu)
