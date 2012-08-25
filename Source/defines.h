@@ -133,15 +133,7 @@ enum
 
 
 
-/*
- * Determine if a "legal" grid is a "clean" floor grid
- *
- * Line 1 -- forbid non-floors
- * Line 2 -- forbid normal objects
- */
-#define cave_clean_bold(Y,X) \
-	((cave.feat[Y][X] == FEAT_FLOOR) && \
-	 (cave.o_idx[Y][X] == 0))
+
 
 /*
  * Determine if a "legal" grid is an "naked" floor grid

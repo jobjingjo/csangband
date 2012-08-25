@@ -13,6 +13,7 @@ extern type_union s2u(const char *s);
 static const type_union END = { T_END, { 0 } };
 
 
+//Nick: This is just a list of Locs.
 /*
  * A set of points that can be constructed to apply a set of changes to
  */

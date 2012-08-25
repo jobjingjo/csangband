@@ -84,18 +84,16 @@ namespace CSAngband {
 		 */
 		public static void target()
 		{
-			throw new NotImplementedException();
-			//if (target_set_interactive(TARGET_KILL, -1, -1))
-			//    msg("Target Selected.");
-			//else
-			//    msg("Target Aborted.");
+			if (Target.set_interactive(Target.KILL, -1, -1))
+			    Utilities.msg("Target Selected.");
+			else
+			    Utilities.msg("Target Aborted.");
 		}
 
 
 		public static void target_closest()
 		{
-			throw new NotImplementedException();
-			//target_set_closest(TARGET_KILL);
+			Target.set_closest(Target.KILL);
 		}
 
 

@@ -362,41 +362,9 @@ bool is_blessed(const object_type *o_ptr)
 }
 
 
-/**
- * Split off 'at' items from 'src' into 'dest'.
- */
-void object_split(struct object *dest, struct object *src, int amt)
-{
-	/* Distribute charges of wands, staves, or rods */
-	distribute_charges(src, dest, amt);
 
-	/* Modify quantity */
-	dest.number = amt;
-	if (src.note)
-		dest.note = src.note;
-}
 
-/**
- * Find and return the index to the oldest object on the given grid marked as
- * "squelch".
- */
-static s16b floor_get_idx_oldest_squelched(int y, int x)
-{
-	s16b squelch_idx = 0;
-	s16b this_o_idx;
 
-	object_type *o_ptr = null;
-
-	for (this_o_idx = cave.o_idx[y][x]; this_o_idx; this_o_idx = o_ptr.next_o_idx)
-	{
-		o_ptr = object_byid(this_o_idx);
-
-		if (squelch_item_ok(o_ptr))
-			squelch_idx = this_o_idx;
-	}
-
-	return squelch_idx;
-}
 
 
 /**
@@ -489,34 +457,7 @@ void inven_item_charges(int item)
 }
 
 
-/*
- * Describe an item in the inventory. Note: only called when an item is 
- * dropped, used, or otherwise deleted from the inventory
- */
-void inven_item_describe(int item)
-{
-	object_type *o_ptr = &p_ptr.inventory[item];
 
-	char o_name[80];
-
-	if (o_ptr.artifact && 
-		(object_is_known(o_ptr) || object_name_is_visible(o_ptr)))
-	{
-		/* Get a description */
-		object_desc(o_name, sizeof(o_name), o_ptr, ODESC_FULL | ODESC_SINGULAR);
-
-		/* Print a message */
-		msg("You no longer have the %s (%c).", o_name, index_to_label(item));
-	}
-	else
-	{
-		/* Get a description */
-		object_desc(o_name, sizeof(o_name), o_ptr, ODESC_PREFIX | ODESC_FULL);
-
-		/* Print a message */
-		msg("You have %s (%c).", o_name, index_to_label(item));
-	}
-}
 
 /**
  * Swap ammunition between quiver slots (0-9).
@@ -622,46 +563,6 @@ void floor_item_describe(int item)
 
 	/* Print a message */
 	msg("You see %s.", o_name);
-}
-
-
-/*
- * Increase the "number" of an item on the floor
- */
-void floor_item_increase(int item, int num)
-{
-	object_type *o_ptr = object_byid(item);
-
-	/* Apply */
-	num += o_ptr.number;
-
-	/* Bounds check */
-	if (num > 255) num = 255;
-	else if (num < 0) num = 0;
-
-	/* Un-apply */
-	num -= o_ptr.number;
-
-	/* Change the number */
-	o_ptr.number += num;
-}
-
-
-/*
- * Optimize an item on the floor (destroy "empty" items)
- */
-void floor_item_optimize(int item)
-{
-	object_type *o_ptr = object_byid(item);
-
-	/* Paranoia -- be sure it exists */
-	if (!o_ptr.kind) return;
-
-	/* Only optimize empty items */
-	if (o_ptr.number) return;
-
-	/* Delete the object */
-	delete_object_idx(item);
 }
 
 
@@ -803,51 +704,7 @@ int get_use_device_chance(const object_type *o_ptr)
 }
 
 
-/*
- * Distribute charges of rods, staves, or wands.
- *
- * o_ptr = source item
- * q_ptr = target item, must be of the same type as o_ptr
- * amt   = number of items that are transfered
- */
-void distribute_charges(object_type *o_ptr, object_type *q_ptr, int amt)
-{
-	int charge_time = randcalc(o_ptr.kind.time, 0, AVERAGE), max_time;
 
-	/*
-	 * Hack -- If rods, staves, or wands are dropped, the total maximum
-	 * timeout or charges need to be allocated between the two stacks.
-	 * If all the items are being dropped, it makes for a neater message
-	 * to leave the original stack's pval alone. -LM-
-	 */
-	if ((o_ptr.tval == TV_WAND) ||
-	    (o_ptr.tval == TV_STAFF))
-	{
-		q_ptr.pval[DEFAULT_PVAL] = o_ptr.pval[DEFAULT_PVAL] * amt / o_ptr.number;
-
-		if (amt < o_ptr.number)
-			o_ptr.pval[DEFAULT_PVAL] -= q_ptr.pval[DEFAULT_PVAL];
-	}
-
-	/*
-	 * Hack -- Rods also need to have their timeouts distributed.
-	 *
-	 * The dropped stack will accept all time remaining to charge up to
-	 * its maximum.
-	 */
-	if (o_ptr.tval == TV_ROD)
-	{
-		max_time = charge_time * amt;
-
-		if (o_ptr.timeout > max_time)
-			q_ptr.timeout = max_time;
-		else
-			q_ptr.timeout = o_ptr.timeout;
-
-		if (amt < o_ptr.number)
-			o_ptr.timeout -= q_ptr.timeout;
-	}
-}
 
 
 void reduce_charges(object_type *o_ptr, int amt)
@@ -1217,67 +1074,7 @@ void display_itemlist(void)
 
 
 
-/*
- * Get a list of "valid" item indexes.
- *
- * Fills item_list[] with items that are "okay" as defined by the
- * current item_tester_hook, etc.  mode determines what combination of
- * inventory, equipment and player's floor location should be used
- * when drawing up the list.
- *
- * Returns the number of items placed into the list.
- *
- * Maximum space that can be used is [INVEN_TOTAL + MAX_FLOOR_STACK],
- * though practically speaking much smaller numbers are likely.
- */
-int scan_items(int *item_list, size_t item_list_max, int mode)
-{
-	bool use_inven = ((mode & USE_INVEN) ? true : false);
-	bool use_equip = ((mode & USE_EQUIP) ? true : false);
-	bool use_floor = ((mode & USE_FLOOR) ? true : false);
 
-	int floor_list[MAX_FLOOR_STACK];
-	int floor_num;
-
-	int i;
-	size_t item_list_num = 0;
-
-	if (use_inven)
-	{
-		for (i = 0; i < INVEN_PACK && item_list_num < item_list_max; i++)
-		{
-			if (get_item_okay(i))
-				item_list[item_list_num++] = i;
-		}
-	}
-
-	if (use_equip)
-	{
-		for (i = INVEN_WIELD; i < ALL_INVEN_TOTAL && item_list_num < item_list_max; i++)
-		{
-			if (get_item_okay(i))
-				item_list[item_list_num++] = i;
-		}
-	}
-
-	/* Scan all non-gold objects in the grid */
-	if (use_floor)
-	{
-		floor_num = scan_floor(floor_list, N_ELEMENTS(floor_list), p_ptr.py, p_ptr.px, 0x03);
-
-		for (i = 0; i < floor_num && item_list_num < item_list_max; i++)
-		{
-			if (get_item_okay(-floor_list[i]))
-				item_list[item_list_num++] = -floor_list[i];
-		}
-	}
-
-	/* Forget the item_tester_tval and item_tester_hook  restrictions */
-	item_tester_tval = 0;
-	item_tester_hook = null;
-
-	return item_list_num;
-}
 
 
 

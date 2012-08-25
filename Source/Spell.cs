@@ -20,6 +20,32 @@ namespace CSAngband {
 
 		public byte spell_index;	/* Index into player_magic array */
 
+		/* TODO: these descriptions are somewhat wrong/misleading */
+		/*
+		 * Bit flags for the "project()" function
+		 *
+		 *   NONE: No flags
+		 *   JUMP: Jump directly to the target location (this is a hack)
+		 *   BEAM: Work as a beam weapon (affect every grid passed through)
+		 *   THRU: Continue "through" the target (used for "bolts"/"beams")
+		 *   STOP: Stop as soon as we hit a monster (used for "bolts")
+		 *   GRID: Affect each grid in the "blast area" in some way
+		 *   ITEM: Affect each object in the "blast area" in some way
+		 *   KILL: Affect each monster in the "blast area" in some way
+		 *   HIDE: Hack -- disable "visual" feedback from projection
+		 *   AWARE: Effects are already obvious to the player
+		 */
+		public const int PROJECT_NONE = 0x000;
+		public const int PROJECT_JUMP = 0x001;
+		public const int PROJECT_BEAM = 0x002;
+		public const int PROJECT_THRU = 0x004;
+		public const int PROJECT_STOP = 0x008;
+		public const int PROJECT_GRID = 0x010;
+		public const int PROJECT_ITEM = 0x020;
+		public const int PROJECT_KILL = 0x040;
+		public const int PROJECT_HIDE = 0x080;
+		public const int PROJECT_AWARE = 0x100;
+
 		/**
 		 * Adjust damage according to resistance or vulnerability.
 		 *

@@ -195,7 +195,7 @@ namespace CSAngband.Monster {
 			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
 			Monster_Lore l_ptr = Misc.l_list[m_ptr.r_idx];
 
-			int i, d, oy, ox, ny, nx;
+			int i, oy, ox, ny, nx;
 
 			int[] mm = new int[5];
 
@@ -248,8 +248,7 @@ namespace CSAngband.Monster {
 				/* Hack -- See if monster "notices" player */
 				if ((notice * notice * notice) <= Misc.p_ptr.state.noise)
 				{
-					//Was int d, if wonky, this is why...
-				    d = 1;
+				    int d = 1;
 
 				    /* Wake up faster near the player */
 				    if (m_ptr.cdis < 50) d = (100 / m_ptr.cdis);
@@ -310,10 +309,10 @@ namespace CSAngband.Monster {
 			if (woke_up) return;
 
 			if (m_ptr.m_timed[(int)Misc.MON_TMD.FAST] != 0)
-			    mon_dec_timed(m_idx, (int)Misc.MON_TMD.FAST, 1, 0, false);
+			    mon_dec_timed(m_idx, Misc.MON_TMD.FAST, 1, 0, false);
 
 			if (m_ptr.m_timed[(int)Misc.MON_TMD.SLOW] != 0)
-			    mon_dec_timed(m_idx, (int)Misc.MON_TMD.SLOW, 1, 0, false);
+			    mon_dec_timed(m_idx, Misc.MON_TMD.SLOW, 1, 0, false);
 
 			if (m_ptr.m_timed[(int)Misc.MON_TMD.STUN] != 0)
 			{
@@ -352,14 +351,13 @@ namespace CSAngband.Monster {
 
 			if (m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] != 0)
 			{
-				throw new NotImplementedException();
-				///* Amount of "boldness" */
-				//int d = randint1(r_ptr.level / 10 + 1);
+				/* Amount of "boldness" */
+				int d = Random.randint1(r_ptr.level / 10 + 1);
 
-				//if (m_ptr.m_timed[MON_TMD_FEAR] > d)
-				//    mon_dec_timed(m_idx, MON_TMD_FEAR, d, MON_TMD_FLG_NOMESSAGE, false);
-				//else
-				//    mon_clear_timed(m_idx, MON_TMD_FEAR, MON_TMD_FLG_NOTIFY, false);
+				if (m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] > d)
+				    mon_dec_timed(m_idx, Misc.MON_TMD.FEAR, d, Misc.MON_TMD_FLG_NOMESSAGE, false);
+				else
+				    mon_clear_timed(m_idx, Misc.MON_TMD.FEAR, Misc.MON_TMD_FLG_NOTIFY, false);
 			}
 
 
@@ -481,7 +479,7 @@ namespace CSAngband.Monster {
 			for (i = 0; i < 5; i++)
 			{
 			    /* Get the direction (or stagger) */
-			    d = (stagger ? Misc.ddd[Random.randint0(8)] : mm[i]);
+			    int d = (stagger ? Misc.ddd[Random.randint0(8)] : mm[i]);
 
 			    /* Get the destination */
 			    ny = oy + Misc.ddy[d];
@@ -799,6 +797,8 @@ namespace CSAngband.Monster {
 
 			            /* Get the object */
 			            o_ptr = Object.Object.byid(this_o_idx);
+						if(o_ptr == null)
+							continue;
 
 			            /* Get the next object */
 			            next_o_idx = o_ptr.next_o_idx;
@@ -926,7 +926,7 @@ namespace CSAngband.Monster {
 			/* Hack -- get "bold" if out of options */
 			if (!do_turn && !do_move && m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] != 0)
 			{
-			    mon_clear_timed(m_idx, (int)Misc.MON_TMD.FEAR, Misc.MON_TMD_FLG_NOTIFY, false);
+			    mon_clear_timed(m_idx, Misc.MON_TMD.FEAR, Misc.MON_TMD_FLG_NOTIFY, false);
 			}
 
 			/* If we see an unaware monster do something, become aware of it */
@@ -1030,22 +1030,21 @@ namespace CSAngband.Monster {
 			/* Apply fear */
 			if (!done && mon_will_run(m_idx))
 			{
-				throw new NotImplementedException();
-				///* Try to find safe place */
-				//if (!(OPT(birth_ai_smart) && find_safety(c, m_idx, &y, &x)))
-				//{
-				//    /* This is not a very "smart" method XXX XXX */
-				//    y = (-y);
-				//    x = (-x);
-				//}
+				/* Try to find safe place */
+				if (!(Option.birth_ai_smart.value && find_safety(c, m_idx, out y, out x)))
+				{
+				    /* This is not a very "smart" method XXX XXX */
+				    y = (-y);
+				    x = (-x);
+				}
 
-				//else
-				//{
-				//    /* Adjust movement */
-				//    get_fear_moves_aux(c, m_idx, &y, &x);
-				//}
+				else
+				{
+				    /* Adjust movement */
+				    get_fear_moves_aux(c, m_idx, ref y, ref x);
+				}
 
-				//done = true;
+				done = true;
 			}
 
 
@@ -1669,6 +1668,320 @@ namespace CSAngband.Monster {
 			if (dam > 18) return (3 + max);
 			if (dam > 11) return (2 + max);
 			return (1 + max);
+		}
+
+
+		/*
+		 * Hack -- Precompute a bunch of calls to distance() in find_safety() and
+		 * find_hiding().
+		 *
+		 * The pair of arrays dist_offsets_y[n] and dist_offsets_x[n] contain the
+		 * offsets of all the locations with a distance of n from a central point,
+		 * with an offset of (0,0) indicating no more offsets at this distance.
+		 *
+		 * This is, of course, fairly unreadable, but it eliminates multiple loops
+		 * from the previous version.
+		 *
+		 * It is probably better to replace these arrays with code to compute
+		 * the relevant arrays, even if the storage is pre-allocated in hard
+		 * coded sizes.  At the very least, code should be included which is
+		 * able to generate and dump these arrays (ala "los()").  XXX XXX XXX
+		 *
+		 * Also, the storage needs could be reduced by using char.  XXX XXX XXX
+		 *
+		 * These arrays could be combined into two big arrays, using sub-arrays
+		 * to hold the offsets and lengths of each portion of the sub-arrays, and
+		 * this could perhaps also be used somehow in the "look" code.  XXX XXX XXX
+		 */
+		//Nick: ohh My GOD this is horrible. Remove this IMMEDIATELY and just fucking call distance() @_@
+		//XXX XXX XXX MAJOR HACK DA FUQ BBQ TODO FIX THIS FIRST ABOVE ALL ELSE
+
+		static int[] d_off_y_0 =
+		{ 0 };
+
+		static int[] d_off_x_0 =
+		{ 0 };
+
+
+		static int[] d_off_y_1 =
+		{ -1, -1, -1, 0, 0, 1, 1, 1, 0 };
+
+		static int[] d_off_x_1 =
+		{ -1, 0, 1, -1, 1, -1, 0, 1, 0 };
+
+
+		static int[] d_off_y_2 =
+		{ -1, -1, -2, -2, -2, 0, 0, 1, 1, 2, 2, 2, 0 };
+
+		static int[] d_off_x_2 =
+		{ -2, 2, -1, 0, 1, -2, 2, -2, 2, -1, 0, 1, 0 };
+
+
+		static int[] d_off_y_3 =
+		{ -1, -1, -2, -2, -3, -3, -3, 0, 0, 1, 1, 2, 2,
+		  3, 3, 3, 0 };
+
+		static int[] d_off_x_3 =
+		{ -3, 3, -2, 2, -1, 0, 1, -3, 3, -3, 3, -2, 2,
+		  -1, 0, 1, 0 };
+
+
+		static int[] d_off_y_4 =
+		{ -1, -1, -2, -2, -3, -3, -3, -3, -4, -4, -4, 0,
+		  0, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 0 };
+
+		static int[] d_off_x_4 =
+		{ -4, 4, -3, 3, -2, -3, 2, 3, -1, 0, 1, -4, 4,
+		  -4, 4, -3, 3, -2, -3, 2, 3, -1, 0, 1, 0 };
+
+
+		static int[] d_off_y_5 =
+		{ -1, -1, -2, -2, -3, -3, -4, -4, -4, -4, -5, -5,
+		  -5, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5,
+		  5, 0 };
+
+		static int[] d_off_x_5 =
+		{ -5, 5, -4, 4, -4, 4, -2, -3, 2, 3, -1, 0, 1,
+		  -5, 5, -5, 5, -4, 4, -4, 4, -2, -3, 2, 3, -1,
+		  0, 1, 0 };
+
+
+		static int[] d_off_y_6 =
+		{ -1, -1, -2, -2, -3, -3, -4, -4, -5, -5, -5, -5,
+		  -6, -6, -6, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5,
+		  5, 5, 6, 6, 6, 0 };
+
+		static int[] d_off_x_6 =
+		{ -6, 6, -5, 5, -5, 5, -4, 4, -2, -3, 2, 3, -1,
+		  0, 1, -6, 6, -6, 6, -5, 5, -5, 5, -4, 4, -2,
+		  -3, 2, 3, -1, 0, 1, 0 };
+
+
+		static int[] d_off_y_7 =
+		{ -1, -1, -2, -2, -3, -3, -4, -4, -5, -5, -5, -5,
+		  -6, -6, -6, -6, -7, -7, -7, 0, 0, 1, 1, 2, 2, 3,
+		  3, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 0 };
+
+		static int[] d_off_x_7 =
+		{ -7, 7, -6, 6, -6, 6, -5, 5, -4, -5, 4, 5, -2,
+		  -3, 2, 3, -1, 0, 1, -7, 7, -7, 7, -6, 6, -6,
+		  6, -5, 5, -4, -5, 4, 5, -2, -3, 2, 3, -1, 0,
+		  1, 0 };
+
+
+		static int[] d_off_y_8 =
+		{ -1, -1, -2, -2, -3, -3, -4, -4, -5, -5, -6, -6,
+		  -6, -6, -7, -7, -7, -7, -8, -8, -8, 0, 0, 1, 1,
+		  2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7,
+		  8, 8, 8, 0 };
+
+		static int[] d_off_x_8 =
+		{ -8, 8, -7, 7, -7, 7, -6, 6, -6, 6, -4, -5, 4,
+		  5, -2, -3, 2, 3, -1, 0, 1, -8, 8, -8, 8, -7,
+		  7, -7, 7, -6, 6, -6, 6, -4, -5, 4, 5, -2, -3,
+		  2, 3, -1, 0, 1, 0 };
+
+
+		static int[] d_off_y_9 =
+		{ -1, -1, -2, -2, -3, -3, -4, -4, -5, -5, -6, -6,
+		  -7, -7, -7, -7, -8, -8, -8, -8, -9, -9, -9, 0,
+		  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 7,
+		  7, 8, 8, 8, 8, 9, 9, 9, 0 };
+
+		static int[] d_off_x_9 =
+		{ -9, 9, -8, 8, -8, 8, -7, 7, -7, 7, -6, 6, -4,
+		  -5, 4, 5, -2, -3, 2, 3, -1, 0, 1, -9, 9, -9,
+		  9, -8, 8, -8, 8, -7, 7, -7, 7, -6, 6, -4, -5,
+		  4, 5, -2, -3, 2, 3, -1, 0, 1, 0 };
+
+
+		static int[][] dist_offsets_y =
+		{
+			d_off_y_0, d_off_y_1, d_off_y_2, d_off_y_3, d_off_y_4,
+			d_off_y_5, d_off_y_6, d_off_y_7, d_off_y_8, d_off_y_9
+		};
+
+		static int[][] dist_offsets_x =
+		{
+			d_off_x_0, d_off_x_1, d_off_x_2, d_off_x_3, d_off_x_4,
+			d_off_x_5, d_off_x_6, d_off_x_7, d_off_x_8, d_off_x_9
+		};
+
+
+		/*
+		 * Choose a "safe" location near a monster for it to run toward.
+		 *
+		 * A location is "safe" if it can be reached quickly and the player
+		 * is not able to fire into it (it isn't a "clean shot").  So, this will
+		 * cause monsters to "duck" behind walls.  Hopefully, monsters will also
+		 * try to run towards corridor openings if they are in a room.
+		 *
+		 * This function may take lots of CPU time if lots of monsters are fleeing.
+		 *
+		 * Return true if a safe location is available.
+		 */
+		public static bool find_safety(Cave c, int m_idx, out int yp, out int xp)
+		{
+			yp = 0;
+			xp = 0;
+
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+
+			int fy = m_ptr.fy;
+			int fx = m_ptr.fx;
+
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
+
+			int i, y, x, dy, dx, d, dis;
+			int gy = 0, gx = 0, gdis = 0;
+
+			int[] y_offsets;
+			int[] x_offsets;
+
+			/* Start with adjacent locations, spread further */
+			for (d = 1; d < 10; d++)
+			{
+				/* Get the lists of points with a distance d from (fx, fy) */
+				y_offsets = dist_offsets_y[d];
+				x_offsets = dist_offsets_x[d];
+
+				/* Check the locations */
+				for (i = 0, dx = x_offsets[0], dy = y_offsets[0];
+					 dx != 0 || dy != 0;
+					 i++, dx = x_offsets[i], dy = y_offsets[i])
+				{
+					y = fy + dy;
+					x = fx + dx;
+
+					/* Skip illegal locations */
+					if (!Cave.cave.in_bounds_fully(y, x)) continue;
+
+					/* Skip locations in a wall */
+					if (!Cave.cave_floor_bold(y, x)) continue;
+
+					/* Ignore grids very far from the player */
+					if (c.when[y][x] < c.when[py][px]) continue;
+
+					/* Ignore too-distant grids */
+					if (c.cost[y][x] > c.cost[fy][fx] + 2 * d) continue;
+
+					/* Check for absence of shot (more or less) */
+					if (!Cave.player_has_los_bold(y,x))
+					{
+						/* Calculate distance from player */
+						dis = Cave.distance(y, x, py, px);
+
+						/* Remember if further than previous */
+						if (dis > gdis)
+						{
+							gy = y;
+							gx = x;
+							gdis = dis;
+						}
+					}
+				}
+
+				/* Check for success */
+				if (gdis > 0)
+				{
+					/* Good location */
+					yp = fy - gy;
+					xp = fx - gx;
+
+					/* Found safe place */
+					return (true);
+				}
+			}
+
+			/* No safe place */
+			return (false);
+		}
+
+		/*
+		 * Provide a location to flee to, but give the player a wide berth.
+		 *
+		 * A monster may wish to flee to a location that is behind the player,
+		 * but instead of heading directly for it, the monster should "swerve"
+		 * around the player so that he has a smaller chance of getting hit.
+		 */
+		static bool get_fear_moves_aux(Cave c, int m_idx, ref int yp, ref int xp)
+		{
+			int y, x, y1, x1, fy, fx, py, px, gy = 0, gx = 0;
+			int when = 0, score = -1;
+			int i;
+
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			/* Player location */
+			py = Misc.p_ptr.py;
+			px = Misc.p_ptr.px;
+
+			/* Monster location */
+			fy = m_ptr.fy;
+			fx = m_ptr.fx;
+
+			/* Desired destination */
+			y1 = fy - yp;
+			x1 = fx - xp;
+
+			/* The player is not currently near the monster grid */
+			if (c.when[fy][fx] < c.when[py][px])
+			{
+				/* No reason to attempt flowing */
+				return (false);
+			}
+
+			/* Monster is too far away to use flow information */
+			if (c.cost[fy][fx] > Misc.MONSTER_FLOW_DEPTH) return (false);
+			if (c.cost[fy][fx] > r_ptr.aaf) return (false);
+
+			/* Check nearby grids, diagonals first */
+			for (i = 7; i >= 0; i--)
+			{
+				int dis, s;
+
+				/* Get the location */
+				y = fy + Misc.ddy_ddd[i];
+				x = fx + Misc.ddx_ddd[i];
+
+				/* Ignore illegal locations */
+				if (c.when[y][x] == 0) continue;
+
+				/* Ignore ancient locations */
+				if (c.when[y][x] < when) continue;
+
+				/* Calculate distance of this grid from our destination */
+				dis = Cave.distance(y, x, y1, x1);
+
+				/* Score this grid */
+				s = 5000 / (dis + 3) - 500 / (c.cost[y][x] + 1);
+
+				/* No negative scores */
+				if (s < 0) s = 0;
+
+				/* Ignore lower scores */
+				if (s < score) continue;
+
+				/* Save the score and time */
+				when = c.when[y][x];
+				score = s;
+
+				/* Save the location */
+				gy = y;
+				gx = x;
+			}
+
+			/* No legal move (?) */
+			if (when == 0) return (false);
+
+			/* Find deltas */
+			yp = fy - gy;
+			xp = fx - gx;
+
+			/* Success */
+			return (true);
 		}
 
 	}

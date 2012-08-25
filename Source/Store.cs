@@ -1599,7 +1599,7 @@ namespace CSAngband {
 			if (amt <= 0) return false;
 
 			/* Get desired object */
-			i_ptr.copy_amt(o_ptr, amt);
+			Object.Object.copy_amt(ref i_ptr, o_ptr, amt);
 
 			/* Ensure we have room */
 			if (!i_ptr.inven_carry_okay())

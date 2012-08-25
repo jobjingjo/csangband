@@ -441,8 +441,8 @@ namespace CSAngband {
 						 * This action is optional, but may be required by this file,
 						 * especially if special "macro sequences" must be supported.
 						 */
-						throw new NotImplementedException();
-						//return (0);
+						Thread.Sleep(v);
+						return (0);
 					}
 			}
 

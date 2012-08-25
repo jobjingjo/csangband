@@ -791,202 +791,201 @@ namespace CSAngband.Object {
 		 */
 		public static void drop_near(Cave c, Object j_ptr, int chance, int y, int x, bool verbose)
 		{
-			throw new NotImplementedException();
-			//int i, k, n, d, s;
+			int i, k, n, d, s;
 
-			//int bs, bn;
-			//int by, bx;
-			//int dy, dx;
-			//int ty, tx;
+			int bs, bn;
+			int by, bx;
+			int dy, dx;
+			int ty, tx;
 
-			//object_type *o_ptr;
+			Object o_ptr;
 
 			//char o_name[80];
+			string o_name;
 
-			//bool flag = false;
+			bool flag = false;
 
-			//bool plural = false;
-
-
-			///* Extract plural */
-			//if (j_ptr.number != 1) plural = true;
-
-			///* Describe object */
-			//object_desc(o_name, sizeof(o_name), j_ptr, ODESC_BASE);
+			bool plural = false;
 
 
-			///* Handle normal "breakage" */
-			//if (!j_ptr.artifact && (randint0(100) < chance))
-			//{
-			//    /* Message */
-			//    msg("The %s break%s.", o_name, PLURAL(plural));
+			/* Extract plural */
+			if (j_ptr.number != 1) plural = true;
 
-			//    /* Failure */
-			//    return;
-			//}
+			/* Describe object */
+			o_name = j_ptr.object_desc(Detail.BASE);
 
 
-			///* Score */
-			//bs = -1;
+			/* Handle normal "breakage" */
+			if (j_ptr.artifact == null && (Random.randint0(100) < chance))
+			{
+			    /* Message */
+			    Utilities.msg("The {0} break{1}.", o_name, Misc.PLURAL(plural));
 
-			///* Picker */
-			//bn = 0;
+			    /* Failure */
+			    return;
+			}
 
-			///* Default */
-			//by = y;
-			//bx = x;
 
-			///* Scan local grids */
-			//for (dy = -3; dy <= 3; dy++)
-			//{
-			//    /* Scan local grids */
-			//    for (dx = -3; dx <= 3; dx++)
-			//    {
-			//        bool comb = false;
+			/* Score */
+			bs = -1;
 
-			//        /* Calculate actual distance */
-			//        d = (dy * dy) + (dx * dx);
+			/* Picker */
+			bn = 0;
 
-			//        /* Ignore distant grids */
-			//        if (d > 10) continue;
+			/* Default */
+			by = y;
+			bx = x;
 
-			//        /* Location */
-			//        ty = y + dy;
-			//        tx = x + dx;
+			/* Scan local grids */
+			for (dy = -3; dy <= 3; dy++)
+			{
+			    /* Scan local grids */
+			    for (dx = -3; dx <= 3; dx++)
+			    {
+			        bool comb = false;
 
-			//        /* Skip illegal grids */
-			//        if (!in_bounds_fully(ty, tx)) continue;
+			        /* Calculate actual distance */
+			        d = (dy * dy) + (dx * dx);
 
-			//        /* Require line of sight */
-			//        if (!los(y, x, ty, tx)) continue;
+			        /* Ignore distant grids */
+			        if (d > 10) continue;
 
-			//        /* Require floor space */
-			//        if (cave.feat[ty][tx] != FEAT_FLOOR) continue;
+			        /* Location */
+			        ty = y + dy;
+			        tx = x + dx;
 
-			//        /* No objects */
-			//        k = 0;
-			//        n = 0;
+			        /* Skip illegal grids */
+			        if (!Cave.cave.in_bounds_fully(ty, tx)) continue;
 
-			//        /* Scan objects in that grid */
-			//        for (o_ptr = get_first_object(ty, tx); o_ptr;
-			//                o_ptr = get_next_object(o_ptr))
-			//        {
-			//            /* Check for possible combination */
-			//            if (object_similar(o_ptr, j_ptr, OSTACK_FLOOR))
-			//                comb = true;
+			        /* Require line of sight */
+			        if (!Cave.los(y, x, ty, tx)) continue;
 
-			//            /* Count objects */
-			//            if (!squelch_item_ok(o_ptr))
-			//                k++;
-			//            else
-			//                n++;
-			//        }
+			        /* Require floor space */
+			        if (Cave.cave.feat[ty][tx] != Cave.FEAT_FLOOR) continue;
 
-			//        /* Add new object */
-			//        if (!comb) k++;
+			        /* No objects */
+			        k = 0;
+			        n = 0;
 
-			//        /* Option -- disallow stacking */
-			//        if (OPT(birth_no_stacking) && (k > 1)) continue;
+			        /* Scan objects in that grid */
+			        for (o_ptr = get_first_object(ty, tx); o_ptr != null;
+			                o_ptr = get_next_object(o_ptr))
+			        {
+			            /* Check for possible combination */
+			            if (o_ptr.similar(j_ptr, object_stack_t.OSTACK_FLOOR))
+			                comb = true;
+
+			            /* Count objects */
+			            if (!Squelch.item_ok(o_ptr))
+			                k++;
+			            else
+			                n++;
+			        }
+
+			        /* Add new object */
+			        if (!comb) k++;
+
+			        /* Option -- disallow stacking */
+			        if (Option.birth_no_stacking.value && (k > 1)) continue;
 			
-			//        /* Paranoia? */
-			//        if ((k + n) > MAX_FLOOR_STACK &&
-			//                !floor_get_idx_oldest_squelched(ty, tx)) continue;
+			        /* Paranoia? */
+			        if ((k + n) > Misc.MAX_FLOOR_STACK && floor_get_idx_oldest_squelched(ty, tx) == 0) continue;
 
-			//        /* Calculate score */
-			//        s = 1000 - (d + k * 5);
+			        /* Calculate score */
+			        s = 1000 - (d + k * 5);
 
-			//        /* Skip bad values */
-			//        if (s < bs) continue;
+			        /* Skip bad values */
+			        if (s < bs) continue;
 
-			//        /* New best value */
-			//        if (s > bs) bn = 0;
+			        /* New best value */
+			        if (s > bs) bn = 0;
 
-			//        /* Apply the randomizer to equivalent values */
-			//        if ((++bn >= 2) && (randint0(bn) != 0)) continue;
+			        /* Apply the randomizer to equivalent values */
+			        if ((++bn >= 2) && (Random.randint0(bn) != 0)) continue;
 
-			//        /* Keep score */
-			//        bs = s;
+			        /* Keep score */
+			        bs = s;
 
-			//        /* Track it */
-			//        by = ty;
-			//        bx = tx;
+			        /* Track it */
+			        by = ty;
+			        bx = tx;
 
-			//        /* Okay */
-			//        flag = true;
-			//    }
-			//}
-
-
-			///* Handle lack of space */
-			//if (!flag && !j_ptr.artifact)
-			//{
-			//    /* Message */
-			//    msg("The %s disappear%s.", o_name, PLURAL(plural));
-
-			//    /* Debug */
-			//    if (p_ptr.wizard) msg("Breakage (no floor space).");
-
-			//    /* Failure */
-			//    return;
-			//}
+			        /* Okay */
+			        flag = true;
+			    }
+			}
 
 
-			///* Find a grid */
-			//for (i = 0; !flag; i++)
-			//{
-			//    /* Bounce around */
-			//    if (i < 1000)
-			//    {
-			//        ty = rand_spread(by, 1);
-			//        tx = rand_spread(bx, 1);
-			//    }
+			/* Handle lack of space */
+			if (!flag && j_ptr.artifact == null)
+			{
+			    /* Message */
+			    Utilities.msg("The {0} disappear{1}.", o_name, Misc.PLURAL(plural));
 
-			//    /* Random locations */
-			//    else
-			//    {
-			//        ty = randint0(c.height);
-			//        tx = randint0(c.width);
-			//    }
+			    /* Debug */
+			    if (Misc.p_ptr.wizard) Utilities.msg("Breakage (no floor space).");
 
-			//    /* Require floor space */
-			//    if (cave.feat[ty][tx] != FEAT_FLOOR) continue;
-
-			//    /* Bounce to that location */
-			//    by = ty;
-			//    bx = tx;
-
-			//    /* Require floor space */
-			//    if (!cave_clean_bold(by, bx)) continue;
-
-			//    /* Okay */
-			//    flag = true;
-			//}
+			    /* Failure */
+			    return;
+			}
 
 
-			///* Give it to the floor */
-			//if (!floor_carry(c, by, bx, j_ptr))
-			//{
-			//    /* Message */
-			//    msg("The %s disappear%s.", o_name, PLURAL(plural));
+			/* Find a grid */
+			for (i = 0; !flag; i++)
+			{
+			    /* Bounce around */
+			    if (i < 1000)
+			    {
+			        ty = Random.rand_spread(by, 1);
+			        tx = Random.rand_spread(bx, 1);
+			    }
 
-			//    /* Debug */
-			//    if (p_ptr.wizard) msg("Breakage (too many objects).");
+			    /* Random locations */
+			    else
+			    {
+			        ty = Random.randint0(c.height);
+			        tx = Random.randint0(c.width);
+			    }
 
-			//    if (j_ptr.artifact) j_ptr.artifact.created = false;
+			    /* Require floor space */
+			    if (Cave.cave.feat[ty][tx] != Cave.FEAT_FLOOR) continue;
 
-			//    /* Failure */
-			//    return;
-			//}
+			    /* Bounce to that location */
+			    by = ty;
+			    bx = tx;
+
+			    /* Require floor space */
+			    if (!Cave.cave_clean_bold(by, bx)) continue;
+
+			    /* Okay */
+			    flag = true;
+			}
 
 
-			///* Sound */
-			//sound(MSG_DROP);
+			/* Give it to the floor */
+			if (floor_carry(c, by, bx, j_ptr) == 0)
+			{
+			    /* Message */
+			    Utilities.msg("The {0} disappear{1}.", o_name, Misc.PLURAL(plural));
 
-			///* Message when an object falls under the player */
-			//if (verbose && (cave.m_idx[by][bx] < 0) && !squelch_item_ok(j_ptr))
-			//{
-			//    msg("You feel something roll beneath your feet.");
-			//}
+			    /* Debug */
+			    if (Misc.p_ptr.wizard) Utilities.msg("Breakage (too many objects).");
+
+			    if (j_ptr.artifact != null) j_ptr.artifact.created = false;
+
+			    /* Failure */
+			    return;
+			}
+
+
+			/* Sound */
+			//sound(MSG_DROP); //Nick: Add this later
+
+			/* Message when an object falls under the player */
+			if (verbose && (Cave.cave.m_idx[by][bx] < 0) && !Squelch.item_ok(j_ptr))
+			{
+			    Utilities.msg("You feel something roll beneath your feet.");
+			}
 		}
 
 		/*
@@ -1005,6 +1004,8 @@ namespace CSAngband.Object {
 			for (this_o_idx = c.o_idx[y][x]; this_o_idx != 0; this_o_idx = next_o_idx)
 			{
 				Object o_ptr = byid(this_o_idx);
+				if(o_ptr == null)
+					continue;
 
 				/* Get the next object */
 				next_o_idx = o_ptr.next_o_idx;
@@ -1172,25 +1173,85 @@ namespace CSAngband.Object {
 		 *
 		 * 'mode' defines which areas we should look at, a la scan_items().
 		 */
-		public delegate bool tester_func(Object o);
-		public static bool item_is_available(int item, tester_func tester, int mode)
+		public static bool item_is_available(int item, Misc.item_tester_hook_func tester, int mode)
 		{
-			throw new NotImplementedException();
-			//int[] item_list = new int[ALL_INVEN_TOTAL + MAX_FLOOR_STACK];
-			//int item_num;
-			//int i;
+			int[] item_list = new int[Misc.ALL_INVEN_TOTAL + Misc.MAX_FLOOR_STACK];
+			int item_num;
+			int i;
 
-			//item_tester_hook = tester;
-			//item_tester_tval = 0;
-			//item_num = scan_items(item_list, N_ELEMENTS(item_list), mode);
+			Misc.item_tester_hook = tester;
+			Misc.item_tester_tval = 0;
+			item_num = scan_items(item_list, item_list.Length, mode);
 
-			//for (i = 0; i < item_num; i++)
-			//{
-			//    if (item_list[i] == item)
-			//        return true;
-			//}
+			for (i = 0; i < item_num; i++)
+			{
+			    if (item_list[i] == item)
+			        return true;
+			}
 
-			//return false;
+			return false;
+		}
+
+		/*
+		 * Get a list of "valid" item indexes.
+		 *
+		 * Fills item_list[] with items that are "okay" as defined by the
+		 * current item_tester_hook, etc.  mode determines what combination of
+		 * inventory, equipment and player's floor location should be used
+		 * when drawing up the list.
+		 *
+		 * Returns the number of items placed into the list.
+		 *
+		 * Maximum space that can be used is [INVEN_TOTAL + MAX_FLOOR_STACK],
+		 * though practically speaking much smaller numbers are likely.
+		 */
+		public static int scan_items(int[] item_list, int item_list_max, int mode)
+		{
+			bool use_inven = ((mode & Misc.USE_INVEN) != 0 ? true : false);
+			bool use_equip = ((mode & Misc.USE_EQUIP) != 0 ? true : false);
+			bool use_floor = ((mode & Misc.USE_FLOOR) != 0 ? true : false);
+
+			int[] floor_list = new int[Misc.MAX_FLOOR_STACK];
+			int floor_num;
+
+			int i;
+			int item_list_num = 0;
+
+			if (use_inven)
+			{
+				for (i = 0; i < Misc.INVEN_PACK && item_list_num < item_list_max; i++)
+				{
+					if (get_item_okay(i))
+						item_list[item_list_num++] = i;
+				}
+			}
+
+			if (use_equip)
+			{
+				for (i = Misc.INVEN_WIELD; i < Misc.ALL_INVEN_TOTAL && item_list_num < item_list_max; i++)
+				{
+					if (get_item_okay(i))
+						item_list[item_list_num++] = i;
+				}
+			}
+
+			/* Scan all non-gold objects in the grid */
+			if (use_floor)
+			{
+				floor_num = scan_floor(floor_list, floor_list.Length, Misc.p_ptr.py, Misc.p_ptr.px, 0x03);
+
+				for (i = 0; i < floor_num && item_list_num < item_list_max; i++)
+				{
+					if (get_item_okay(-floor_list[i]))
+						item_list[item_list_num++] = -floor_list[i];
+				}
+			}
+
+			/* Forget the item_tester_tval and item_tester_hook  restrictions */
+			Misc.item_tester_tval = 0;
+			Misc.item_tester_hook = null;
+
+			return item_list_num;
 		}
 
 		/*
@@ -1250,120 +1311,119 @@ namespace CSAngband.Object {
 		 */
 		public static void excise_object_idx(int o_idx)
 		{
-			throw new NotImplementedException();
-			//object_type *j_ptr;
+			Object j_ptr;
 
-			//s16b this_o_idx, next_o_idx = 0;
+			short this_o_idx, next_o_idx = 0;
 
-			//s16b prev_o_idx = 0;
+			short prev_o_idx = 0;
 
 
-			///* Object */
-			//j_ptr = object_byid(o_idx);
+			/* Object */
+			j_ptr = byid((short)o_idx);
 
-			///* Monster */
-			//if (j_ptr.held_m_idx)
-			//{
-			//    monster_type *m_ptr;
+			/* Monster */
+			if (j_ptr.held_m_idx != 0)
+			{
+			    Monster.Monster m_ptr;
 
-			//    /* Monster */
-			//    m_ptr = cave_monster(cave, j_ptr.held_m_idx);
+			    /* Monster */
+			    m_ptr = Cave.cave_monster(Cave.cave, j_ptr.held_m_idx);
 
-			//    /* Scan all objects in the grid */
-			//    for (this_o_idx = m_ptr.hold_o_idx; this_o_idx; this_o_idx = next_o_idx)
-			//    {
-			//        object_type *o_ptr;
+			    /* Scan all objects in the grid */
+			    for (this_o_idx = m_ptr.hold_o_idx; this_o_idx != 0; this_o_idx = next_o_idx)
+			    {
+			        Object o_ptr;
 
-			//        /* Get the object */
-			//        o_ptr = object_byid(this_o_idx);
+			        /* Get the object */
+			        o_ptr = byid(this_o_idx);
 
-			//        /* Get the next object */
-			//        next_o_idx = o_ptr.next_o_idx;
+			        /* Get the next object */
+			        next_o_idx = o_ptr.next_o_idx;
 
-			//        /* Done */
-			//        if (this_o_idx == o_idx)
-			//        {
-			//            /* No previous */
-			//            if (prev_o_idx == 0)
-			//            {
-			//                /* Remove from list */
-			//                m_ptr.hold_o_idx = next_o_idx;
-			//            }
+			        /* Done */
+			        if (this_o_idx == o_idx)
+			        {
+			            /* No previous */
+			            if (prev_o_idx == 0)
+			            {
+			                /* Remove from list */
+			                m_ptr.hold_o_idx = next_o_idx;
+			            }
 
-			//            /* Real previous */
-			//            else
-			//            {
-			//                object_type *i_ptr;
+			            /* Real previous */
+			            else
+			            {
+			                Object i_ptr;
 
-			//                /* Previous object */
-			//                i_ptr = object_byid(prev_o_idx);
+			                /* Previous object */
+			                i_ptr = byid(prev_o_idx);
 
-			//                /* Remove from list */
-			//                i_ptr.next_o_idx = next_o_idx;
-			//            }
+			                /* Remove from list */
+			                i_ptr.next_o_idx = next_o_idx;
+			            }
 
-			//            /* Forget next pointer */
-			//            o_ptr.next_o_idx = 0;
+			            /* Forget next pointer */
+			            o_ptr.next_o_idx = 0;
 
-			//            /* Done */
-			//            break;
-			//        }
+			            /* Done */
+			            break;
+			        }
 
-			//        /* Save prev_o_idx */
-			//        prev_o_idx = this_o_idx;
-			//    }
-			//}
+			        /* Save prev_o_idx */
+			        prev_o_idx = this_o_idx;
+			    }
+			}
 
-			///* Dungeon */
-			//else
-			//{
-			//    int y = j_ptr.iy;
-			//    int x = j_ptr.ix;
+			/* Dungeon */
+			else
+			{
+			    int y = j_ptr.iy;
+			    int x = j_ptr.ix;
 
-			//    /* Scan all objects in the grid */
-			//    for (this_o_idx = cave.o_idx[y][x]; this_o_idx; this_o_idx = next_o_idx)
-			//    {
-			//        object_type *o_ptr;
+			    /* Scan all objects in the grid */
+			    for (this_o_idx = Cave.cave.o_idx[y][x]; this_o_idx != 0; this_o_idx = next_o_idx)
+			    {
+			        Object o_ptr;
 
-			//        /* Get the object */
-			//        o_ptr = object_byid(this_o_idx);
+			        /* Get the object */
+			        o_ptr = byid(this_o_idx);
 
-			//        /* Get the next object */
-			//        next_o_idx = o_ptr.next_o_idx;
+			        /* Get the next object */
+			        next_o_idx = o_ptr.next_o_idx;
 
-			//        /* Done */
-			//        if (this_o_idx == o_idx)
-			//        {
-			//            /* No previous */
-			//            if (prev_o_idx == 0)
-			//            {
-			//                /* Remove from list */
-			//                cave.o_idx[y][x] = next_o_idx;
-			//            }
+			        /* Done */
+			        if (this_o_idx == o_idx)
+			        {
+			            /* No previous */
+			            if (prev_o_idx == 0)
+			            {
+			                /* Remove from list */
+			                Cave.cave.o_idx[y][x] = next_o_idx;
+			            }
 
-			//            /* Real previous */
-			//            else
-			//            {
-			//                object_type *i_ptr;
+			            /* Real previous */
+			            else
+			            {
+			                Object i_ptr;
 
-			//                /* Previous object */
-			//                i_ptr = object_byid(prev_o_idx);
+			                /* Previous object */
+			                i_ptr = byid(prev_o_idx);
 
-			//                /* Remove from list */
-			//                i_ptr.next_o_idx = next_o_idx;
-			//            }
+			                /* Remove from list */
+			                i_ptr.next_o_idx = next_o_idx;
+			            }
 
-			//            /* Forget next pointer */
-			//            o_ptr.next_o_idx = 0;
+			            /* Forget next pointer */
+			            o_ptr.next_o_idx = 0;
 
-			//            /* Done */
-			//            break;
-			//        }
+			            /* Done */
+			            break;
+			        }
 
-			//        /* Save prev_o_idx */
-			//        prev_o_idx = this_o_idx;
-			//    }
-			//}
+			        /* Save prev_o_idx */
+			        prev_o_idx = this_o_idx;
+			    }
+			}
 		}
 
 		
@@ -1373,39 +1433,189 @@ namespace CSAngband.Object {
 		 *
 		 * Takes care of the charge redistribution concerns of stacked items.
 		 */
-		public void copy_amt(Object src, int amt)
+		public static void copy_amt(ref Object dst, Object src, int amt)
 		{
-			throw new NotImplementedException();
 			//this is the dest
-			//int charge_time = randcalc(src.kind.time, 0, AVERAGE), max_time;
+			int charge_time = Random.randcalc(src.kind.time, 0, aspect.AVERAGE), max_time;
 
-			///* Get a copy of the object */
-			//object_copy(dst, src);
+			/* Get a copy of the object */
+			dst = src.copy();
 
-			///* Modify quantity */
-			//dst.number = amt;
-			//dst.note = src.note;
+			/* Modify quantity */
+			dst.number = (byte)amt;
+			dst.note = src.note;
 
-			///* 
-			// * If the item has charges/timeouts, set them to the correct level 
-			// * too. We split off the same amount as distribute_charges.
-			// */
-			//if (src.tval == TV_WAND || src.tval == TV_STAFF)
-			//{
-			//    dst.pval[DEFAULT_PVAL] =
-			//        src.pval[DEFAULT_PVAL] * amt / src.number;
-			//}
+			/* 
+			 * If the item has charges/timeouts, set them to the correct level 
+			 * too. We split off the same amount as distribute_charges.
+			 */
+			if (src.tval == TVal.TV_WAND || src.tval == TVal.TV_STAFF)
+			{
+			    dst.pval[Misc.DEFAULT_PVAL] = (short)(src.pval[Misc.DEFAULT_PVAL] * amt / src.number);
+			}
 
-			//if (src.tval == TV_ROD)
-			//{
-			//    max_time = charge_time * amt;
+			if (src.tval == TVal.TV_ROD)
+			{
+			    max_time = charge_time * amt;
 
-			//    if (src.timeout > max_time)
-			//        dst.timeout = max_time;
-			//    else
-			//        dst.timeout = src.timeout;
-			//}
+			    if (src.timeout > max_time)
+			        dst.timeout = (short)max_time;
+			    else
+			        dst.timeout = src.timeout;
+			}
 		}
 
+		/**
+		 * Split off 'at' items from 'src' into 'dest'.
+		 */
+		public void split(Object src, int amt)
+		{
+			/* Distribute charges of wands, staves, or rods */
+			src.distribute_charges(this, amt);
+
+			/* Modify quantity */
+			number = (byte)amt;
+			if (src.note != null)
+				note = src.note;
+		}
+
+		/*
+		 * Distribute charges of rods, staves, or wands.
+		 *
+		 * o_ptr = source item
+		 * q_ptr = target item, must be of the same type as o_ptr
+		 * amt   = number of items that are transfered
+		 */
+		public void distribute_charges(Object o_ptr, int amt)
+		{
+			int charge_time = Random.randcalc(o_ptr.kind.time, 0, aspect.AVERAGE), max_time;
+
+			/*
+			 * Hack -- If rods, staves, or wands are dropped, the total maximum
+			 * timeout or charges need to be allocated between the two stacks.
+			 * If all the items are being dropped, it makes for a neater message
+			 * to leave the original stack's pval alone. -LM-
+			 */
+			if ((o_ptr.tval == TVal.TV_WAND) ||
+			    (o_ptr.tval == TVal.TV_STAFF))
+			{
+			    pval[Misc.DEFAULT_PVAL] = (short)(o_ptr.pval[Misc.DEFAULT_PVAL] * amt / o_ptr.number);
+
+			    if (amt < o_ptr.number)
+			        o_ptr.pval[Misc.DEFAULT_PVAL] -= pval[Misc.DEFAULT_PVAL];
+			}
+
+			/*
+			 * Hack -- Rods also need to have their timeouts distributed.
+			 *
+			 * The dropped stack will accept all time remaining to charge up to
+			 * its maximum.
+			 */
+			if (o_ptr.tval == TVal.TV_ROD)
+			{
+			    max_time = charge_time * amt;
+
+			    if (o_ptr.timeout > max_time)
+			        timeout = (short)max_time;
+			    else
+			        timeout = o_ptr.timeout;
+
+			    if (amt < o_ptr.number)
+			        o_ptr.timeout -= timeout;
+			}
+		}
+
+		/*
+		 * Describe an item in the inventory. Note: only called when an item is 
+		 * dropped, used, or otherwise deleted from the inventory
+		 */
+		public static void inven_item_describe(int item)
+		{
+			Object o_ptr = Misc.p_ptr.inventory[item];
+
+			//char o_name[80];
+			string o_name;
+
+			if (o_ptr.artifact != null && (o_ptr.is_known() || o_ptr.name_is_visible()))
+			{
+			    /* Get a description */
+				o_name = o_ptr.object_desc(Detail.FULL | Detail.SINGULAR);
+
+			    /* Print a message */
+			    Utilities.msg("You no longer have the {0} ({1}).", o_name, index_to_label(item));
+			}
+			else
+			{
+			    /* Get a description */
+				o_name = o_ptr.object_desc(Detail.PREFIX | Detail.FULL);
+
+			    /* Print a message */
+			    Utilities.msg("You have {0} ({1}).", o_name, index_to_label(item));
+			}
+		}
+
+		/*
+		 * Increase the "number" of an item on the floor
+		 */
+		public static void floor_item_increase(int item, int num)
+		{
+			throw new NotImplementedException();
+			//object_type *o_ptr = object_byid(item);
+
+			///* Apply */
+			//num += o_ptr.number;
+
+			///* Bounds check */
+			//if (num > 255) num = 255;
+			//else if (num < 0) num = 0;
+
+			///* Un-apply */
+			//num -= o_ptr.number;
+
+			///* Change the number */
+			//o_ptr.number += num;
+		}
+
+		
+		/*
+		 * Optimize an item on the floor (destroy "empty" items)
+		 */
+		public static void floor_item_optimize(int item)
+		{
+			throw new NotImplementedException();
+			//object_type *o_ptr = object_byid(item);
+
+			///* Paranoia -- be sure it exists */
+			//if (!o_ptr.kind) return;
+
+			///* Only optimize empty items */
+			//if (o_ptr.number) return;
+
+			///* Delete the object */
+			//delete_object_idx(item);
+		}
+
+		/**
+		 * Find and return the index to the oldest object on the given grid marked as
+		 * "squelch".
+		 */
+		static short floor_get_idx_oldest_squelched(int y, int x)
+		{
+			throw new NotImplementedException();
+			//s16b squelch_idx = 0;
+			//s16b this_o_idx;
+
+			//object_type *o_ptr = null;
+
+			//for (this_o_idx = cave.o_idx[y][x]; this_o_idx; this_o_idx = o_ptr.next_o_idx)
+			//{
+			//    o_ptr = object_byid(this_o_idx);
+
+			//    if (squelch_item_ok(o_ptr))
+			//        squelch_idx = this_o_idx;
+			//}
+
+			//return squelch_idx;
+		}
 	}
 }

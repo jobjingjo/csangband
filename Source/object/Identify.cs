@@ -586,5 +586,16 @@ namespace CSAngband.Object {
 			Game_Event.signal(Game_Event.Event_Type.INVENTORY);
 			Game_Event.signal(Game_Event.Event_Type.EQUIPMENT);
 		}
+
+		/*
+		 * Notice stuff when firing or throwing objects.
+		 *
+		 */
+		/* XXX Eddie perhaps some stuff from do_cmd_fire and do_cmd_throw should be moved here */
+		public void notice_on_firing()
+		{
+			if (add_ident_flags(IDENT_FIRED))
+				check_for_ident();
+		}
 	}
 }

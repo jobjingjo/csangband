@@ -74,8 +74,3 @@ void add_to_point_set(struct point_set *ps, int y, int x)
 		ps.pts = mem_realloc(ps.pts, sizeof(*(ps.pts)) * ps.allocated);
 	}
 }
-
-int point_set_size(struct point_set *ps)
-{
-	return ps.n;
-}

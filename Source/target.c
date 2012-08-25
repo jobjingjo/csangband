@@ -113,43 +113,7 @@ void target_set_location(int y, int x)
 
 
 
-/*
- * Sorting hook -- comp function -- by "distance to player"
- *
- * We use "u" and "v" to point to arrays of "x" and "y" positions,
- * and sort the arrays by double-distance to the player.
- */
-static int cmp_distance(const void *a, const void *b)
-{
-	int py = p_ptr.py;
-	int px = p_ptr.px;
 
-	const struct loc *pa = a;
-	const struct loc *pb = b;
-
-	int da, db, kx, ky;
-
-	/* Absolute distance components */
-	kx = pa.x; kx -= px; kx = ABS(kx);
-	ky = pa.y; ky -= py; ky = ABS(ky);
-
-	/* Approximate Double Distance to the first point */
-	da = ((kx > ky) ? (kx + kx + ky) : (ky + ky + kx));
-
-	/* Absolute distance components */
-	kx = pb.x; kx -= px; kx = ABS(kx);
-	ky = pb.y; ky -= py; ky = ABS(ky);
-
-	/* Approximate Double Distance to the first point */
-	db = ((kx > ky) ? (kx + kx + ky) : (ky + ky + kx));
-
-	/* Compare the distances */
-	if (da < db)
-		return -1;
-	if (da > db)
-		return 1;
-	return 0;
-}
 
 /*
  * Hack -- help "select" a location (see below)
@@ -203,111 +167,9 @@ static s16b target_pick(int y1, int x1, int dy, int dx, struct point_set *target
 }
 
 
-/*
- * Hack -- determine if a given location is "interesting"
- */
-static bool target_set_interactive_accept(int y, int x)
-{
-	object_type *o_ptr;
 
 
-	/* Player grids are always interesting */
-	if (cave.m_idx[y][x] < 0) return (true);
 
-
-	/* Handle hallucination */
-	if (p_ptr.timed[TMD_IMAGE]) return (false);
-
-
-	/* Visible monsters */
-	if (cave.m_idx[y][x] > 0)
-	{
-		monster_type *m_ptr = cave_monster(cave, cave.m_idx[y][x]);
-
-		/* Visible monsters */
-		if (m_ptr.ml && !m_ptr.unaware) return (true);
-	}
-
-	/* Scan all objects in the grid */
-	for (o_ptr = get_first_object(y, x); o_ptr; o_ptr = get_next_object(o_ptr))
-	{
-		/* Memorized object */
-		if (o_ptr.marked && !squelch_item_ok(o_ptr)) return (true);
-	}
-
-	/* Interesting memorized features */
-	if (cave.info[y][x] & (CAVE_MARK))
-	{
-		/* Notice glyphs */
-		if (cave.feat[y][x] == FEAT_GLYPH) return (true);
-
-		/* Notice doors */
-		if (cave.feat[y][x] == FEAT_OPEN) return (true);
-		if (cave.feat[y][x] == FEAT_BROKEN) return (true);
-
-		/* Notice stairs */
-		if (cave.feat[y][x] == FEAT_LESS) return (true);
-		if (cave.feat[y][x] == FEAT_MORE) return (true);
-
-		/* Notice shops */
-		if ((cave.feat[y][x] >= FEAT_SHOP_HEAD) &&
-		    (cave.feat[y][x] <= FEAT_SHOP_TAIL)) return (true);
-
-		/* Notice traps */
-		if (cave_isknowntrap(cave, y, x)) return true;
-
-		/* Notice doors */
-		if (cave_iscloseddoor(cave, y, x)) return true;
-
-		/* Notice rubble */
-		if (cave.feat[y][x] == FEAT_RUBBLE) return (true);
-
-		/* Notice veins with treasure */
-		if (cave.feat[y][x] == FEAT_MAGMA_K) return (true);
-		if (cave.feat[y][x] == FEAT_QUARTZ_K) return (true);
-	}
-
-	/* Nope */
-	return (false);
-}
-
-/*
- * Return a target set of target_able monsters.
- */
-static struct point_set *target_set_interactive_prepare(int mode)
-{
-	int y, x;
-	struct point_set *targets = point_set_new(TS_INITIAL_SIZE);
-
-	/* Scan the current panel */
-	for (y = Term.offset_y; y < Term.offset_y + SCREEN_HGT; y++)
-	{
-		for (x = Term.offset_x; x < Term.offset_x + SCREEN_WID; x++)
-		{
-			/* Check bounds */
-			if (!in_bounds_fully(y, x)) continue;
-
-			/* Require "interesting" contents */
-			if (!target_set_interactive_accept(y, x)) continue;
-
-			/* Special mode */
-			if (mode & (TARGET_KILL))
-			{
-				/* Must contain a monster */
-				if (!(cave.m_idx[y][x] > 0)) continue;
-
-				/* Must be a targettable monster */
-			 	if (!target_able(cave.m_idx[y][x])) continue;
-			}
-
-			/* Save the location */
-			add_to_point_set(targets, y, x);
-		}
-	}
-
-	sort(targets.pts, point_set_size(targets), sizeof(*(targets.pts)), cmp_distance);
-	return targets;
-}
 
 /*
  * Perform the minimum "whole panel" adjustment to ensure that the given
@@ -993,17 +855,3 @@ static void load_path(u16b path_n, u16b *path_g, char *c, byte *a) {
 }
 
 
-/**
- * Obtains the location the player currently targets.
- *
- * Both `col` and `row` must point somewhere, and on function termination,
- * contain the X and Y locations respectively.
- */
-void target_get(s16b *col, s16b *row)
-{
-	assert(col);
-	assert(row);
-
-	*col = target_x;
-	*row = target_y;
-}

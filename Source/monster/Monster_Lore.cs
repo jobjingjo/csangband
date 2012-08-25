@@ -49,25 +49,24 @@ namespace CSAngband.Monster {
 		 */
 		public static void lore_treasure(int m_idx, int num_item, int num_gold)
 		{
-			throw new NotImplementedException();
-			//monster_type *m_ptr = cave_monster(cave, m_idx);
-			//monster_lore *l_ptr = &l_list[m_ptr.r_idx];
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Lore l_ptr = Misc.l_list[m_ptr.r_idx];
 
 
-			///* Note the number of things dropped */
-			//if (num_item > l_ptr.drop_item) l_ptr.drop_item = num_item;
-			//if (num_gold > l_ptr.drop_gold) l_ptr.drop_gold = num_gold;
+			/* Note the number of things dropped */
+			if (num_item > l_ptr.drop_item) l_ptr.drop_item = (byte)num_item;
+			if (num_gold > l_ptr.drop_gold) l_ptr.drop_gold = (byte)num_gold;
 
-			///* Learn about drop quality */
-			//rf_on(l_ptr.flags, RF_DROP_GOOD);
-			//rf_on(l_ptr.flags, RF_DROP_GREAT);
+			/* Learn about drop quality */
+			l_ptr.flags.on(Monster_Flag.DROP_GOOD.value);
+			l_ptr.flags.on(Monster_Flag.DROP_GREAT.value);
 
-			///* Update monster recall window */
-			//if (p_ptr.monster_race_idx == m_ptr.r_idx)
-			//{
-			//    /* Window stuff */
-			//    p_ptr.redraw |= (PR_MONSTER);
-			//}
+			/* Update monster recall window */
+			if (Misc.p_ptr.monster_race_idx == m_ptr.r_idx)
+			{
+			    /* Window stuff */
+			    Misc.p_ptr.redraw |= (Misc.PR_MONSTER);
+			}
 		}
 	}
 }

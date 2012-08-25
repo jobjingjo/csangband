@@ -1609,22 +1609,21 @@ namespace CSAngband {
 		 */
 		public static void bell(string reason)
 		{
-			throw new NotImplementedException();
-			///* Mega-Hack -- Flush the output */
-			//Term.fresh();
+			/* Mega-Hack -- Flush the output */
+			Term.fresh();
 
-			///* Hack -- memorize the reason if possible */
-			//if (character_generated && reason)
-			//{
-			//    message_add(reason, MSG_BELL);
+			/* Hack -- memorize the reason if possible */
+			if (Player.Player.character_generated && reason != null)
+			{
+				Message.add(reason, Message_Type.MSG_BELL);
 
-			//    /* Window stuff */
-			//    p_ptr.redraw |= (PR_MESSAGE);
-			//    redraw_stuff(p_ptr);
-			//}
+			    /* Window stuff */
+			    Misc.p_ptr.redraw |= (Misc.PR_MESSAGE);
+			    Misc.p_ptr.redraw_stuff();
+			}
 
-			///* Flush the input (later!) */
-			//flush();
+			/* Flush the input (later!) */
+			flush();
 		}
 		/*
 		 * Flush all pending input.

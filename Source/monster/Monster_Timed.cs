@@ -7,7 +7,7 @@ namespace CSAngband.Monster {
 	partial class Monster {
 
 		class mon_timed_effect{
-			public mon_timed_effect(int a, int b, int c, uint d, int e){
+			public mon_timed_effect(MON_MSG a, MON_MSG b, MON_MSG c, uint d, int e){
 				message_begin = a;
 				message_end = b;
 				message_increase = c;
@@ -15,9 +15,9 @@ namespace CSAngband.Monster {
 				max_timer = e;
 			}
 
-			public int message_begin;
-			public int message_end;
-			public int message_increase;
+			public MON_MSG message_begin;
+			public MON_MSG message_end;
+			public MON_MSG message_increase;
 			public uint flag_resist;
 			public int max_timer;
 		}
@@ -28,18 +28,18 @@ namespace CSAngband.Monster {
 		 */
 		static mon_timed_effect[] effects = new mon_timed_effect[]
 		{
-			new mon_timed_effect( (int)MON_MSG.FALL_ASLEEP, (int)MON_MSG.WAKES_UP, 
+			new mon_timed_effect( MON_MSG.FALL_ASLEEP, MON_MSG.WAKES_UP, 
 				0, (uint)Monster_Flag.NO_SLEEP.value, 10000 ),
-			new mon_timed_effect( (int)MON_MSG.DAZED,		(int)MON_MSG.NOT_DAZED, 
-				(int)MON_MSG.MORE_DAZED, (uint)Monster_Flag.NO_STUN.value, 200 ),
-			new mon_timed_effect( (int)MON_MSG.CONFUSED,	(int)MON_MSG.NOT_CONFUSED, 
-				(int)MON_MSG.MORE_CONFUSED, (uint)Monster_Flag.NO_CONF.value, 200 ),
-			new mon_timed_effect( (int)MON_MSG.FLEE_IN_TERROR, (int)MON_MSG.NOT_AFRAID, 
-				(int)MON_MSG.MORE_AFRAID, (uint)Monster_Flag.NO_FEAR.value, 10000 ),
-			new mon_timed_effect( (int)MON_MSG.SLOWED,		(int)MON_MSG.NOT_SLOWED, 
-				(int)MON_MSG.MORE_SLOWED, (uint)0L, 50 ),
-			new mon_timed_effect( (int)MON_MSG.HASTED,		(int)MON_MSG.NOT_HASTED, 
-				(int)MON_MSG.MORE_HASTED, (uint)0L, 50 ),
+			new mon_timed_effect( MON_MSG.DAZED,		MON_MSG.NOT_DAZED, 
+				MON_MSG.MORE_DAZED, (uint)Monster_Flag.NO_STUN.value, 200 ),
+			new mon_timed_effect( MON_MSG.CONFUSED,	MON_MSG.NOT_CONFUSED, 
+				MON_MSG.MORE_CONFUSED, (uint)Monster_Flag.NO_CONF.value, 200 ),
+			new mon_timed_effect( MON_MSG.FLEE_IN_TERROR, MON_MSG.NOT_AFRAID, 
+				MON_MSG.MORE_AFRAID, (uint)Monster_Flag.NO_FEAR.value, 10000 ),
+			new mon_timed_effect( MON_MSG.SLOWED,		MON_MSG.NOT_SLOWED, 
+				MON_MSG.MORE_SLOWED, (uint)0L, 50 ),
+			new mon_timed_effect( MON_MSG.HASTED,		MON_MSG.NOT_HASTED, 
+				MON_MSG.MORE_HASTED, (uint)0L, 50 ),
 		};
 
 
@@ -52,11 +52,11 @@ namespace CSAngband.Monster {
 		 *
 		 * Returns true if the monster's timer changed.
 		 */
-		public static bool mon_dec_timed(int m_idx, int ef_idx, int timer, ushort flag, bool id)
+		public static bool mon_dec_timed(int m_idx, Misc.MON_TMD ef_idx, int timer, ushort flag, bool id)
 		{
 			Monster m_ptr;
 
-			Misc.assert(ef_idx >= 0 && ef_idx < (int)Misc.MON_TMD.MAX);
+			Misc.assert(ef_idx >= 0 && ef_idx < Misc.MON_TMD.MAX);
 
 			Misc.assert(m_idx > 0);
 			m_ptr = Cave.cave_monster(Cave.cave, m_idx);
@@ -67,7 +67,7 @@ namespace CSAngband.Monster {
 			flag |= Misc.MON_TMD_FLG_NOFAIL;
 
 			/* New counter amount */
-			timer = m_ptr.m_timed[ef_idx] - timer;
+			timer = m_ptr.m_timed[(int)ef_idx] - timer;
 			if (timer < 0)
 			    timer = 0;
 
@@ -87,19 +87,19 @@ namespace CSAngband.Monster {
 		 * Returns true if the monster was affected.
 		 * Return false if the monster was unaffected.
 		 */
-		static bool mon_set_timed(Monster m_ptr, int ef_idx, int timer, ushort flag, bool id)
+		static bool mon_set_timed(Monster m_ptr, Misc.MON_TMD ef_idx, int timer, ushort flag, bool id)
 		{
 			mon_timed_effect effect;
 
-			int m_note = 0;
+			MON_MSG m_note = 0;
 			int resisted;
 			int old_timer;
 
-			Misc.assert(ef_idx >= 0 && ef_idx < (int)Misc.MON_TMD.MAX);
-			effect = effects[ef_idx];
+			Misc.assert(ef_idx >= 0 && ef_idx < Misc.MON_TMD.MAX);
+			effect = effects[(int)ef_idx];
 
 			Misc.assert(m_ptr != null);
-			old_timer = m_ptr.m_timed[ef_idx];
+			old_timer = m_ptr.m_timed[(int)ef_idx];
 
 			/* Ignore dead monsters */
 			if (m_ptr.r_idx == 0) return false;
@@ -124,9 +124,9 @@ namespace CSAngband.Monster {
 			resisted = mon_resist_effect(m_ptr, ef_idx, timer, flag)?1:0;
 
 			if (resisted != 0)
-				m_note = (int)MON_MSG.UNAFFECTED;
+				m_note = MON_MSG.UNAFFECTED;
 			else
-				m_ptr.m_timed[ef_idx] = (short)timer;
+				m_ptr.m_timed[(int)ef_idx] = (short)timer;
 
 			if (Misc.p_ptr.health_who == m_ptr.midx) Misc.p_ptr.redraw |= (Misc.PR_HEALTH);
 
@@ -161,28 +161,28 @@ namespace CSAngband.Monster {
 		 *
 		 * Also marks the lore for any appropriate resists.
 		 */
-		static bool mon_resist_effect(Monster m_ptr, int ef_idx, int timer, ushort flag)
+		static bool mon_resist_effect(Monster m_ptr, Misc.MON_TMD ef_idx, int timer, ushort flag)
 		{
 			mon_timed_effect effect;
 			int resist_chance;
 			Monster_Race r_ptr;
 			Monster_Lore l_ptr;
 
-			Misc.assert(ef_idx >= 0 && ef_idx < (int)Misc.MON_TMD.MAX);
-			effect = effects[ef_idx];
+			Misc.assert(ef_idx >= 0 && ef_idx < Misc.MON_TMD.MAX);
+			effect = effects[(int)ef_idx];
 
 			Misc.assert(m_ptr != null);
 			r_ptr = Misc.r_info[m_ptr.r_idx];
 			l_ptr = Misc.l_list[m_ptr.r_idx];
 	
 			/* Hasting never fails */
-			if (ef_idx == (int)Misc.MON_TMD.FAST) return (false);
+			if (ef_idx == Misc.MON_TMD.FAST) return (false);
 	
 			/* Some effects are marked to never fail */
 			if ((flag & Misc.MON_TMD_FLG_NOFAIL) != 0) return (false);
 
 			/* A sleeping monster resists further sleeping */
-			if (ef_idx == (int)Misc.MON_TMD.SLEEP && m_ptr.m_timed[ef_idx] != 0) return (true);
+			if (ef_idx == (int)Misc.MON_TMD.SLEEP && m_ptr.m_timed[(int)ef_idx] != 0) return (true);
 
 			/* If the monster resists innately, learn about it */
 			if (r_ptr.flags.has((int)effect.flag_resist)) {
@@ -193,7 +193,7 @@ namespace CSAngband.Monster {
 			}
 
 			/* Monsters with specific breaths resist stunning*/
-			if (ef_idx == (int)Misc.MON_TMD.STUN && (r_ptr.spell_flags.has(Monster_Spell_Flag.BR_SOUN.value) ||
+			if (ef_idx == Misc.MON_TMD.STUN && (r_ptr.spell_flags.has(Monster_Spell_Flag.BR_SOUN.value) ||
 			        r_ptr.spell_flags.has(Monster_Spell_Flag.BR_WALL.value)))
 			{
 			    /* Add the lore */
@@ -209,7 +209,7 @@ namespace CSAngband.Monster {
 			}
 
 			/* Monsters with specific breaths resist confusion */
-			if ((ef_idx == (int)Misc.MON_TMD.CONF) &&
+			if ((ef_idx == Misc.MON_TMD.CONF) &&
 			    ((r_ptr.spell_flags.has(Monster_Spell_Flag.BR_CHAO.value)) ||
 			     (r_ptr.spell_flags.has(Monster_Spell_Flag.BR_CONF.value))) )
 			{
@@ -226,7 +226,7 @@ namespace CSAngband.Monster {
 			}
 
 			/* Inertia breathers resist slowing */
-			if (ef_idx == (int)Misc.MON_TMD.SLOW && r_ptr.spell_flags.has(Monster_Spell_Flag.BR_INER.value))
+			if (ef_idx == Misc.MON_TMD.SLOW && r_ptr.spell_flags.has(Monster_Spell_Flag.BR_INER.value))
 			{
 			    l_ptr.spell_flags.on(Monster_Spell_Flag.BR_INER.value);
 			    return (true);
@@ -255,16 +255,16 @@ namespace CSAngband.Monster {
 		 *
 		 * Returns true if the monster's timer was changed.
 		 */
-		public static bool mon_clear_timed(int m_idx, int ef_idx, ushort flag, bool id)
+		public static bool mon_clear_timed(int m_idx, Misc.MON_TMD ef_idx, ushort flag, bool id)
 		{
 			Monster m_ptr;
 
-			Misc.assert(ef_idx >= 0 && ef_idx < (int)Misc.MON_TMD.MAX);
+			Misc.assert(ef_idx >= 0 && ef_idx < Misc.MON_TMD.MAX);
 
 			Misc.assert(m_idx > 0);
 			m_ptr = Cave.cave_monster(Cave.cave, m_idx);
 
-			if (m_ptr.m_timed[ef_idx] == 0) return false;
+			if (m_ptr.m_timed[(int)ef_idx] == 0) return false;
 
 			/* Clearing never fails */
 			flag |= Misc.MON_TMD_FLG_NOFAIL;
@@ -282,13 +282,13 @@ namespace CSAngband.Monster {
 		 *
 		 * Returns true if the monster's timer changed.
 		 */
-		public static bool mon_inc_timed(int m_idx, int ef_idx, int timer, ushort flag, bool id)
+		public static bool mon_inc_timed(int m_idx, Misc.MON_TMD ef_idx, int timer, ushort flag, bool id)
 		{
 			Monster m_ptr;
 			mon_timed_effect effect;
 
-			Misc.assert(ef_idx >= 0 && ef_idx < (int)Misc.MON_TMD.MAX);
-			effect = effects[ef_idx];
+			Misc.assert(ef_idx >= 0 && ef_idx < Misc.MON_TMD.MAX);
+			effect = effects[(int)ef_idx];
 
 			Misc.assert(m_idx > 0);
 			m_ptr = Cave.cave_monster(Cave.cave, m_idx);
@@ -297,13 +297,13 @@ namespace CSAngband.Monster {
 			Misc.assert(timer > 0);
 
 			/* Make it last for a mimimum # of turns if it is a new effect */
-			if ((m_ptr.m_timed[ef_idx] == 0) && (timer < 2)) timer = 2;
+			if ((m_ptr.m_timed[(int)ef_idx] == 0) && (timer < 2)) timer = 2;
 
 			/* New counter amount - prevent overflow */
-			if (short.MaxValue - timer < m_ptr.m_timed[ef_idx])
+			if (short.MaxValue - timer < m_ptr.m_timed[(int)ef_idx])
 			    timer = short.MaxValue;
 			else
-			    timer += m_ptr.m_timed[ef_idx];
+			    timer += m_ptr.m_timed[(int)ef_idx];
 
 			/* Reduce to max_timer if necessary*/
 			if (timer > effect.max_timer)
