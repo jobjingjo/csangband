@@ -47,42 +47,41 @@ namespace CSAngband.Object {
 		 *
 		 * Just truncates if the buffer isn't big enough.
 		 */
-		void object_kind_name(string buf, int max, Object_Kind kind, bool easy_know)
+		public static string object_kind_name(Object_Kind kind, bool easy_know)
 		{
-			throw new NotImplementedException();
-			///* If not aware, use flavor */
-			//if (!easy_know && !kind.aware && kind.flavor)
-			//{
-			//    if (kind.tval == TV_FOOD && kind.sval > SV_FOOD_MIN_SHROOM)
-			//    {
-			//        strnfmt(buf, max, "%s Mushroom", kind.flavor.text);
-			//    }
-			//    else
-			//    {
-			//        /* Plain flavour (e.g. Copper) will do. */
-			//        my_strcpy(buf, kind.flavor.text, max);
-			//    }
-			//}
+			string buf = "";
 
-			///* Use proper name (Healing, or whatever) */
-			//else
-			//{
-			//    char *t;
+			/* If not aware, use flavor */
+			if (!easy_know && !kind.aware && kind.flavor != null)
+			{
+			    if (kind.tval == TVal.TV_FOOD && kind.sval > SVal.SV_FOOD_MIN_SHROOM)
+			    {
+					buf = String.Format("{0} Mushroom", kind.flavor.text);
+			    }
+			    else
+			    {
+			        /* Plain flavour (e.g. Copper) will do. */
+					buf = kind.flavor.text;
+			    }
+			}
 
-			//    if (kind.tval == TV_FOOD && kind.sval > SV_FOOD_MIN_SHROOM)
-			//    {
-			//        my_strcpy(buf, "Mushroom of ", max);
-			//        max -= strlen(buf);
-			//        t = buf + strlen(buf);
-			//    }
-			//    else
-			//    {
-			//        t = buf;
-			//    }
+			/* Use proper name (Healing, or whatever) */
+			else
+			{
+			    string t = "";
 
-			//    /* Format remainder of the string */
-			//    obj_desc_name_format(t, max, 0, kind.name, null, false);
-			//}
+			    if (kind.tval == TVal.TV_FOOD && kind.sval > SVal.SV_FOOD_MIN_SHROOM)
+			    {
+					buf = "Mushroom of ";
+			    }
+
+			    /* Format remainder of the string */
+				obj_desc_name_format(ref t, kind.Name, null, false);
+
+				buf += t;
+			}
+
+			return buf;
 		}
 
 
@@ -235,7 +234,7 @@ namespace CSAngband.Object {
 		 * '#' will be replaced with 'modstr' (which may contain the pluralising
 		 * formats given above).
 		 */
-		static int obj_desc_name_format(ref string buf, int max, int end, string fmt, string modstr, bool pluralise)
+		static void obj_desc_name_format(ref string buf, string fmt, string modstr, bool pluralise)
 		{
 			char prev = '\0';
 			/* Copy the string */
@@ -318,7 +317,7 @@ namespace CSAngband.Object {
 			    /* Add modstr, with pluralisation if relevant */
 			    else if (fmt[0] == '#')
 			    {
-			        end = obj_desc_name_format(ref buf, max, end, modstr, null, pluralise);
+			        obj_desc_name_format(ref buf, modstr, null, pluralise);
 			    }
 
 			    else
@@ -332,8 +331,6 @@ namespace CSAngband.Object {
 			}
 
 			//buf[end] = 0;
-
-			return end;
 		}
 
 
@@ -358,7 +355,7 @@ namespace CSAngband.Object {
 			/* Pluralize if (not forced singular) and
 			 * (not a known/visible artifact) and
 			 * (not one in stack or forced plural) */
-			end = obj_desc_name_format(ref buf, max, end, basename, modstr,
+			obj_desc_name_format(ref buf, basename, modstr,
 			        ((mode & Detail.SINGULAR) == 0) &&
 			        !(o_ptr.artifact == null && (o_ptr.name_is_visible() || known)) &&
 			        (o_ptr.number != 1 || ((mode & Detail.PLURAL) != 0)));

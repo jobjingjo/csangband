@@ -74,7 +74,6 @@ void object_know_all_flags(object_type *o_ptr);
 
 /* obj-desc.c */
 void object_base_name(char *buf, size_t max, int tval, bool plural);
-void object_kind_name(char *buf, size_t max, const object_kind *kind, bool easy_know);
 
 /* obj-info.c */
 textblock *object_info(const object_type *o_ptr, oinfo_detail_t mode);
