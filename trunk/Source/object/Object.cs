@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CSAngband.Monster;
 
 namespace CSAngband.Object
 {
@@ -1742,67 +1743,68 @@ namespace CSAngband.Object
 		 */
 		public void absorb(Object j_ptr)
 		{	
-			throw new NotImplementedException();
-			//int total = o_ptr.number + j_ptr.number;
+			int total = number + j_ptr.number;
 
-			///* Add together the item counts */
-			//o_ptr.number = ((total < MAX_STACK_SIZE) ? total : (MAX_STACK_SIZE - 1));
+			/* Add together the item counts */
+			number = (byte)((total < Misc.MAX_STACK_SIZE) ? total : (Misc.MAX_STACK_SIZE - 1));
 
-			///* Blend all knowledge */
-			//o_ptr.ident |= (j_ptr.ident & ~IDENT_EMPTY);
-			//of_union(o_ptr.known_flags, j_ptr.known_flags);
+			/* Blend all knowledge */
+			ident |= (short)(j_ptr.ident & ~IDENT_EMPTY);
+			known_flags.union(j_ptr.known_flags);
 
-			///* Merge inscriptions */
-			//if (j_ptr.note)
-			//    o_ptr.note = j_ptr.note;
+			/* Merge inscriptions */
+			if (j_ptr.note != null)
+			    note = j_ptr.note;
 
-			///* Combine timeouts for rod stacking */
-			//if (o_ptr.tval == TV_ROD)
-			//    o_ptr.timeout += j_ptr.timeout;
+			/* Combine timeouts for rod stacking */
+			if (tval == TVal.TV_ROD)
+			    timeout += j_ptr.timeout;
 
-			///* Combine pvals for wands and staves */
-			//if (o_ptr.tval == TV_WAND || o_ptr.tval == TV_STAFF ||
-			//        o_ptr.tval == TV_GOLD)
-			//{
-			//    int total = o_ptr.pval[DEFAULT_PVAL] + j_ptr.pval[DEFAULT_PVAL];
-			//    o_ptr.pval[DEFAULT_PVAL] = total >= MAX_PVAL ? MAX_PVAL : total;
-			//}
+			/* Combine pvals for wands and staves */
+			if (tval == TVal.TV_WAND || tval == TVal.TV_STAFF || tval == TVal.TV_GOLD)
+			{
+			    int tot = pval[Misc.DEFAULT_PVAL] + j_ptr.pval[Misc.DEFAULT_PVAL];
+			    pval[Misc.DEFAULT_PVAL] = (short)(tot >= Misc.MAX_PVAL ? Misc.MAX_PVAL : tot);
+			}
 
-			///* Combine origin data as best we can */
-			//if (o_ptr.origin != j_ptr.origin ||
-			//        o_ptr.origin_depth != j_ptr.origin_depth ||
-			//        o_ptr.origin_xtra != j_ptr.origin_xtra) {
-			//    int act = 2;
+			/* Combine origin data as best we can */
+			if (origin != j_ptr.origin ||
+			        origin_depth != j_ptr.origin_depth ||
+			        origin_xtra != j_ptr.origin_xtra) {
+			    int act = 2;
 
-			//    if (o_ptr.origin_xtra && j_ptr.origin_xtra) {
-			//        monster_race *r_ptr = &r_info[o_ptr.origin_xtra];
-			//        monster_race *s_ptr = &r_info[j_ptr.origin_xtra];
+			    if (origin_xtra != 0 && j_ptr.origin_xtra != 0) {
+			        Monster_Race r_ptr = Misc.r_info[origin_xtra];
+			        Monster_Race s_ptr = Misc.r_info[j_ptr.origin_xtra];
 
-			//        bool r_uniq = rf_has(r_ptr.flags, RF_UNIQUE) ? true : false;
-			//        bool s_uniq = rf_has(s_ptr.flags, RF_UNIQUE) ? true : false;
+			        bool r_uniq = r_ptr.flags.has(Monster_Flag.UNIQUE.value) ? true : false;
+			        bool s_uniq = s_ptr.flags.has(Monster_Flag.UNIQUE.value) ? true : false;
 
-			//        if (r_uniq && !s_uniq) act = 0;
-			//        else if (s_uniq && !r_uniq) act = 1;
-			//        else act = 2;
-			//    }
+			        if (r_uniq && !s_uniq) act = 0;
+			        else if (s_uniq && !r_uniq) act = 1;
+			        else act = 2;
+			    }
 
-			//    switch (act)
-			//    {
-			//        /* Overwrite with j_ptr */
-			//        case 1:
-			//        {
-			//            o_ptr.origin = j_ptr.origin;
-			//            o_ptr.origin_depth = j_ptr.origin_depth;
-			//            o_ptr.origin_xtra = j_ptr.origin_xtra;
-			//        }
+			    switch (act)
+			    {
+			        /* Overwrite with j_ptr */
+			        case 1:
+			        {
+			            origin = j_ptr.origin;
+			            origin_depth = j_ptr.origin_depth;
+			            origin_xtra = j_ptr.origin_xtra;
+						origin = Origin.MIXED;
+						break;
+			        }
 
-			//        /* Set as "mixed" */
-			//        case 2:
-			//        {
-			//            o_ptr.origin = ORIGIN_MIXED;
-			//        }
-			//    }
-			//}
+			        /* Set as "mixed" */
+			        case 2:
+			        {
+			            origin = Origin.MIXED;
+						break;
+			        }
+			    }
+			}
 		}
 
 		/*

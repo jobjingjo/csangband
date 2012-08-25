@@ -48,56 +48,7 @@
 
 
 
-/*** Flavour text stuff ***/
 
-/*
- * Messages for reacting to purchase prices.
- */
-static const char *comment_worthless[] =
-{
-	"Arrgghh!",
-	"You bastard!",
-	"You hear someone sobbing...",
-	"The shopkeeper howls in agony!",
-	"The shopkeeper wails in anguish!",
-	"The shopkeeper beats his head against the counter."
-};
-
-static const char *comment_bad[] =
-{
-	"Damn!",
-	"You fiend!",
-	"The shopkeeper curses at you.",
-	"The shopkeeper glares at you."
-};
-
-static const char *comment_accept[] =
-{
-	"Okay.",
-	"Fine.",
-	"Accepted!",
-	"Agreed!",
-	"Done!",
-	"Taken!"
-};
-
-static const char *comment_good[] =
-{
-	"Cool!",
-	"You've made my day!",
-	"The shopkeeper sniggers.",
-	"The shopkeeper giggles.",
-	"The shopkeeper laughs loudly."
-};
-
-static const char *comment_great[] =
-{
-	"Yipee!",
-	"I think I'll retire!",
-	"The shopkeeper jumps for joy.",
-	"The shopkeeper smiles gleefully.",
-	"Wow.  I'm going to name my new villa in your honour."
-};
 
 /*
  * Get rid of stores at cleanup. Gets rid of everything.

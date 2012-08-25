@@ -468,6 +468,8 @@ namespace CSAngband {
 			{
 			    /* Get the object and the next object */
 			    o_ptr = Object.Object.byid(this_o_idx);
+				if(o_ptr == null)
+					break;
 			    next_o_idx = o_ptr.next_o_idx;
 
 			    /* Ignore all hidden objects and non-objects */
@@ -534,6 +536,8 @@ namespace CSAngband {
 			{
 			    /* Get the object */
 			    o_ptr = Object.Object.byid(this_o_idx);
+				if(o_ptr == null)
+					break;
 
 			    /* Get the next object */
 			    next_o_idx = o_ptr.next_o_idx;

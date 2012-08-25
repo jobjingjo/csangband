@@ -521,7 +521,7 @@ namespace CSAngband {
 		 * Increase, by a 'num', the number of an item 'item' in store 'st'.
 		 * This can result in zero items.
 		 */
-		void item_increase(int item, int num)
+		public void item_increase(int item, int num)
 		{
 			int cnt;
 			Object.Object o_ptr;
@@ -541,7 +541,7 @@ namespace CSAngband {
 		/*
 		 * Remove a slot if it is empty, in store 'st'.
 		 */
-		void item_optimize(int item)
+		public void item_optimize(int item)
 		{
 			int j;
 			Object.Object o_ptr;
@@ -1373,40 +1373,45 @@ namespace CSAngband {
 		 */
 		static bool store_process_command_key(keypress kp)
 		{
-			throw new NotImplementedException();
-			//int cmd = 0;
+			Command_Code cmd = 0;
+			char key = (char)kp.code;
 
-			///* Process the keycode */
-			//switch (kp.code) {
-			//    case 'T': /* roguelike */
-			//    case 't': cmd = CMD_TAKEOFF; break;
+			//Had to extract the non-constant cases
+			if(key == UIEvent.KTRL('D') || /* roguelike */
+				key == 'k') {
+				TextUI.cmd_destroy();
+			} else if(key == UIEvent.KTRL('E')) {
+				Command_Info.toggle_inven_equip();
+			} else if(key == UIEvent.KTRL('P')) {
+				Do_Command.messages();
+			} else {
+				/* Process the keycode */
+				switch ((char)kp.code) {
+					case 'T': /* roguelike */
+					case 't': cmd = Command_Code.TAKEOFF; break;
 
-			//    case KTRL('D'): /* roguelike */
-			//    case 'k': textui_cmd_destroy(); break;
+					case 'P': /* roguelike */
+					case 'b': TextUI.spell_browse(); break;
 
-			//    case 'P': /* roguelike */
-			//    case 'b': textui_spell_browse(); break;
+					case '~': TextUI.browse_knowledge(); break;
+					case 'I': TextUI.obj_examine(); break;
+					case 'w': cmd = Command_Code.WIELD; break;
+					case '{': cmd = Command_Code.INSCRIBE; break;
+					case '}': cmd = Command_Code.UNINSCRIBE; break;
 
-			//    case '~': textui_browse_knowledge(); break;
-			//    case 'I': textui_obj_examine(); break;
-			//    case 'w': cmd = CMD_WIELD; break;
-			//    case '{': cmd = CMD_INSCRIBE; break;
-			//    case '}': cmd = CMD_UNINSCRIBE; break;
+					case 'e': Do_Command.equip(); break;
+					case 'i': Do_Command.inven(); break;
+					case 'C': Do_Command.change_name(); break;
+					case ')': Do_Command.save_screen(); break;
 
-			//    case 'e': do_cmd_equip(); break;
-			//    case 'i': do_cmd_inven(); break;
-			//    case KTRL('E'): toggle_inven_equip(); break;
-			//    case 'C': do_cmd_change_name(); break;
-			//    case KTRL('P'): do_cmd_messages(); break;
-			//    case ')': do_cmd_save_screen(); break;
+					default: return false;
+				}
+			}
 
-			//    default: return false;
-			//}
+			if(cmd != 0)
+				Game_Command.insert_repeated(cmd, 0);
 
-			//if (cmd)
-			//    cmd_insert_repeated(cmd, 0);
-
-			//return true;
+			return true;
 		}
 
 		/*
@@ -2144,6 +2149,58 @@ namespace CSAngband {
 			"{0}: \"You do honour to my humble store, noble {1}.\"",
 			"{0}: \"Me and my family are entirely at your service, glorious {1}.\""
 		};
+
+		/*** Flavour text stuff ***/
+		/*
+		 * Messages for reacting to purchase prices.
+		 */
+		public static string[] comment_accept =
+		{
+			"Okay.",
+			"Fine.",
+			"Accepted!",
+			"Agreed!",
+			"Done!",
+			"Taken!"
+		};
+
+		static string[] comment_worthless =
+		{
+			"Arrgghh!",
+			"You bastard!",
+			"You hear someone sobbing...",
+			"The shopkeeper howls in agony!",
+			"The shopkeeper wails in anguish!",
+			"The shopkeeper beats his head against the counter."
+		};
+
+		static string[] comment_bad =
+		{
+			"Damn!",
+			"You fiend!",
+			"The shopkeeper curses at you.",
+			"The shopkeeper glares at you."
+		};
+
+		static string[] comment_good =
+		{
+			"Cool!",
+			"You've made my day!",
+			"The shopkeeper sniggers.",
+			"The shopkeeper giggles.",
+			"The shopkeeper laughs loudly."
+		};
+
+		static string[] comment_great =
+		{
+			"Yipee!",
+			"I think I'll retire!",
+			"The shopkeeper jumps for joy.",
+			"The shopkeeper smiles gleefully.",
+			"Wow.  I'm going to name my new villa in your honour."
+		};
+
+		
 
 
 		/*
