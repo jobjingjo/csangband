@@ -45,18 +45,6 @@ static const info_entry effects[] =
 	#undef EFFECT
 };
 
-
-/*
- * Utility functions
- */
-bool effect_aim(effect_type effect)
-{
-	if (effect < 1 || effect > EF_MAX)
-		return false;
-
-	return effects[effect].aim;
-}
-
 const char *effect_desc(effect_type effect)
 {
 	if (effect < 1 || effect > EF_MAX)

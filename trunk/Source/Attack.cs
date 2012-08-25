@@ -7,7 +7,7 @@ using CSAngband.Object;
 
 namespace CSAngband {
 	static class Attack {
-		class attack_result {
+		public class attack_result {
 			bool success;
 			int dmg;
 			UInt32 msg_type;
@@ -257,7 +257,50 @@ namespace CSAngband {
 		 * keeping the core projectile tracking, monster cleanup, and display code
 		 * in common.
 		 */
-		//Make this a delegate
-		//public static typedef struct attack_result (*ranged_attack) (object_type *o_ptr, int y, int x);
+		public delegate attack_result ranged_attack(Object.Object o_ptr, int y, int x);
+		
+		/**
+		 * Helper function used with ranged_helper by do_cmd_fire.
+		 */
+		public static attack_result make_ranged_shot(Object.Object o_ptr, int y, int x) {
+			throw new NotImplementedException();
+			//struct attack_result result = {false, 0, 0, "hit"};
+
+			//object_type *j_ptr = &p_ptr.inventory[INVEN_BOW];
+
+			//monster_type *m_ptr = cave_monster(cave, cave.m_idx[y][x]);
+			//monster_race *r_ptr = &r_info[m_ptr.r_idx];
+
+			//int bonus = p_ptr.state.to_h + o_ptr.to_h + j_ptr.to_h;
+			//int chance = p_ptr.state.skills[SKILL_TO_HIT_BOW] + bonus * BTH_PLUS_ADJ;
+			//int chance2 = chance - distance(p_ptr.py, p_ptr.px, y, x);
+
+			//int multiplier = p_ptr.state.ammo_mult;
+			//const struct slay *best_s_ptr = null;
+
+			///* Did we hit it (penalize distance travelled) */
+			//if (!test_hit(chance2, r_ptr.ac, m_ptr.ml)) return result;
+
+			//result.success = true;
+
+			//improve_attack_modifier(o_ptr, m_ptr, &best_s_ptr, true, false);
+			//improve_attack_modifier(j_ptr, m_ptr, &best_s_ptr, true, false);
+
+			///* If we have a slay, modify the multiplier appropriately */
+			//if (best_s_ptr != null) {
+			//    result.hit_verb = best_s_ptr.range_verb;
+			//    multiplier += best_s_ptr.mult;
+			//}
+
+			///* Apply damage: multiplier, slays, criticals, bonuses */
+			//result.dmg = damroll(o_ptr.dd, o_ptr.ds);
+			//result.dmg += o_ptr.to_d + j_ptr.to_d;
+			//result.dmg *= multiplier;
+			//result.dmg = critical_shot(o_ptr.weight, o_ptr.to_h, result.dmg, &result.msg_type);
+
+			//object_notice_attack_plusses(&p_ptr.inventory[INVEN_BOW]);
+
+			//return result;
+		}
 	}
 }

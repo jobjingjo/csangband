@@ -294,5 +294,13 @@ namespace CSAngband {
 			return value; //I am assuming this is power... TODO: make sure this is correct
 			//return effects[effect].power;
 		}
+
+		///*
+		// * Utility functions
+		// */
+		//public bool effect_aim()
+		//{
+		//    return this.aim; //This is bulshit, making a public getter.
+		//}
 	}
 }

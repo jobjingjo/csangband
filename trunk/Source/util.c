@@ -273,36 +273,7 @@ static bool next_section(const char *source, size_t init, const char **text, siz
 	return true;
 }
 
-/*
- * Prompt for a string from the user.
- *
- * The "prompt" should take the form "Prompt: ".
- *
- * See "askfor_aux" for some notes about "buf" and "len", and about
- * the return value of this function.
- */
-bool get_string(const char *prompt, char *buf, size_t len)
-{
-	bool res;
 
-	/* Paranoia XXX XXX XXX */
-	message_flush();
-
-	/* Display prompt */
-	prt(prompt, 0, 0);
-
-	/* Ask the user for a string */
-	res = askfor_aux(buf, len, null);
-
-	/* Translate it to 8-bit (Latin-1) */
- 	xstr_trans(buf, LATIN1);
-
-	/* Clear prompt */
-	prt("", 0, 0);
-
-	/* Result */
-	return (res);
-}
 
 /* TODO: refactor get_check() in terms of get_char() */
 /*
@@ -427,30 +398,7 @@ bool get_com(const char *prompt, struct keypress *command)
 }
 
 
-bool get_com_ex(const char *prompt, ui_event *command)
-{
-	ui_event ke;
 
-	/* Paranoia XXX XXX XXX */
-	message_flush();
-
-	/* Display a prompt */
-	prt(prompt, 0, 0);
-
-	/* Get a key */
-	ke = inkey_ex();
-
-	/* Clear the prompt */
-	prt("", 0, 0);
-
-	/* Save the command */
-	*command = ke;
-
-	/* Done */
-	if (ke.type == EVT_KBRD && ke.key.code == ESCAPE)
-		return false;
-	return true;
-}
 
 
 /*

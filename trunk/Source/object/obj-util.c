@@ -1214,20 +1214,7 @@ void display_itemlist(void)
 
 /*** Generic utility functions ***/
 
-/*
- * Does the given object need to be aimed?
- */ 
-bool obj_needs_aim(object_type *o_ptr)
-{
-	int effect = object_effect(o_ptr);
 
-	/* If the effect needs aiming, or if the object type needs
-	   aiming, this object needs aiming. */
-	return effect_aim(effect) || o_ptr.tval == TV_BOLT ||
-			o_ptr.tval == TV_SHOT || o_ptr.tval == TV_ARROW ||
-			o_ptr.tval == TV_WAND ||
-			(o_ptr.tval == TV_ROD && !object_flavor_is_aware(o_ptr));
-}
 
 
 /*
@@ -1293,29 +1280,7 @@ int scan_items(int *item_list, size_t item_list_max, int mode)
 }
 
 
-/* 
- * Check if the given item is available for the player to use. 
- *
- * 'mode' defines which areas we should look at, a la scan_items().
- */
-bool item_is_available(int item, bool (*tester)(const object_type *), int mode)
-{
-	int item_list[ALL_INVEN_TOTAL + MAX_FLOOR_STACK];
-	int item_num;
-	int i;
 
-	item_tester_hook = tester;
-	item_tester_tval = 0;
-	item_num = scan_items(item_list, N_ELEMENTS(item_list), mode);
-
-	for (i = 0; i < item_num; i++)
-	{
-		if (item_list[i] == item)
-			return true;
-	}
-
-	return false;
-}
 
 /*
  * Returns whether the pack is holding the maximum number of items. The max

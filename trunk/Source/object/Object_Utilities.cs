@@ -1153,6 +1153,47 @@ namespace CSAngband.Object {
 		}
 
 		/*
+		 * Does the given object need to be aimed?
+		 */ 
+		public bool needs_aim()
+		{
+			Effect effect = this.effect();
+
+			/* If the effect needs aiming, or if the object type needs
+			   aiming, this object needs aiming. */
+			return effect.aim || tval == TVal.TV_BOLT ||
+					tval == TVal.TV_SHOT || tval == TVal.TV_ARROW ||
+					tval == TVal.TV_WAND ||
+					(tval == TVal.TV_ROD && !flavor_is_aware());
+		}
+
+		/* 
+		 * Check if the given item is available for the player to use. 
+		 *
+		 * 'mode' defines which areas we should look at, a la scan_items().
+		 */
+		public delegate bool tester_func(Object o);
+		public static bool item_is_available(int item, tester_func tester, int mode)
+		{
+			throw new NotImplementedException();
+			//int[] item_list = new int[ALL_INVEN_TOTAL + MAX_FLOOR_STACK];
+			//int item_num;
+			//int i;
+
+			//item_tester_hook = tester;
+			//item_tester_tval = 0;
+			//item_num = scan_items(item_list, N_ELEMENTS(item_list), mode);
+
+			//for (i = 0; i < item_num; i++)
+			//{
+			//    if (item_list[i] == item)
+			//        return true;
+			//}
+
+			//return false;
+		}
+
+		/*
 		 * Return a string mentioning how a given item is carried
 		 */
 		public static string mention_use(int slot)

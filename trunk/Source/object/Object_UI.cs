@@ -1127,35 +1127,35 @@ namespace CSAngband.Object {
 		 */
 		static bool get_item_allow(int item, char ch, bool is_harmless)
 		{
-			throw new NotImplementedException();
-			//object_type *o_ptr;
+			Object o_ptr;
 			//char verify_inscrip[] = "!*";
+			string verify_inscrip = "!*";
 
-			//unsigned n;
+			int n;
 
-			///* Inventory or floor */
-			//if (item >= 0)
-			//    o_ptr = &p_ptr.inventory[item];
-			//else
-			//    o_ptr = object_byid(0 - item);
+			/* Inventory or floor */
+			if (item >= 0)
+			    o_ptr = Misc.p_ptr.inventory[item];
+			else
+			    o_ptr = Object.byid((short)(0 - item));
 
-			///* Check for a "prevention" inscription */
-			//verify_inscrip[1] = ch;
+			/* Check for a "prevention" inscription */
+			verify_inscrip = verify_inscrip[0].ToString() + ch.ToString();
 
-			///* Find both sets of inscriptions, add together, and prompt that number of times */
-			//n = check_for_inscrip(o_ptr, verify_inscrip);
+			/* Find both sets of inscriptions, add together, and prompt that number of times */
+			n = o_ptr.check_for_inscrip(verify_inscrip)?1:0;
 
-			//if (!is_harmless)
-			//    n += check_for_inscrip(o_ptr, "!*");
+			if (!is_harmless)
+			    n += o_ptr.check_for_inscrip("!*") ? 1:0;
 
-			//while (n--)
-			//{
-			//    if (!verify_item("Really try", item))
-			//        return (false);
-			//}
+			while (n-- != 0)
+			{
+			    if (!verify_item("Really try", item))
+			        return (false);
+			}
 
-			///* Allow it */
-			//return (true);
+			/* Allow it */
+			return (true);
 		}
 
 		/*

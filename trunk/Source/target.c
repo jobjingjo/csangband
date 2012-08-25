@@ -82,41 +82,7 @@ static void look_mon_desc(char *buf, size_t max, int m_idx)
 
 
 
-/*
- * Update (if necessary) and verify (if possible) the target.
- *
- * We return true if the target is "okay" and false otherwise.
- */
-bool target_okay(void)
-{
-	/* No target */
-	if (!target_set) return (false);
 
-	/* Accept "location" targets */
-	if (target_who == 0) return (true);
-
-	/* Check "monster" targets */
-	if (target_who > 0)
-	{
-		int m_idx = target_who;
-
-		/* Accept reasonable targets */
-		if (target_able(m_idx))
-		{
-			monster_type *m_ptr = cave_monster(cave, m_idx);
-
-			/* Get the monster location */
-			target_y = m_ptr.fy;
-			target_x = m_ptr.fx;
-
-			/* Good target */
-			return (true);
-		}
-	}
-
-	/* Assume no target */
-	return (false);
-}
 
 
 /*
@@ -913,66 +879,7 @@ static struct keypress target_set_interactive_aux(int y, int x, int mode)
 }
 
 
-bool target_set_closest(int mode)
-{
-	int y, x, m_idx;
-	monster_type *m_ptr;
-	char m_name[80];
-	bool visibility;
-	struct point_set *targets;
 
-	/* Cancel old target */
-	target_set_monster(0);
-
-	/* Get ready to do targetting */
-	targets = target_set_interactive_prepare(mode);
-
-	/* If nothing was prepared, then return */
-	if (point_set_size(targets) < 1)
-	{
-		msg("No Available Target.");
-		point_set_dispose(targets);
-		return false;
-	}
-
-	/* Find the first monster in the queue */
-	y = targets.pts[0].y;
-	x = targets.pts[0].x;
-	m_idx = cave.m_idx[y][x];
-	
-	/* Target the monster, if possible */
-	if ((m_idx <= 0) || !target_able(m_idx))
-	{
-		msg("No Available Target.");
-		point_set_dispose(targets);
-		return false;
-	}
-
-	/* Target the monster */
-	m_ptr = cave_monster(cave, m_idx);
-	monster_desc(m_name, sizeof(m_name), m_ptr, 0x00);
-	if (!(mode & TARGET_QUIET))
-		msg("%^s is targeted.", m_name);
-	Term_fresh();
-
-	/* Set up target information */
-	monster_race_track(m_ptr.r_idx);
-	health_track(p_ptr, cave.m_idx[y][x]);
-	target_set_monster(m_idx);
-
-	/* Visual cue */
-	Term_get_cursor(&visibility);
-	(void)Term_set_cursor(true);
-	move_cursor_relative(y, x);
-	Term_redraw_section(x, y, x, y);
-
-	/* TODO: what's an appropriate amount of time to spend highlighting */
-	Term_xtra(TERM_XTRA_DELAY, 150);
-	(void)Term_set_cursor(visibility);
-
-	point_set_dispose(targets);
-	return true;
-}
 
 
 /**
