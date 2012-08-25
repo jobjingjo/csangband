@@ -610,18 +610,16 @@ namespace CSAngband.Player {
 		/* Determine if the player can fire with the bow */
 		static public bool can_fire()
 		{
-			throw new NotImplementedException();
-			/*
-			object_type *o_ptr = &p_ptr.inventory[INVEN_BOW];
+			Object.Object o_ptr = Misc.p_ptr.inventory[Misc.INVEN_BOW];
 
 			//Require a usable launcher
-			if (!o_ptr.tval || !p_ptr.state.ammo_tval)
+			if (o_ptr.tval == 0 || Misc.p_ptr.state.ammo_tval == 0)
 			{
-				msg("You have nothing to fire with.");
+				Utilities.msg("You have nothing to fire with.");
 				return false;
 			}
 
-			return true;*/
+			return true;
 		}
 
 		/*
