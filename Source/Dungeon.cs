@@ -821,15 +821,14 @@ namespace CSAngband {
 			    /* Repeated command */
 			    else if (Game_Command.get_nrepeats() > 0)
 			    {
-					throw new NotImplementedException();
-					///* Hack -- Assume messages were seen */
-					//msg_flag = false;
+					/* Hack -- Assume messages were seen */
+					Term.msg_flag = false;
 
-					///* Clear the top line */
-					//prt("", 0, 0);
+					/* Clear the top line */
+					Utilities.prt("", 0, 0);
 
-					///* Process the command */
-					//process_command(CMD_GAME, true);
+					/* Process the command */
+					Game_Command.process_command(cmd_context.CMD_GAME, true);
 			    }
 
 			    /* Normal command */

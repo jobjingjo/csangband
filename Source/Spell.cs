@@ -344,5 +344,44 @@ namespace CSAngband {
 			return result;
 		}
 
+		/*
+		 * Increase players hit points, notice effects
+		 */
+		public static bool hp_player(int num)
+		{
+			/* Healing needed */
+			if (Misc.p_ptr.chp < Misc.p_ptr.mhp)
+			{
+				/* Gain hitpoints */
+				Misc.p_ptr.chp += (short)num;
+
+				/* Enforce maximum */
+				if (Misc.p_ptr.chp >= Misc.p_ptr.mhp)
+				{
+					Misc.p_ptr.chp = Misc.p_ptr.mhp;
+					Misc.p_ptr.chp_frac = 0;
+				}
+
+				/* Redraw */
+				Misc.p_ptr.redraw |= (Misc.PR_HP);
+
+				/* Print a nice message */
+				if (num < 5)
+					Utilities.msg("You feel a little better.");
+				else if (num < 15)
+					Utilities.msg("You feel better.");
+				else if (num < 35)
+					Utilities.msg("You feel much better.");
+				else
+					Utilities.msg("You feel very good.");
+
+				/* Notice */
+				return (true);
+			}
+
+			/* Ignore */
+			return (false);
+		}
+
 	}
 }

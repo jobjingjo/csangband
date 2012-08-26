@@ -82,7 +82,6 @@ bool check_side_immune(int type);
 int inven_damage(struct player *p, int type, int cperc);
 
 /* spells2.c */
-extern bool hp_player(int num);
 extern bool heal_player(int perc, int min);
 extern bool warding_glyph(void);
 extern void warding_glyph_spell(void);

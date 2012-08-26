@@ -51,7 +51,6 @@ bool object_attack_plusses_are_visible(const object_type *o_ptr);
 bool object_defence_plusses_are_visible(const object_type *o_ptr);
 bool object_flag_is_known(const object_type *o_ptr, int flag);
 bool object_high_resist_is_possible(const object_type *o_ptr);
-void object_flavor_tried(object_type *o_ptr);
 void object_notice_everything(object_type *o_ptr);
 void object_notice_indestructible(object_type *o_ptr);
 void object_notice_sensing(object_type *o_ptr);

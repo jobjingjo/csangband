@@ -32,44 +32,7 @@
 #include "target.h"
 #include "trap.h"
 
-/*
- * Increase players hit points, notice effects
- */
-bool hp_player(int num)
-{
-	/* Healing needed */
-	if (p_ptr.chp < p_ptr.mhp)
-	{
-		/* Gain hitpoints */
-		p_ptr.chp += num;
 
-		/* Enforce maximum */
-		if (p_ptr.chp >= p_ptr.mhp)
-		{
-			p_ptr.chp = p_ptr.mhp;
-			p_ptr.chp_frac = 0;
-		}
-
-		/* Redraw */
-		p_ptr.redraw |= (PR_HP);
-
-		/* Print a nice message */
-		if (num < 5)
-			msg("You feel a little better.");
-		else if (num < 15)
-			msg("You feel better.");
-		else if (num < 35)
-			msg("You feel much better.");
-		else
-			msg("You feel very good.");
-
-		/* Notice */
-		return (true);
-	}
-
-	/* Ignore */
-	return (false);
-}
 
 
 /*

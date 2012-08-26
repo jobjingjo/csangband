@@ -53,14 +53,6 @@ const char *effect_desc(effect_type effect)
 	return effects[effect].desc;
 }
 
-bool effect_obvious(effect_type effect)
-{
-	if (effect == EF_IDENTIFY)
-		return true;
-
-	return false;
-}
-
 
 /*
  * The "wonder" effect.

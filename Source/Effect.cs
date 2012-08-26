@@ -854,13 +854,12 @@ namespace CSAngband {
 
 			else if (this == SHERO)
 			{
-				throw new NotImplementedException();
-				//dur = randint1(25) + 25;
-				//if (hp_player(30)) *ident = true;
-				//if (player_clear_timed(p_ptr, TMD_AFRAID, true)) *ident = true;
-				//if (player_inc_timed(p_ptr, TMD_BOLD, dur, true, true)) *ident = true;
-				//if (player_inc_timed(p_ptr, TMD_SHERO, dur, true, true)) *ident = true;
-				//return true;
+				dur = Random.randint1(25) + 25;
+				if (Spell.hp_player(30)) ident = true;
+				if (Misc.p_ptr.clear_timed(Timed_Effect.AFRAID, true)) ident = true;
+				if (Misc.p_ptr.inc_timed(Timed_Effect.BOLD, dur, true, true)) ident = true;
+				if (Misc.p_ptr.inc_timed(Timed_Effect.SHERO, dur, true, true)) ident = true;
+				return true;
 			}
 
 
@@ -2013,10 +2012,9 @@ namespace CSAngband {
 
 			else if (this == FOOD_GOOD)
 			{
-				throw new NotImplementedException();
-				//msg("That tastes good.");
-				//*ident = true;
-				//return true;
+				Utilities.msg("That tastes good.");
+				ident = true;
+				return true;
 			}
 
 			else if (this == FOOD_WAYBREAD)
@@ -2495,5 +2493,12 @@ namespace CSAngband {
 			return false;
 		}
 
+		public bool obvious()
+		{
+			if (this == IDENTIFY)
+				return true;
+
+			return false;
+		}
 	}
 }
