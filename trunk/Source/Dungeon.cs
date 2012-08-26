@@ -814,9 +814,8 @@ namespace CSAngband {
 			    /* Running */
 			    else if (Misc.p_ptr.running != 0)
 			    {
-					throw new NotImplementedException();
 			        /* Take a step */
-			        //run_step(0);
+			        Pathfind.run_step(0);
 			    }
 
 			    /* Repeated command */
