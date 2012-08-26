@@ -1890,6 +1890,10 @@ namespace CSAngband.Object
 			}
 		}
 
+		public static bool obj_is_ammo(Object o) {
+			return o.is_ammo();
+		}
+
 		/**
 		 * \returns whether the player is aware of the object's effect when used
 		 */
@@ -2237,31 +2241,173 @@ namespace CSAngband.Object
 		 */
 		public void pval_flags_known(out Bitflag[] flags)
 		{
-			throw new NotImplementedException();
-			//int i, flag;
+			int i, flag;
 
-			//object_pval_flags(flags);
+			object_pval_flags(out flags);
 
-			//for (i = 0; i < MAX_PVALS; i++)
-			//    of_inter(flags[i], o_ptr.known_flags);
+			for(i = 0; i < Misc.MAX_PVALS; i++) {
+				flags[i].inter(known_flags);
+			}
 
-			///* Kind and ego pval_flags may have shifted pvals so we iterate */
-			//if (object_flavor_is_aware(o_ptr))
-			//    for (i = 0; i < MAX_PVALS; i++)
-			//        for (flag = of_next(o_ptr.kind.pval_flags[i], FLAG_START);
-			//                flag != FLAG_END; flag = of_next(o_ptr.kind.pval_flags[i],
-			//                flag + 1))
-			//            of_on(flags[which_pval(o_ptr, flag)], flag);
+			/* Kind and ego pval_flags may have shifted pvals so we iterate */
+			if(flavor_is_aware()) {
+				for(i = 0; i < Misc.MAX_PVALS; i++) {
+					for(flag = kind.pval_flags[i].next(Bitflag.FLAG_START);
+							flag != Bitflag.FLAG_null; flag = kind.pval_flags[i].next(flag + 1)) {
 
-			//if (o_ptr.ego && easy_know(o_ptr))
-			//    for (i = 0; i < MAX_PVALS; i++)
-			//        for (flag = of_next(o_ptr.ego.pval_flags[i], FLAG_START);
-			//                flag != FLAG_END; flag = of_next(o_ptr.ego.pval_flags[i],
-			//                flag + 1))
-			//            of_on(flags[which_pval(o_ptr, flag)], flag);
+						flags[which_pval(flag)].on(flag);
+					}
+				}
+			}
+
+			if(ego != null && easy_know()) {
+				for(i = 0; i < Misc.MAX_PVALS; i++) {
+					for(flag = ego.pval_flags[i].next(Bitflag.FLAG_START);
+							flag != Bitflag.FLAG_null; flag = ego.pval_flags[i].next(flag + 1)) {
+						
+						flags[which_pval(flag)].on(flag);
+					}
+				}
+			}
 		}
 
 
+		/*
+		 * Wield or wear a single item from the pack or floor
+		 */
+		public void wield_item(int item, int slot)
+		{
+			//If wierd things happen, add o_ptr back as a parameter instead of this
+
+
+			//Object object_type_body;
+			Object i_ptr = new Object();//&object_type_body;
+
+			string fmt;
+			//char o_name[80];
+			string o_name;
+
+			bool combined_ammo = false;
+			bool track_wielded_item = false;
+			int num = 1;
+
+			/* If we are stacking ammo in the quiver */
+			if (is_ammo())
+			{
+				num = number;
+				combined_ammo = similar(Misc.p_ptr.inventory[slot], object_stack_t.OSTACK_QUIVER);
+			}
+
+			/* Take a turn */
+			Misc.p_ptr.energy_use = 100;
+
+			/* Obtain local object */
+			i_ptr = copy();
+
+			/* Modify quantity */
+			i_ptr.number = (byte)num;
+
+			/* Update object_idx if necessary, once object is in slot */
+			if (Cave.tracked_object_is(item))
+			{
+				track_wielded_item = true;
+			}
+
+			/* Decrease the item (from the pack) */
+			if (item >= 0)
+			{
+				inven_item_increase(item, -num);
+				inven_item_optimize(item);
+			}
+
+			/* Decrease the item (from the floor) */
+			else
+			{
+				floor_item_increase(0 - item, -num);
+				floor_item_optimize(0 - item);
+			}
+
+			/* Get the wield slot */
+			//Things might get wonky here. We stop using "this" and start using "o_ptr" form here on.
+			Object o_ptr = Misc.p_ptr.inventory[slot];
+
+			if (combined_ammo)
+			{
+				/* Add the new ammo to the already-quiver-ed ammo */
+				o_ptr.absorb(i_ptr);
+			}
+			else 
+			{
+				/* Take off existing item */
+				if (o_ptr.kind != null) 
+					inven_takeoff(slot, 255);
+
+				/* If we are wielding ammo we may need to "open" the slot by shifting
+				 * later ammo up the quiver; this is because we already called the
+				 * inven_item_optimize() function. */
+				if (slot >= Misc.QUIVER_START)
+					open_quiver_slot(slot);
+	
+				/* Wear the new stuff */
+				o_ptr = i_ptr.copy();
+
+				/* Increment the equip counter by hand */
+				Misc.p_ptr.equip_cnt++;
+			}
+
+			/* Increase the weight */
+			Misc.p_ptr.total_weight += i_ptr.weight * num;
+
+			/* Track object if necessary */
+			if (track_wielded_item)
+			{
+				Cave.track_object(slot);
+			}
+
+			/* Do any ID-on-wield */
+			o_ptr.notice_on_wield();
+
+			/* Where is the item now */
+			if (slot == Misc.INVEN_WIELD)
+				fmt = "You are wielding {0} ({1}).";
+			else if (slot == Misc.INVEN_BOW)
+				fmt = "You are shooting with {0} ({1}).";
+			else if (slot == Misc.INVEN_LIGHT)
+				fmt = "Your light source is {0} ({1}).";
+			else if (combined_ammo)
+				fmt = "You combine {0} in your quiver ({1}).";
+			else if (slot >= Misc.QUIVER_START && slot < Misc.QUIVER_END)
+				fmt = "You add {0} to your quiver ({1}).";
+			else
+				fmt = "You are wearing {0} ({1}).";
+
+			/* Describe the result */
+			o_name = o_ptr.object_desc(Detail.PREFIX | Detail.FULL);
+
+			/* Message */
+			Utilities.msgt(Message_Type.MSG_WIELD, fmt, o_name, index_to_label(slot));
+
+			/* Cursed! */
+			if (Object_Flag.cursed_p(o_ptr.flags))
+			{
+				/* Warn the player */
+				Utilities.msgt(Message_Type.MSG_CURSED, "Oops! It feels deathly cold!");
+
+				/* Sense the object */
+				o_ptr.notice_curses();
+			}
+
+			/* Save quiver size */
+			save_quiver_size(Misc.p_ptr);
+
+			/* See if we have to overflow the pack */
+			pack_overflow();
+
+			/* Recalculate bonuses, torch, mana */
+			Misc.p_ptr.notice |= Misc.PN_SORT_QUIVER;
+			Misc.p_ptr.update |= (Misc.PU_BONUS | Misc.PU_TORCH | Misc.PU_MANA);
+			Misc.p_ptr.redraw |= (Misc.PR_INVEN | Misc.PR_EQUIP);
+		}
 
 
 	}

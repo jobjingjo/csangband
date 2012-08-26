@@ -69,18 +69,7 @@ bool object_is_known_blessed(const object_type *o_ptr)
 
 
 
-/**
- * Mark an object's flavour as tried.
- *
- * \param o_ptr is the object whose flavour should be marked
- */
-void object_flavor_tried(object_type *o_ptr)
-{
-	assert(o_ptr);
-	assert(o_ptr.kind);
 
-	o_ptr.kind.tried = true;
-}
 
 /**
  * Check whether an object has IDENT_KNOWN but should not
@@ -115,22 +104,6 @@ void object_notice_indestructible(object_type *o_ptr)
 		object_check_for_ident(o_ptr);
 }
 
-
-
-
-
-/*
- * Sense artifacts
- */
-void object_sense_artifact(object_type *o_ptr)
-{
-	if (o_ptr.artifact)
-		object_notice_sensing(o_ptr);
-	else
-		o_ptr.ident |= IDENT_NOTART;
-}
-
-
 /**
  * Notice the "effect" from activating an object.
  *
@@ -148,135 +121,7 @@ void object_notice_effect(object_type *o_ptr)
 
 
 
-/*
- * Determine whether a weapon or missile weapon is obviously {excellent} when
- * worn.
- *
- * XXX Eddie should messages be adhoc all over the place?  perhaps the main
- * loop should check for change in inventory/wieldeds and all messages be
- * printed from one place
- */
-void object_notice_on_wield(object_type *o_ptr)
-{
-	bitflag f[OF_SIZE], f2[OF_SIZE], obvious_mask[OF_SIZE];
-	bool obvious = false;
 
-	create_mask(obvious_mask, true, OFID_WIELD, OFT_MAX);
-
-	/* Save time of wield for later */
-	object_last_wield = turn;
-
-	/* Only deal with un-ID'd items */
-	if (object_is_known(o_ptr)) return;
-
-	/* Wear it */
-	object_flavor_tried(o_ptr);
-	if (object_add_ident_flags(o_ptr, IDENT_WORN))
-		object_check_for_ident(o_ptr);
-
-	/* CC: may wish to be more subtle about this once we have ego lights
-	 * with multiple pvals */
-	if (obj_is_light(o_ptr) && o_ptr.ego)
-		object_notice_ego(o_ptr);
-
-	if (object_flavor_is_aware(o_ptr) && easy_know(o_ptr))
-	{
-		object_notice_everything(o_ptr);
-		return;
-	}
-
-	/* Automatically sense artifacts upon wield */
-	object_sense_artifact(o_ptr);
-
-	/* Note artifacts when found */
-	if (o_ptr.artifact)
-		history_add_artifact(o_ptr.artifact, object_is_known(o_ptr), true);
-
-	/* special case FA, needed at least for mages wielding gloves */
-	if (object_FA_would_be_obvious(o_ptr))
-		of_on(obvious_mask, OF_FREE_ACT);
-
-	/* Extract the flags */
-	object_flags(o_ptr, f);
-
-	/* Find obvious things (disregarding curses) - why do we remove the curses?? */
-	create_mask(f2, false, OFT_CURSE, OFT_MAX);
-	of_diff(obvious_mask, f2);
-	if (of_is_inter(f, obvious_mask)) obvious = true;
-	create_mask(obvious_mask, true, OFID_WIELD, OFT_MAX);
-
-	/* Notice any obvious brands or slays */
-	object_notice_slays(o_ptr, obvious_mask);
-
-	/* Learn about obvious flags */
-	of_union(o_ptr.known_flags, obvious_mask);
-
-	/* XXX Eddie should these next NOT call object_check_for_ident due to worries about repairing? */
-
-	/* XXX Eddie this is a small hack, but jewelry with anything noticeable really is obvious */
-	/* XXX Eddie learn =soulkeeping vs =bodykeeping when notice sustain_str */
-	if (object_is_jewelry(o_ptr))
-	{
-		/* Learn the flavor of jewelry with obvious flags */
-		if (EASY_LEARN && obvious)
-			object_flavor_aware(o_ptr);
-
-		/* Learn all flags on any aware non-artifact jewelry */
-		if (object_flavor_is_aware(o_ptr) && !o_ptr.artifact)
-			object_know_all_flags(o_ptr);
-	}
-
-	object_check_for_ident(o_ptr);
-
-	if (!obvious) return;
-
-	/* XXX Eddie need to add stealth here, also need to assert/double-check everything is covered */
-	/* CC: also need to add FA! */
-	if (of_has(f, OF_STR))
-		msg("You feel %s!", o_ptr.pval[which_pval(o_ptr,
-			OF_STR)] > 0 ? "stronger" : "weaker");
-	if (of_has(f, OF_INT))
-		msg("You feel %s!", o_ptr.pval[which_pval(o_ptr,
-			OF_INT)] > 0 ? "smarter" : "more stupid");
-	if (of_has(f, OF_WIS))
-		msg("You feel %s!", o_ptr.pval[which_pval(o_ptr,
-			OF_WIS)] > 0 ? "wiser" : "more naive");
-	if (of_has(f, OF_DEX))
-		msg("You feel %s!", o_ptr.pval[which_pval(o_ptr,
-			OF_DEX)] > 0 ? "more dextrous" : "clumsier");
-	if (of_has(f, OF_CON))
-		msg("You feel %s!", o_ptr.pval[which_pval(o_ptr,
-			OF_CON)] > 0 ? "healthier" : "sicklier");
-	if (of_has(f, OF_CHR))
-		msg("You feel %s!", o_ptr.pval[which_pval(o_ptr,
-			OF_CHR)] > 0 ? "cuter" : "uglier");
-	if (of_has(f, OF_SPEED))
-		msg("You feel strangely %s.", o_ptr.pval[which_pval(o_ptr,
-			OF_SPEED)] > 0 ? "quick" : "sluggish");
-	if (of_has(f, OF_BLOWS))
-		msg("Your weapon %s in your hands.",
-			o_ptr.pval[which_pval(o_ptr, OF_BLOWS)] > 0 ?
-				"tingles" : "aches");
-	if (of_has(f, OF_SHOTS))
-		msg("Your bow %s in your hands.",
-			o_ptr.pval[which_pval(o_ptr, OF_SHOTS)] > 0 ?
-				"tingles" : "aches");
-	if (of_has(f, OF_INFRA))
-		msg("Your eyes tingle.");
-	if (of_has(f, OF_LIGHT))
-		msg("It glows!");
-	if (of_has(f, OF_TELEPATHY))
-		msg("Your mind feels strangely sharper!");
-
-	/* WARNING -- masking f by obvious mask -- this should be at the end of this function */
-	/* CC: I think this can safely go, but just in case ... */
-/*	flags_mask(f, OF_SIZE, OF_OBVIOUS_MASK, FLAG_END); */
-
-	/* Remember the flags */
-	object_notice_sensing(o_ptr);
-
-	/* XXX Eddie should we check_for_ident here? */
-}
 
 
 

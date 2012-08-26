@@ -64,7 +64,6 @@ void object_notice_on_firing(object_type *o_ptr);
 void wieldeds_notice_flag(struct player *p, int flag);
 void wieldeds_notice_on_attack(void);
 void object_repair_knowledge(object_type *o_ptr);
-bool object_FA_would_be_obvious(const object_type *o_ptr);
 obj_pseudo_t object_pseudo(const object_type *o_ptr);
 void sense_inventory(void);
 bool easy_know(const object_type *o_ptr);

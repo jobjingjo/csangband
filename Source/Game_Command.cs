@@ -805,37 +805,36 @@ namespace CSAngband {
 
 					case Command_Code.WIELD:
 					{
-						throw new NotImplementedException();
-						//object_type *o_ptr = object_from_item_idx(cmd.arg[0].choice);
-						//int slot = wield_slot(o_ptr);
+						Object.Object o_ptr = Object.Object.object_from_item_idx(cmd.arg[0].value);
+						int slot = o_ptr.wield_slot();
 			
-						///* Usually if the slot is taken we'll just replace the item in the slot,
-						// * but in some cases we need to ask the user which slot they actually
-						// * want to replace */
-						//if (p_ptr.inventory[slot].kind)
-						//{
-						//    if (o_ptr.tval == TV_RING)
-						//    {
-						//        const char *q = "Replace which ring? ";
-						//        const char *s = "Error in obj_wield, please report";
-						//        item_tester_hook = obj_is_ring;
-						//        if (!get_item(&slot, q, s, CMD_WIELD, USE_EQUIP)) return;
-						//    }
+						/* Usually if the slot is taken we'll just replace the item in the slot,
+						 * but in some cases we need to ask the user which slot they actually
+						 * want to replace */
+						if (Misc.p_ptr.inventory[slot].kind != null)
+						{
+						    if (o_ptr.tval == Object.TVal.TV_RING)
+						    {
+						        string q = "Replace which ring? ";
+						        string s = "Error in obj_wield, please report";
+						        Misc.item_tester_hook = Object.Object.obj_is_ring;
+						        if (!Object.Object.get_item(ref slot, q, s, Command_Code.WIELD, Misc.USE_EQUIP)) return;
+						    }
 			
-						//    if (obj_is_ammo(o_ptr) && !object_similar(&p_ptr.inventory[slot],
-						//        o_ptr, OSTACK_QUIVER))
-						//    {
-						//        const char *q = "Replace which ammunition? ";
-						//        const char *s = "Error in obj_wield, please report";
-						//        item_tester_hook = obj_is_ammo;
-						//        if (!get_item(&slot, q, s, CMD_WIELD, USE_EQUIP)) return;
-						//    }
-						//}
+						    if (o_ptr.is_ammo() && 
+								!Misc.p_ptr.inventory[slot].similar(o_ptr, Object.Object.object_stack_t.OSTACK_QUIVER))
+						    {
+						        string q = "Replace which ammunition? ";
+						        string s = "Error in obj_wield, please report";
+						        Misc.item_tester_hook = Object.Object.obj_is_ammo;
+						        if (!Object.Object.get_item(ref slot, q, s, Command_Code.WIELD, Misc.USE_EQUIP)) return;
+						    }
+						}
 
-						///* Set relevant slot */
-						//cmd_set_arg_number(cmd, 1, slot);
+						/* Set relevant slot */
+						cmd.set_arg_number(1, slot);
 
-						//break;
+						break;
 					}
 
 					default: 

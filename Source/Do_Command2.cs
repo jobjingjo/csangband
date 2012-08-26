@@ -1756,68 +1756,66 @@ namespace CSAngband {
 
 		/* Wield or wear an item */
 		public static void wield(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			//object_type *equip_o_ptr;
+			Object.Object equip_o_ptr;
 			//char o_name[80];
+			string o_name;
 
-			//unsigned n;
+			int n;
 
-			//int item = args[0].item;
-			//int slot = args[1].number;
-			//object_type *o_ptr = object_from_item_idx(item);
+			int item = args[0].value;
+			int slot = args[1].value;
+			Object.Object o_ptr = Object.Object.object_from_item_idx(item);
 
-			//if (!item_is_available(item, null, USE_INVEN | USE_FLOOR))
-			//{
-			//    msg("You do not have that item to wield.");
-			//    return;
-			//}
+			if (!Object.Object.item_is_available(item, null, Misc.USE_INVEN | Misc.USE_FLOOR))
+			{
+			    Utilities.msg("You do not have that item to wield.");
+			    return;
+			}
 
-			///* Check the slot */
-			//if (!slot_can_wield_item(slot, o_ptr))
-			//{
-			//    msg("You cannot wield that item there.");
-			//    return;
-			//}
+			/* Check the slot */
+			if (!o_ptr.slot_can_wield_item(slot))
+			{
+			    Utilities.msg("You cannot wield that item there.");
+			    return;
+			}
 
-			//equip_o_ptr = &p_ptr.inventory[slot];
+			equip_o_ptr = Misc.p_ptr.inventory[slot];
 
-			///* If the slot is open, wield and be done */
-			//if (!equip_o_ptr.kind)
-			//{
-			//    wield_item(o_ptr, item, slot);
-			//    return;
-			//}
+			/* If the slot is open, wield and be done */
+			if (equip_o_ptr.kind == null)
+			{
+			    o_ptr.wield_item(item, slot);
+			    return;
+			}
 
-			///* If the slot is in the quiver and objects can be combined */
-			//if (obj_is_ammo(equip_o_ptr) && object_similar(equip_o_ptr, o_ptr,
-			//    OSTACK_QUIVER))
-			//{
-			//    wield_item(o_ptr, item, slot);
-			//    return;
-			//}
+			/* If the slot is in the quiver and objects can be combined */
+			if (equip_o_ptr.is_ammo() && equip_o_ptr.similar(o_ptr, Object.Object.object_stack_t.OSTACK_QUIVER))
+			{
+			    o_ptr.wield_item(item, slot);
+			    return;
+			}
 
-			///* Prevent wielding into a cursed slot */
-			//if (cursed_p(equip_o_ptr.flags))
-			//{
-			//    object_desc(o_name, sizeof(o_name), equip_o_ptr, ODESC_BASE);
-			//    msg("The %s you are %s appears to be cursed.", o_name,
-			//               describe_use(slot));
-			//    return;
-			//}
+			/* Prevent wielding into a cursed slot */
+			if (Object_Flag.cursed_p(equip_o_ptr.flags))
+			{
+			    o_name = equip_o_ptr.object_desc(Object.Object.Detail.BASE);
+			    Utilities.msg("The {0} you are {1} appears to be cursed.", o_name,
+			               Object.Object.describe_use(slot));
+			    return;
+			}
 
-			///* "!t" checks for taking off */
-			//n = check_for_inscrip(equip_o_ptr, "!t");
-			//while (n--)
-			//{
-			//    /* Prompt */
-			//    object_desc(o_name, sizeof(o_name), equip_o_ptr,
-			//                ODESC_PREFIX | ODESC_FULL);
+			/* "!t" checks for taking off */
+			n = equip_o_ptr.check_for_inscrip("!t")?1:0;
+			while (n-- != 0)
+			{
+			    /* Prompt */
+				o_name = equip_o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
 
-			//    /* Forget it */
-			//    if (!get_check(format("Really take off %s? ", o_name))) return;
-			//}
+			    /* Forget it */
+			    if (!Utilities.get_check(String.Format("Really take off {0}? ", o_name))) return;
+			}
 
-			//wield_item(o_ptr, item, slot);
+			o_ptr.wield_item(item, slot);
 		}
 
 		/* Take off an item */

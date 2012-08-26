@@ -519,6 +519,11 @@ namespace CSAngband.Object {
 		public static bool obj_is_ring(Object o_ptr)   { return o_ptr.tval == TVal.TV_RING; }
 
 
+		public bool is_light() {
+			return tval == TVal.TV_LIGHT;
+		}
+
+
 		/* Determine if an object has charges */
 		public static bool obj_has_charges(Object o_ptr)
 		{
@@ -1618,5 +1623,164 @@ namespace CSAngband.Object {
 
 			//return squelch_idx;
 		}
+
+		/*
+		 * \returns whether item this will fit in slot 'slot'
+		 */
+		public bool slot_can_wield_item(int slot)
+		{
+			if (tval == TVal.TV_RING)
+				return (slot == Misc.INVEN_LEFT || slot == Misc.INVEN_RIGHT) ? true : false;
+			else if (is_ammo())
+				return (slot >= Misc.QUIVER_START && slot < Misc.QUIVER_END) ? true : false;
+			else
+				return (wield_slot() == slot) ? true : false;
+		}
+
+
+		/*
+		 * Shifts ammo at or above the item slot towards the end of the quiver, making
+		 * room for a new piece of ammo.
+		 */
+		public static void open_quiver_slot(int slot)
+		{
+			throw new NotImplementedException();
+			//int i, pref;
+			//int dest = QUIVER_END - 1;
+
+			///* This should only be used on ammunition */
+			//if (slot < QUIVER_START) return;
+
+			///* Quiver is full */
+			//if (p_ptr.inventory[QUIVER_END - 1].kind) return;
+
+			///* Find the first open quiver slot */
+			//while (p_ptr.inventory[dest].kind) dest++;
+
+			///* Swap things with the space one higher (essentially moving the open space
+			// * towards our goal slot. */
+			//for (i = dest - 1; i >= slot; i--)
+			//{
+			//    /* If we have an item with an inscribed location (and it's in */
+			//    /* that location) then we won't move it. */
+			//    pref = get_inscribed_ammo_slot(&p_ptr.inventory[i]);
+			//    if (i != slot && pref && pref == i) continue;
+
+			//    /* Update object_idx if necessary */
+			//    if (tracked_object_is(i))
+			//    {
+			//        track_object(dest);
+			//    }
+
+			//    /* Copy the item up and wipe the old slot */
+			//    COPY(&p_ptr.inventory[dest], &p_ptr.inventory[i], object_type);
+			//    dest = i;
+			//    object_wipe(&p_ptr.inventory[dest]);
+
+
+			//}
+		}
+
+		/*
+		 * Take off (some of) a non-cursed equipment item
+		 *
+		 * Note that only one item at a time can be wielded per slot.
+		 *
+		 * Note that taking off an item when "full" may cause that item
+		 * to fall to the ground.
+		 *
+		 * Return the inventory slot into which the item is placed.
+		 */
+		public static short inven_takeoff(int item, int amt)
+		{
+			int slot;
+
+			Object o_ptr;
+
+			Object i_ptr;
+			//object_type object_type_body;
+
+			string act;
+
+			//char o_name[80];
+			string o_name;
+
+			bool track_removed_item = false;
+
+
+			/* Get the item to take off */
+			o_ptr = Misc.p_ptr.inventory[item];
+
+			/* Paranoia */
+			if (amt <= 0) return (-1);
+
+			/* Verify */
+			if (amt > o_ptr.number) amt = o_ptr.number;
+
+			/* Get local object */
+			i_ptr = new Object();//&object_type_body;
+
+			/* Obtain a local object */
+			i_ptr = o_ptr.copy();
+			//object_copy(i_ptr, o_ptr);
+
+			/* Modify quantity */
+			i_ptr.number = (byte)amt;
+
+			/* Describe the object */
+			o_name = i_ptr.object_desc(Detail.PREFIX | Detail.FULL);
+
+			/* Took off weapon */
+			if (item == Misc.INVEN_WIELD)
+			{
+			    act = "You were wielding";
+			}
+
+			/* Took off bow */
+			else if (item == Misc.INVEN_BOW)
+			{
+			    act = "You were holding";
+			}
+
+			/* Took off light */
+			else if (item == Misc.INVEN_LIGHT)
+			{
+			    act = "You were holding";
+			}
+
+			/* Took off something */
+			else
+			{
+			    act = "You were wearing";
+			}
+
+			/* Update object_idx if necessary, after optimization */
+			if (Cave.tracked_object_is(item))
+			{
+			    track_removed_item = true;
+			}
+
+			/* Modify, Optimize */
+			inven_item_increase(item, -amt);
+			inven_item_optimize(item);
+
+			/* Carry the object */
+			slot = i_ptr.inven_carry(Misc.p_ptr);
+
+			/* Track removed item if necessary */
+			if (track_removed_item)
+			{
+			    Cave.track_object(slot);
+			}
+
+			/* Message */
+			Utilities.msgt(Message_Type.MSG_WIELD, "{0} {1} ({2}).", act, o_name, index_to_label(slot));
+
+			Misc.p_ptr.notice |= Misc.PN_SQUELCH;
+
+			/* Return slot */
+			return (short)(slot);
+		}
+
 	}
 }

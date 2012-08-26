@@ -36,25 +36,6 @@ extern void init_translate_visuals(void);
 #endif /* ALLOW_BORG_GRAPHICS */
 
 /*
- * \returns whether item o_ptr will fit in slot 'slot'
- */
-bool slot_can_wield_item(int slot, const object_type *o_ptr)
-{
-	if (o_ptr.tval == TV_RING)
-		return (slot == INVEN_LEFT || slot == INVEN_RIGHT) ? true : false;
-	else if (obj_is_ammo(o_ptr))
-		return (slot >= QUIVER_START && slot < QUIVER_END) ? true : false;
-	else
-		return (wield_slot(o_ptr) == slot) ? true : false;
-}
-
-
-
-
-
-
-
-/*
  * Deletes all objects at given location
  */
 void delete_object(int y, int x)
@@ -485,49 +466,6 @@ void swap_quiver_slots(int slot1, int slot2)
 }
 
 /*
- * Shifts ammo at or above the item slot towards the end of the quiver, making
- * room for a new piece of ammo.
- */
-void open_quiver_slot(int slot)
-{
-	int i, pref;
-	int dest = QUIVER_END - 1;
-
-	/* This should only be used on ammunition */
-	if (slot < QUIVER_START) return;
-
-	/* Quiver is full */
-	if (p_ptr.inventory[QUIVER_END - 1].kind) return;
-
-	/* Find the first open quiver slot */
-	while (p_ptr.inventory[dest].kind) dest++;
-
-	/* Swap things with the space one higher (essentially moving the open space
-	 * towards our goal slot. */
-	for (i = dest - 1; i >= slot; i--)
-	{
-		/* If we have an item with an inscribed location (and it's in */
-		/* that location) then we won't move it. */
-		pref = get_inscribed_ammo_slot(&p_ptr.inventory[i]);
-		if (i != slot && pref && pref == i) continue;
-
-		/* Update object_idx if necessary */
-		if (tracked_object_is(i))
-		{
-			track_object(dest);
-		}
-
-		/* Copy the item up and wipe the old slot */
-		COPY(&p_ptr.inventory[dest], &p_ptr.inventory[i], object_type);
-		dest = i;
-		object_wipe(&p_ptr.inventory[dest]);
-
-
-	}
-}
-
-
-/*
  * Describe the charges on an item on the floor.
  */
 void floor_item_charges(int item)
@@ -563,106 +501,6 @@ void floor_item_describe(int item)
 
 	/* Print a message */
 	msg("You see %s.", o_name);
-}
-
-
-/*
- * Take off (some of) a non-cursed equipment item
- *
- * Note that only one item at a time can be wielded per slot.
- *
- * Note that taking off an item when "full" may cause that item
- * to fall to the ground.
- *
- * Return the inventory slot into which the item is placed.
- */
-s16b inven_takeoff(int item, int amt)
-{
-	int slot;
-
-	object_type *o_ptr;
-
-	object_type *i_ptr;
-	object_type object_type_body;
-
-	const char *act;
-
-	char o_name[80];
-
-	bool track_removed_item = false;
-
-
-	/* Get the item to take off */
-	o_ptr = &p_ptr.inventory[item];
-
-	/* Paranoia */
-	if (amt <= 0) return (-1);
-
-	/* Verify */
-	if (amt > o_ptr.number) amt = o_ptr.number;
-
-	/* Get local object */
-	i_ptr = &object_type_body;
-
-	/* Obtain a local object */
-	object_copy(i_ptr, o_ptr);
-
-	/* Modify quantity */
-	i_ptr.number = amt;
-
-	/* Describe the object */
-	object_desc(o_name, sizeof(o_name), i_ptr, ODESC_PREFIX | ODESC_FULL);
-
-	/* Took off weapon */
-	if (item == INVEN_WIELD)
-	{
-		act = "You were wielding";
-	}
-
-	/* Took off bow */
-	else if (item == INVEN_BOW)
-	{
-		act = "You were holding";
-	}
-
-	/* Took off light */
-	else if (item == INVEN_LIGHT)
-	{
-		act = "You were holding";
-	}
-
-	/* Took off something */
-	else
-	{
-		act = "You were wearing";
-	}
-
-	/* Update object_idx if necessary, after optimization */
-	if (tracked_object_is(item))
-	{
-		track_removed_item = true;
-	}
-
-	/* Modify, Optimize */
-	inven_item_increase(item, -amt);
-	inven_item_optimize(item);
-
-	/* Carry the object */
-	slot = inven_carry(p_ptr, i_ptr);
-
-	/* Track removed item if necessary */
-	if (track_removed_item)
-	{
-		track_object(slot);
-	}
-
-	/* Message */
-	msgt(MSG_WIELD, "%s %s (%c).", act, o_name, index_to_label(slot));
-
-	p_ptr.notice |= PN_SQUELCH;
-
-	/* Return slot */
-	return (slot);
 }
 
 
