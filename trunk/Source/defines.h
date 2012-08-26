@@ -135,17 +135,7 @@ enum
 
 
 
-/*
- * Determine if a "legal" grid is an "naked" floor grid
- *
- * Line 1 -- forbid non-floors
- * Line 2 -- forbid normal objects
- * Line 3 -- forbid player/monsters
- */
-#define cave_naked_bold(Y,X) \
-	((cave.feat[Y][X] == FEAT_FLOOR) && \
-	 (cave.o_idx[Y][X] == 0) && \
-	 (cave.m_idx[Y][X] == 0))
+
 
 
 /*
