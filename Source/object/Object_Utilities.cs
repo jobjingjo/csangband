@@ -1644,41 +1644,38 @@ namespace CSAngband.Object {
 		 */
 		public static void open_quiver_slot(int slot)
 		{
-			throw new NotImplementedException();
-			//int i, pref;
-			//int dest = QUIVER_END - 1;
+			int i, pref;
+			int dest = Misc.QUIVER_END - 1;
 
-			///* This should only be used on ammunition */
-			//if (slot < QUIVER_START) return;
+			/* This should only be used on ammunition */
+			if (slot < Misc.QUIVER_START) return;
 
-			///* Quiver is full */
-			//if (p_ptr.inventory[QUIVER_END - 1].kind) return;
+			/* Quiver is full */
+			if (Misc.p_ptr.inventory[Misc.QUIVER_END - 1].kind != null) return;
 
-			///* Find the first open quiver slot */
-			//while (p_ptr.inventory[dest].kind) dest++;
+			/* Find the first open quiver slot */
+			while (Misc.p_ptr.inventory[dest].kind != null) dest++;
 
-			///* Swap things with the space one higher (essentially moving the open space
-			// * towards our goal slot. */
-			//for (i = dest - 1; i >= slot; i--)
-			//{
-			//    /* If we have an item with an inscribed location (and it's in */
-			//    /* that location) then we won't move it. */
-			//    pref = get_inscribed_ammo_slot(&p_ptr.inventory[i]);
-			//    if (i != slot && pref && pref == i) continue;
+			/* Swap things with the space one higher (essentially moving the open space
+			 * towards our goal slot. */
+			for (i = dest - 1; i >= slot; i--)
+			{
+			    /* If we have an item with an inscribed location (and it's in */
+			    /* that location) then we won't move it. */
+			    pref = Misc.p_ptr.inventory[i].get_inscribed_ammo_slot();
+			    if (i != slot && pref != 0 && pref == i) continue;
 
-			//    /* Update object_idx if necessary */
-			//    if (tracked_object_is(i))
-			//    {
-			//        track_object(dest);
-			//    }
+			    /* Update object_idx if necessary */
+			    if (Cave.tracked_object_is(i))
+			    {
+			        Cave.track_object(dest);
+			    }
 
-			//    /* Copy the item up and wipe the old slot */
-			//    COPY(&p_ptr.inventory[dest], &p_ptr.inventory[i], object_type);
-			//    dest = i;
-			//    object_wipe(&p_ptr.inventory[dest]);
-
-
-			//}
+			    /* Copy the item up and wipe the old slot */
+				Misc.p_ptr.inventory[dest] = Misc.p_ptr.inventory[i];
+			    dest = i;
+			    Misc.p_ptr.inventory[dest] = new Object();
+			}
 		}
 
 		/*
