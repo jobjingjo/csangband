@@ -207,13 +207,13 @@ namespace CSAngband {
 	
 			/* Display only the object feeling when it's first discovered. */
 			if (obj_only){
-			    Utilities.msg("You feel that %s", obj_feeling_text[obj_feeling]);
+			    Utilities.msg("You feel that {0}", obj_feeling_text[obj_feeling]);
 			    return;
 			}
 	
 			/* Players automatically get a monster feeling. */
 			if (Cave.cave.feeling_squares < Cave.FEELING1){
-			    Utilities.msg("%s.", mon_feeling_text[mon_feeling]);
+			    Utilities.msg("{0}.", mon_feeling_text[mon_feeling]);
 			    return;
 			}
 	
@@ -416,8 +416,6 @@ namespace CSAngband {
 
 				    /* Message */
 				    Utilities.msg("You found a trap!");
-
-					throw new NotImplementedException();
 
 					/* Pick a trap */
 					Trap.pick_trap(y, x);

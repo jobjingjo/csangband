@@ -680,7 +680,7 @@ namespace CSAngband.Monster {
 		 * \param m_idx is the attacking monster
 		 * \param seen is whether the player can see the monster at this moment
 		 */
-		void do_mon_spell(int spell, int m_idx, bool seen)
+		public static void do_mon_spell(int spell, int m_idx, bool seen)
 		{
 			throw new NotImplementedException();
 			//const struct mon_spell *rs_ptr = &mon_spell_table[spell];
@@ -761,7 +761,7 @@ namespace CSAngband.Monster {
 		 * \param f is the set of spell flags we're testing
 		 * \param type is the spell type(s) we're looking for
 		 */
-		bool test_spells(Bitflag f, mon_spell_type type)
+		public static bool test_spells(Bitflag f, mon_spell_type type)
 		{
 			throw new NotImplementedException();
 			//const struct mon_spell *rs_ptr;
@@ -779,7 +779,7 @@ namespace CSAngband.Monster {
 		 * \param f is the set of spell flags we're pruning
 		 * \param type is the spell type(s) we're allowing
 		 */
-		void set_spells(Bitflag f, mon_spell_type type)
+		public static void set_spells(Bitflag f, mon_spell_type type)
 		{
 			throw new NotImplementedException();
 			//const struct mon_spell *rs_ptr;

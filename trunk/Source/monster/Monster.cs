@@ -1530,109 +1530,110 @@ namespace CSAngband.Monster {
 			if (r_ptr.flags.has(Monster_Flag.SMART.value) &&
 			    m_ptr.hp < m_ptr.maxhp / 10 &&
 			    Random.randint0(100) < 50){
+
 				throw new NotImplementedException();
 
 				///* Require intelligent spells */
 				//set_spells(f, RST_HASTE | RST_ANNOY | RST_ESCAPE | RST_HEAL | RST_TACTIC | RST_SUMMON);
 			}
 
-			throw new NotImplementedException();
+			/* Remove the "ineffective" spells */
+			remove_bad_spells(m_idx, f);
 
-			///* Remove the "ineffective" spells */
-			//remove_bad_spells(m_idx, f);
+			/* Check whether summons and bolts are worth it. */
+			if (!r_ptr.flags.has(Monster_Flag.STUPID.value))
+			{
+			    /* Check for a clean bolt shot */
+			    if (Monster_Spell_Flag.test_spells(f, Monster_Spell_Flag.mon_spell_type.RST_BOLT) &&
+			        !clean_shot(m_ptr.fy, m_ptr.fx, py, px))
 
-			///* Check whether summons and bolts are worth it. */
-			//if (!rf_has(r_ptr.flags, RF_STUPID))
-			//{
-			//    /* Check for a clean bolt shot */
-			//    if (test_spells(f, RST_BOLT) &&
-			//        !clean_shot(m_ptr.fy, m_ptr.fx, py, px))
+			        /* Remove spells that will only hurt friends */
+			        Monster_Spell_Flag.set_spells(f, ~Monster_Spell_Flag.mon_spell_type.RST_BOLT);
 
-			//        /* Remove spells that will only hurt friends */
-			//        set_spells(f, ~RST_BOLT);
+			    /* Check for a possible summon */
+			    if (!(summon_possible(m_ptr.fy, m_ptr.fx)))
 
-			//    /* Check for a possible summon */
-			//    if (!(summon_possible(m_ptr.fy, m_ptr.fx)))
+			        /* Remove summoning spells */
+			        Monster_Spell_Flag.set_spells(f, ~Monster_Spell_Flag.mon_spell_type.RST_SUMMON);
+			}
 
-			//        /* Remove summoning spells */
-			//        set_spells(f, ~RST_SUMMON);
-			//}
+			/* No spells left */
+			if (f.is_empty()) return false;
 
-			///* No spells left */
-			//if (rsf_is_empty(f)) return false;
+			/* Get the monster name (or "it") */
+			m_name = m_ptr.monster_desc(0x00);
+			//Nick: Capatilize the first letter.
+			m_name = Char.ToUpper(m_name[0]) + m_name.Substring(1);
 
-			///* Get the monster name (or "it") */
-			//monster_desc(m_name, sizeof(m_name), m_ptr, 0x00);
+			/* Get the monster possessive ("his"/"her"/"its") */
+			m_poss = m_ptr.monster_desc(Desc.PRO2 | Desc.POSS);
 
-			///* Get the monster possessive ("his"/"her"/"its") */
-			//monster_desc(m_poss, sizeof(m_poss), m_ptr, MDESC_PRO2 | MDESC_POSS);
+			/* Get the "died from" name */
+			ddesc = m_ptr.monster_desc(Desc.SHOW | Desc.IND2);
 
-			///* Get the "died from" name */
-			//monster_desc(ddesc, sizeof(ddesc), m_ptr, MDESC_SHOW | MDESC_IND2);
+			/* Choose a spell to cast */
+			thrown_spell = choose_attack_spell(m_idx, f);
 
-			///* Choose a spell to cast */
-			//thrown_spell = choose_attack_spell(m_idx, f);
+			/* Abort if no spell was chosen */
+			if (thrown_spell == 0) return false;
 
-			///* Abort if no spell was chosen */
-			//if (!thrown_spell) return false;
+			/* If we see an unaware monster try to cast a spell, become aware of it */
+			if (m_ptr.unaware)
+			    become_aware(m_idx);
 
-			///* If we see an unaware monster try to cast a spell, become aware of it */
-			//if (m_ptr.unaware)
-			//    become_aware(m_idx);
+			/* Calculate spell failure rate */
+			failrate = 25 - (rlev + 3) / 4;
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] != 0)
+			    failrate += 20;
 
-			///* Calculate spell failure rate */
-			//failrate = 25 - (rlev + 3) / 4;
-			//if (m_ptr.m_timed[MON_TMD_FEAR])
-			//    failrate += 20;
+			/* Stupid monsters will never fail (for jellies and such) */
+			if (Option.birth_ai_smart.value || r_ptr.flags.has(Monster_Flag.STUPID.value))
+			    failrate = 0;
 
-			///* Stupid monsters will never fail (for jellies and such) */
-			//if (OPT(birth_ai_smart) || rf_has(r_ptr.flags, RF_STUPID))
-			//    failrate = 0;
+			/* Check for spell failure (innate attacks never fail) */
+			if ((thrown_spell >= Monster_Spell_Flag.MIN_NONINNATE_SPELL) && (Random.randint0(100) < failrate))
+			{
+			    /* Message */
+			    Utilities.msg("{0} tries to cast a spell, but fails.", m_name);
 
-			///* Check for spell failure (innate attacks never fail) */
-			//if ((thrown_spell >= MIN_NONINNATE_SPELL) && (randint0(100) < failrate))
-			//{
-			//    /* Message */
-			//    msg("%^s tries to cast a spell, but fails.", m_name);
+			    return true;
+			}
 
-			//    return true;
-			//}
+			/* Cast the spell. */
+			Cave.disturb(Misc.p_ptr, 1, 0);
 
-			///* Cast the spell. */
-			//disturb(p_ptr, 1, 0);
+			/* Special case RSF_HASTE until TMD_* and MON_TMD_* are rationalised */
+			if (thrown_spell == Monster_Spell_Flag.HASTE.value) {
+			    if (blind)
+			        Utilities.msg("{0} mumbles.", m_name);
+			    else
+			        Utilities.msg("{0} concentrates on {1} body.", m_name, m_poss);
 
-			///* Special case RSF_HASTE until TMD_* and MON_TMD_* are rationalised */
-			//if (thrown_spell == RSF_HASTE) {
-			//    if (blind)
-			//        msg("%^s mumbles.", m_name);
-			//    else
-			//        msg("%^s concentrates on %s body.", m_name, m_poss);
+			    mon_inc_timed(m_idx, Misc.MON_TMD.FAST, 50, 0, false);
+			} else
+			    Monster_Spell_Flag.do_mon_spell(thrown_spell, m_idx, seen);
 
-			//    (void)mon_inc_timed(m_idx, MON_TMD_FAST, 50, 0, false);
-			//} else
-			//    do_mon_spell(thrown_spell, m_idx, seen);
+			/* Remember what the monster did to us */
+			if (seen) {
+			    l_ptr.spell_flags.on(thrown_spell);
 
-			///* Remember what the monster did to us */
-			//if (seen) {
-			//    rsf_on(l_ptr.spell_flags, thrown_spell);
+			    /* Innate spell */
+			    if (thrown_spell < Monster_Spell_Flag.MIN_NONINNATE_SPELL) {
+			        if (l_ptr.cast_innate < byte.MaxValue)
+			            l_ptr.cast_innate++;
+			    } else {
+			    /* Bolt or Ball, or Special spell */
+			        if (l_ptr.cast_spell < byte.MaxValue)
+			            l_ptr.cast_spell++;
+			    }
+			}
+			/* Always take note of monsters that kill you */
+			if (Misc.p_ptr.is_dead && (l_ptr.deaths < short.MaxValue)) {
+			    l_ptr.deaths++;
+			}
 
-			//    /* Innate spell */
-			//    if (thrown_spell < MIN_NONINNATE_SPELL) {
-			//        if (l_ptr.cast_innate < MAX_UCHAR)
-			//            l_ptr.cast_innate++;
-			//    } else {
-			//    /* Bolt or Ball, or Special spell */
-			//        if (l_ptr.cast_spell < MAX_UCHAR)
-			//            l_ptr.cast_spell++;
-			//    }
-			//}
-			///* Always take note of monsters that kill you */
-			//if (p_ptr.is_dead && (l_ptr.deaths < MAX_SHORT)) {
-			//    l_ptr.deaths++;
-			//}
-
-			///* A spell was cast */
-			//return true;
+			/* A spell was cast */
+			return true;
 		}
 
 		/*

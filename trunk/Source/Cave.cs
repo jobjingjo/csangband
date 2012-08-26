@@ -1780,36 +1780,34 @@ namespace CSAngband {
 		 *
 		 * Currently the "m" parameter is unused.
 		 */
-		//yp and xp were both pointers
-		public static void scatter(int[] yp, int[] xp, int y, int x, int d, int m)
+		public static void scatter(out int yp, out int xp, int y, int x, int d, int m)
 		{
-			throw new NotImplementedException();
-			//int nx, ny;
+			int nx, ny;
 
 
-			///* Unused parameter */
+			/* Unused parameter */
 			//(void)m;
 
-			///* Pick a location */
-			//while (true)
-			//{
-			//    /* Pick a new location */
-			//    ny = rand_spread(y, d);
-			//    nx = rand_spread(x, d);
+			/* Pick a location */
+			while (true)
+			{
+			    /* Pick a new location */
+			    ny = Random.rand_spread(y, d);
+			    nx = Random.rand_spread(x, d);
 
-			//    /* Ignore annoying locations */
-			//    if (!in_bounds_fully(ny, nx)) continue;
+			    /* Ignore annoying locations */
+			    if (!Cave.cave.in_bounds_fully(ny, nx)) continue;
 
-			//    /* Ignore "excessively distant" locations */
-			//    if ((d > 1) && (distance(y, x, ny, nx) > d)) continue;
+			    /* Ignore "excessively distant" locations */
+			    if ((d > 1) && (distance(y, x, ny, nx) > d)) continue;
 
-			//    /* Require "line of sight" */
-			//    if (los(y, x, ny, nx)) break;
-			//}
+			    /* Require "line of sight" */
+			    if (los(y, x, ny, nx)) break;
+			}
 
-			///* Save the location */
-			//(*yp) = ny;
-			//(*xp) = nx;
+			/* Save the location */
+			yp = ny;
+			xp = nx;
 		}
 
 		public static void health_track(Player.Player p, int m_idx)

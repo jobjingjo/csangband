@@ -1313,8 +1313,7 @@ namespace CSAngband {
 		}
 
 		public static void alter(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			//do_cmd_alter_aux(args[0].direction);
+			Do_Command.alter_aux(args[0].value);
 		}
 
 

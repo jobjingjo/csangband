@@ -20,14 +20,6 @@
 #ifndef INCLUDED_MONSTER_CONSTANTS_H
 #define INCLUDED_MONSTER_CONSTANTS_H
 
-/*
- * XXX Hack: player immunity to mana draining cannot be represented by 
- * m_ptr.known_pflags, so we need this.
- */
-#define SM_IMM_MANA		0x00000800
-
-
-
 
 /* Some flags are obvious */
 #define RF_OBVIOUS_MASK \

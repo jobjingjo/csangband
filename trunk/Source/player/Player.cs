@@ -686,57 +686,56 @@ namespace CSAngband.Player {
 			else if (idx == Timed_Effect.OPP_CONF && state.flags.has(Object_Flag.RES_CONFU.value))
 			    notify = false;
 
-			throw new NotImplementedException();
-			///* Find the effect */
-			//Effect effect = &effects[idx];
+			/* Find the effect */
+			timed_effect effect = effects[(int)idx];
 
-			///* Turning off, always mention */
-			//if (v == 0)
-			//{
-			//    msgt(MSG_RECOVER, "%s", effect.on_end);
-			//    notify = true;
-			//}
+			/* Turning off, always mention */
+			if (v == 0)
+			{
+			    Utilities.msgt(Message_Type.MSG_RECOVER, "{0}", effect.on_end);
+			    notify = true;
+			}
 
-			///* Turning on, always mention */
-			//else if (p.timed[idx] == 0)
-			//{
-			//    msgt(effect.msg, "%s", effect.on_begin);
-			//    notify = true;
-			//}
+			/* Turning on, always mention */
+			else if (timed[(int)idx] == 0)
+			{
+			    Utilities.msgt(effect.msg, "{0}", effect.on_begin);
+			    notify = true;
+			}
 
-			//else if (notify)
-			//{
-			//    /* Decrementing */
-			//    if (p.timed[idx] > v && effect.on_decrease)
-			//        msgt(effect.msg, "%s", effect.on_decrease);
+			else if (notify)
+			{
+			    /* Decrementing */
+			    if (timed[(int)idx] > v && effect.on_decrease != null)
+			        Utilities.msgt(effect.msg, "{0}", effect.on_decrease);
 
-			//    /* Incrementing */
-			//    else if (v > p.timed[idx] && effect.on_increase)
-			//        msgt(effect.msg, "%s", effect.on_increase);
-			//}
+			    /* Incrementing */
+			    else if (v > timed[(int)idx] && effect.on_increase != null)
+			        Utilities.msgt(effect.msg, "{0}", effect.on_increase);
+			}
 
-			///* Use the value */
-			//p.timed[idx] = v;
+			/* Use the value */
+			timed[(int)idx] = (short)v;
 
-			///* Sort out the sprint effect */
-			//if (idx == TMD_SPRINT && v == 0)
-			//    player_inc_timed(p, TMD_SLOW, 100, true, false);
+			/* Sort out the sprint effect */
+			if (idx == Timed_Effect.SPRINT && v == 0)
+			    inc_timed(Timed_Effect.SLOW, 100, true, false);
 
-			///* Nothing to notice */
-			//if (!notify) return false;
+			/* Nothing to notice */
+			if (!notify) return false;
 
-			///* Disturb */
-			//if (OPT(disturb_state)) disturb(p_ptr, 0, 0);
+			/* Disturb */
+			if (Option.disturb_state.value) Cave.disturb(this, 0, 0);
 
-			///* Update the visuals, as appropriate. */
-			//p.update |= effect.flag_update;
-			//p.redraw |= (PR_STATUS | effect.flag_redraw);
+			/* Update the visuals, as appropriate. */
+			update |= effect.flag_update;
+			redraw |= (Misc.PR_STATUS | effect.flag_redraw);
 
-			///* Handle stuff */
-			//handle_stuff(p);
+			/* Handle stuff */
+			handle_stuff();
 
-			///* Result */
-			//return true;
+			/* Result */
+			return true;
 		}
 
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using RBM = CSAngband.Monster.Monster_Blow.RBM;
 using RBE = CSAngband.Monster.Monster_Blow.RBE;
+using CSAngband.Object;
 
 namespace CSAngband.Monster {
 	partial class Monster {
@@ -612,28 +613,26 @@ namespace CSAngband.Monster {
 						//update_smart_learn(m_ptr, p, OF_RES_FEAR);
 			        } else if(effect.value == RBE.PARALYZE.value)
 			        {
-						throw new NotImplementedException();
-						//// Hack -- Prevent perma-paralysis via damage
-						//if (p.timed[TMD_PARALYZED] && (damage < 1)) damage = 1;
+						// Hack -- Prevent perma-paralysis via damage
+						if (p.timed[(int)Timed_Effect.PARALYZED] != 0 && (damage < 1)) damage = 1;
 
-						//// Take damage
-						//take_hit(p, damage, ddesc);
+						// Take damage
+						Spell.take_hit(p, damage, ddesc);
 
-						//// Increase "paralyzed"
-						//if (randint0(100) < p.state.skills[SKILL_SAVE])
-						//{
-						//    msg("You resist the effects!");
-						//    obvious = true;
-						//}
-						//else
-						//{
-						//    if (player_inc_timed(p, TMD_PARALYZED, 3 + randint1(rlev), true,
-						//            true))
-						//        obvious = true;
-						//}
+						// Increase "paralyzed"
+						if (Random.randint0(100) < p.state.skills[(int)Skill.SAVE])
+						{
+						    Utilities.msg("You resist the effects!");
+						    obvious = true;
+						}
+						else
+						{
+						    if (p.inc_timed(Timed_Effect.PARALYZED, 3 + Random.randint1(rlev), true, true))
+						        obvious = true;
+						}
 
-						//// Learn about the player
-						//update_smart_learn(m_ptr, p, OF_FREE_ACT);
+						// Learn about the player
+						update_smart_learn(p, Object_Flag.FREE_ACT);
 			        } else if (effect.value == RBE.LOSE_STR.value)
 			        {
 						throw new NotImplementedException();

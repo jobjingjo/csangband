@@ -315,32 +315,33 @@ namespace CSAngband {
 		 */
 		public static int check_for_resist(Player.Player p, GF type, Bitflag flags, bool real)
 		{
-			throw new NotImplementedException();
-			//const struct gf_type *gf_ptr = &gf_table[type];
-			//int result = 0;
+			//GF gf_ptr = &gf_table[type];
+			GF gf_ptr = type;
 
-			//if (gf_ptr.vuln && of_has(flags, gf_ptr.vuln))
-			//    result--;
+			int result = 0;
 
-			///* If it's not a real attack, we don't check timed status explicitly */
-			//if (real && gf_ptr.opp && p.timed[gf_ptr.opp])
-			//    result++;
+			if (gf_ptr.vuln != Object.Object_Flag.NONE && flags.has(gf_ptr.vuln.value))
+			    result--;
 
-			//if (gf_ptr.resist && of_has(flags, gf_ptr.resist))
-			//    result++;
+			/* If it's not a real attack, we don't check timed status explicitly */
+			if (real && (int)gf_ptr.opp != 0 && p.timed[(int)gf_ptr.opp] != 0)
+			    result++;
 
-			//if (gf_ptr.immunity && of_has(flags, gf_ptr.immunity))
-			//    result = 3;
+			if (gf_ptr.resist != Object.Object_Flag.NONE && flags.has(gf_ptr.resist.value))
+			    result++;
 
-			///* Notice flags, if it's a real attack */
-			//if (real && gf_ptr.immunity)
-			//    wieldeds_notice_flag(p, gf_ptr.immunity);
-			//if (real && gf_ptr.resist)
-			//    wieldeds_notice_flag(p, gf_ptr.resist);
-			//if (real && gf_ptr.vuln)
-			//    wieldeds_notice_flag(p, gf_ptr.vuln);
+			if (gf_ptr.immunity != Object.Object_Flag.NONE && flags.has(gf_ptr.immunity.value))
+			    result = 3;
 
-			//return result;
+			/* Notice flags, if it's a real attack */
+			if (real && gf_ptr.immunity.value != 0)
+			    Object.Object.wieldeds_notice_flag(p, gf_ptr.immunity.value);
+			if (real && gf_ptr.resist.value  != 0)
+			    Object.Object.wieldeds_notice_flag(p, gf_ptr.resist.value);
+			if (real && gf_ptr.vuln.value != 0)
+			    Object.Object.wieldeds_notice_flag(p, gf_ptr.vuln.value);
+
+			return result;
 		}
 
 	}
