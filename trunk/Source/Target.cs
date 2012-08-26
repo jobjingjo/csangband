@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CSAngband.Monster;
 
 namespace CSAngband {
 	class Target {
@@ -19,6 +20,15 @@ namespace CSAngband {
 		public const int XTRA =  0x04;
 		public const int GRID =  0x08;
 		public const int QUIET = 0x10;
+
+
+		public const int TS_INITIAL_SIZE = 20;
+
+		/*
+		 * Height of the help screen; any higher than 4 will overlap the health
+		 * bar which we want to keep in targeting mode.
+		 */
+		public const int HELP_HEIGHT = 3;
 
 		/*** File-wide variables ***/
 
@@ -163,442 +173,1244 @@ namespace CSAngband {
 		 */
 		public static bool set_interactive(int mode, int x, int y)
 		{
-			throw new NotImplementedException();
-			//int py = p_ptr.py;
-			//int px = p_ptr.px;
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
 
-			//int path_n;
-			//u16b path_g[256];
+			int path_n;
+			List<ushort> path_g = new List<ushort>();//[256];
 
-			//int i, d, m, t, bd;
-			//int wid, hgt, help_prompt_loc;
+			int i, d, m, t, bd;
+			int wid, hgt, help_prompt_loc;
 
-			//bool done = false;
-			//bool flag = true;
-			//bool help = false;
+			bool done = false;
+			bool flag = true;
+			bool help = false;
 
-			//struct keypress query;
+			keypress query;
 
-			///* These are used for displaying the path to the target */
-			//char path_char[MAX_RANGE];
-			//byte path_attr[MAX_RANGE];
-			//struct point_set *targets;
+			/* These are used for displaying the path to the target */
+			char[] path_char = new char[Misc.MAX_RANGE];
+			ConsoleColor[] path_attr = new ConsoleColor[Misc.MAX_RANGE];
+			List<Loc> targets;
 
-			///* If we haven't been given an initial location, start on the
-			//   player. */
-			//if (x == -1 || y == -1)
-			//{
-			//    x = p_ptr.px;
-			//    y = p_ptr.py;
-			//}
-			///* If we /have/ been given an initial location, make sure we
-			//   honour it by going into "free targetting" mode. */
-			//else
-			//{
-			//    flag = false;
-			//}
+			/* If we haven't been given an initial location, start on the
+			   player. */
+			if (x == -1 || y == -1)
+			{
+			    x = Misc.p_ptr.px;
+			    y = Misc.p_ptr.py;
+			}
+			/* If we /have/ been given an initial location, make sure we
+			   honour it by going into "free targetting" mode. */
+			else
+			{
+			    flag = false;
+			}
 
-			///* Cancel target */
-			//target_set_monster(0);
+			/* Cancel target */
+			Target.set_monster(0);
 
-			///* Cancel tracking */
-			///* health_track(0); */
+			/* Cancel tracking */
+			/* health_track(0); */
 
-			///* Calculate the window location for the help prompt */
-			//Term_get_size(&wid, &hgt);
-			//help_prompt_loc = hgt - 1;
+			/* Calculate the window location for the help prompt */
+			Term.get_size(out wid, out hgt);
+			help_prompt_loc = hgt - 1;
 	
-			///* Display the help prompt */
-			//prt("Press '?' for help.", help_prompt_loc, 0);
+			/* Display the help prompt */
+			Utilities.prt("Press '?' for help.", help_prompt_loc, 0);
 
-			///* Prepare the target set */
-			//targets = target_set_interactive_prepare(mode);
+			/* Prepare the target set */
+			targets = Target.set_interactive_prepare(mode);
 
-			///* Start near the player */
-			//m = 0;
+			/* Start near the player */
+			m = 0;
 
-			///* Interact */
-			//while (!done) {
-			//    bool path_drawn = false;
+			/* Interact */
+			while (!done) {
+			    bool path_drawn = false;
 		
-			//    /* Interesting grids */
-			//    if (flag && point_set_size(targets))
-			//    {
-			//        y = targets.pts[m].y;
-			//        x = targets.pts[m].x;
+			    /* Interesting grids */
+			    if (flag && targets.Count() != 0)
+			    {
+			        y = targets[m].y;
+			        x = targets[m].x;
 
-			//        /* Adjust panel if needed */
-			//        if (adjust_panel_help(y, x, help)) handle_stuff(p_ptr);
+			        /* Adjust panel if needed */
+			        if (adjust_panel_help(y, x, help)) Misc.p_ptr.handle_stuff();
 		
-			//        /* Update help */
-			//        if (help) {
-			//            bool good_target = (cave.m_idx[y][x] > 0) &&
-			//                target_able(cave.m_idx[y][x]);
-			//            target_display_help(good_target, !(flag && point_set_size(targets)));
-			//        }
+			        /* Update help */
+			        if (help) {
+			            bool good_target = (Cave.cave.m_idx[y][x] > 0) &&
+			                Target.able(Cave.cave.m_idx[y][x]);
+			            Target.display_help(good_target, !(flag && targets.Count() != 0));
+			        }
 
-			//        /* Find the path. */
-			//        path_n = project_path(path_g, MAX_RANGE, py, px, y, x, PROJECT_THRU);
+			        /* Find the path. */
+			        path_n = Cave.project_path(out path_g, Misc.MAX_RANGE, py, px, y, x, Spell.PROJECT_THRU);
 
-			//        /* Draw the path in "target" mode. If there is one */
-			//        if (mode & (TARGET_KILL))
-			//            path_drawn = draw_path(path_n, path_g, path_char, path_attr, py, px);
+			        /* Draw the path in "target" mode. If there is one */
+			        if ((mode & (KILL)) != 0)
+			            path_drawn = draw_path(path_g, path_char, path_attr, py, px) != 0;
 
-			//        /* Describe and Prompt */
-			//        query = target_set_interactive_aux(y, x, mode);
+			        /* Describe and Prompt */
+			        query = Target.set_interactive_aux(y, x, mode);
 
-			//        /* Remove the path */
-			//        if (path_drawn) load_path(path_n, path_g, path_char, path_attr);
+			        /* Remove the path */
+			        if (path_drawn) load_path(path_g, path_char, path_attr);
 
-			//        /* Cancel tracking */
-			//        /* health_track(0); */
+			        /* Cancel tracking */
+			        /* health_track(0); */
 
-			//        /* Assume no "direction" */
-			//        d = 0;
+			        /* Assume no "direction" */
+			        d = 0;
 
 
-			//        /* Analyze */
-			//        switch (query.code)
-			//        {
-			//            case ESCAPE:
-			//            case 'q':
-			//            {
-			//                done = true;
-			//                break;
-			//            }
+			        /* Analyze */
+			        switch ((char)query.code)
+			        {
+			            case (char)keycode_t.ESCAPE:
+			            case 'q':
+			            {
+			                done = true;
+			                break;
+			            }
 
-			//            case ' ':
-			//            case '*':
-			//            case '+':
-			//            {
-			//                if (++m == point_set_size(targets))
-			//                    m = 0;
+			            case ' ':
+			            case '*':
+			            case '+':
+			            {
+			                if (++m == targets.Count())
+			                    m = 0;
 
-			//                break;
-			//            }
+			                break;
+			            }
 
-			//            case '-':
-			//            {
-			//                if (m-- == 0)
-			//                    m = point_set_size(targets) - 1;
+			            case '-':
+			            {
+			                if (m-- == 0)
+			                    m = targets.Count() - 1;
 
-			//                break;
-			//            }
+			                break;
+			            }
 
-			//            case 'p':
-			//            {
-			//                /* Recenter around player */
-			//                verify_panel();
+			            case 'p':
+			            {
+			                /* Recenter around player */
+			                Xtra2.verify_panel();
 
-			//                /* Handle stuff */
-			//                handle_stuff(p_ptr);
+			                /* Handle stuff */
+			                Misc.p_ptr.handle_stuff();
 
-			//                y = p_ptr.py;
-			//                x = p_ptr.px;
-			//            }
+			                y = Misc.p_ptr.py;
+			                x = Misc.p_ptr.px;
+							flag = false;
+							break;
+			            }
 
-			//            case 'o':
-			//            {
-			//                flag = false;
-			//                break;
-			//            }
+			            case 'o':
+			            {
+			                flag = false;
+			                break;
+			            }
 
-			//            case 'm':
-			//            {
-			//                break;
-			//            }
+			            case 'm':
+			            {
+			                break;
+			            }
 
-			//            case 't':
-			//            case '5':
-			//            case '0':
-			//            case '.':
-			//            {
-			//                int m_idx = cave.m_idx[y][x];
+			            case 't':
+			            case '5':
+			            case '0':
+			            case '.':
+			            {
+			                int m_idx = Cave.cave.m_idx[y][x];
 
-			//                if ((m_idx > 0) && target_able(m_idx))
-			//                {
-			//                    health_track(p_ptr, m_idx);
-			//                    target_set_monster(m_idx);
-			//                    done = true;
-			//                }
-			//                else
-			//                {
-			//                    bell("Illegal target!");
-			//                }
-			//                break;
-			//            }
+			                if ((m_idx > 0) && Target.able(m_idx))
+			                {
+			                    Cave.health_track(Misc.p_ptr, m_idx);
+			                    Target.set_monster(m_idx);
+			                    done = true;
+			                }
+			                else
+			                {
+			                    Utilities.bell("Illegal target!");
+			                }
+			                break;
+			            }
 
-			//            case 'g':
-			//            {
-			//                cmd_insert(CMD_PATHFIND);
-			//                cmd_set_arg_point(cmd_get_top(), 0, y, x);
-			//                done = true;
-			//                break;
-			//            }
+			            case 'g':
+			            {
+							Game_Command.insert(Command_Code.PATHFIND);
+							Game_Command.get_top().set_arg_point(0, y, x);
+			                done = true;
+			                break;
+			            }
 				
-			//            case '?':
-			//            {
-			//                help = !help;
+			            case '?':
+			            {
+			                help = !help;
 					
-			//                /* Redraw main window */
-			//                p_ptr.redraw |= (PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIP);
-			//                Term_clear();
-			//                handle_stuff(p_ptr);
-			//                if (!help)
-			//                    prt("Press '?' for help.", help_prompt_loc, 0);
+			                /* Redraw main window */
+			                Misc.p_ptr.redraw |= (uint)(Misc.PR_BASIC | Misc.PR_EXTRA | Misc.PR_MAP | Misc.PR_EQUIP);
+			                Term.clear();
+			                Misc.p_ptr.handle_stuff();
+			                if (!help)
+			                    Utilities.prt("Press '?' for help.", help_prompt_loc, 0);
 					
-			//                break;
-			//            }
+			                break;
+			            }
 
-			//            default:
-			//            {
-			//                /* Extract direction */
-			//                d = target_dir(query);
+			            default:
+			            {
+			                /* Extract direction */
+			                d = Utilities.target_dir(query);
 
-			//                /* Oops */
-			//                if (!d) bell("Illegal command for target mode!");
+			                /* Oops */
+			                if (d == 0) Utilities.bell("Illegal command for target mode!");
 
-			//                break;
-			//            }
-			//        }
+			                break;
+			            }
+			        }
 
-			//        /* Hack -- move around */
-			//        if (d)
-			//        {
-			//            int old_y = targets.pts[m].y;
-			//            int old_x = targets.pts[m].x;
+			        /* Hack -- move around */
+			        if (d != 0)
+			        {
+			            int old_y = targets[m].y;
+			            int old_x = targets[m].x;
 
-			//            /* Find a new monster */
-			//            i = target_pick(old_y, old_x, ddy[d], ddx[d], targets);
+			            /* Find a new monster */
+			            i = Target.pick(old_y, old_x, Misc.ddy[d], Misc.ddx[d], targets);
 
-			//            /* Scroll to find interesting grid */
-			//            if (i < 0)
-			//            {
-			//                int old_wy = Term.offset_y;
-			//                int old_wx = Term.offset_x;
+			            /* Scroll to find interesting grid */
+			            if (i < 0)
+			            {
+			                int old_wy = Term.instance.offset_y;
+			                int old_wx = Term.instance.offset_x;
 
-			//                /* Change if legal */
-			//                if (change_panel(d))
-			//                {
-			//                    /* Recalculate interesting grids */
-			//                    point_set_dispose(targets);
-			//                    targets = target_set_interactive_prepare(mode);
+			                /* Change if legal */
+			                if (Xtra2.change_panel(d))
+			                {
+			                    /* Recalculate interesting grids */
+			                    //point_set_dispose(targets);
+			                    targets = Target.set_interactive_prepare(mode);
 
-			//                    /* Find a new monster */
-			//                    i = target_pick(old_y, old_x, ddy[d], ddx[d], targets);
+			                    /* Find a new monster */
+			                    i = Target.pick(old_y, old_x, Misc.ddy[d], Misc.ddx[d], targets);
 
-			//                    /* Restore panel if needed */
-			//                    if ((i < 0) && modify_panel(Term, old_wy, old_wx))
-			//                    {
-			//                        /* Recalculate interesting grids */
-			//                        point_set_dispose(targets);
-			//                        targets = target_set_interactive_prepare(mode);
-			//                    }
+			                    /* Restore panel if needed */
+			                    if ((i < 0) && Xtra2.modify_panel(Term.instance, old_wy, old_wx))
+			                    {
+			                        /* Recalculate interesting grids */
+			                        //point_set_dispose(targets);
+			                        targets = Target.set_interactive_prepare(mode);
+			                    }
 
-			//                    /* Handle stuff */
-			//                    handle_stuff(p_ptr);
-			//                }
-			//            }
+			                    /* Handle stuff */
+			                    Misc.p_ptr.handle_stuff();
+			                }
+			            }
 
-			//            /* Use interesting grid if found */
-			//            if (i >= 0) m = i;
-			//        }
-			//    }
+			            /* Use interesting grid if found */
+			            if (i >= 0) m = i;
+			        }
+			    }
 
-			//    /* Arbitrary grids */
-			//    else
-			//    {
-			//        /* Update help */
-			//        if (help) 
-			//        {
-			//            bool good_target = ((cave.m_idx[y][x] > 0) && target_able(cave.m_idx[y][x]));
-			//            target_display_help(good_target, !(flag && point_set_size(targets)));
-			//        }
+			    /* Arbitrary grids */
+			    else
+			    {
+			        /* Update help */
+			        if (help) 
+			        {
+			            bool good_target = ((Cave.cave.m_idx[y][x] > 0) && Target.able(Cave.cave.m_idx[y][x]));
+			            Target.display_help(good_target, !(flag && targets.Count() != 0));
+			        }
 
-			//        /* Find the path. */
-			//        path_n = project_path(path_g, MAX_RANGE, py, px, y, x, PROJECT_THRU);
+			        /* Find the path. */
+			        path_n = Cave.project_path(out path_g, Misc.MAX_RANGE, py, px, y, x, Spell.PROJECT_THRU);
 
-			//        /* Draw the path in "target" mode. If there is one */
-			//        if (mode & (TARGET_KILL))
-			//            path_drawn = draw_path (path_n, path_g, path_char, path_attr, py, px);
+			        /* Draw the path in "target" mode. If there is one */
+			        if ((mode & (KILL)) != 0)
+			            path_drawn = draw_path(path_g, path_char, path_attr, py, px) != 0;
 
-			//        /* Describe and Prompt (enable "TARGET_LOOK") */
-			//        query = target_set_interactive_aux(y, x, mode | TARGET_LOOK);
+			        /* Describe and Prompt (enable "TARGET_LOOK") */
+			        query = Target.set_interactive_aux(y, x, mode | LOOK);
 
-			//        /* Remove the path */
-			//        if (path_drawn)  load_path(path_n, path_g, path_char, path_attr);
+			        /* Remove the path */
+			        if (path_drawn)  load_path(path_g, path_char, path_attr);
 
-			//        /* Cancel tracking */
-			//        /* health_track(0); */
+			        /* Cancel tracking */
+			        /* health_track(0); */
 
-			//        /* Assume no direction */
-			//        d = 0;
+			        /* Assume no direction */
+			        d = 0;
 
-			//        /* Analyze the keypress */
-			//        switch (query.code)
-			//        {
-			//            case ESCAPE:
-			//            case 'q':
-			//            {
-			//                done = true;
-			//                break;
-			//            }
+			        /* Analyze the keypress */
+			        switch ((char)query.code)
+			        {
+			            case (char)keycode_t.ESCAPE:
+			            case 'q':
+			            {
+			                done = true;
+			                break;
+			            }
 
-			//            case ' ':
-			//            case '*':
-			//            case '+':
-			//            case '-':
-			//            {
-			//                break;
-			//            }
+			            case ' ':
+			            case '*':
+			            case '+':
+			            case '-':
+			            {
+			                break;
+			            }
 
-			//            case 'p':
-			//            {
-			//                /* Recenter around player */
-			//                verify_panel();
+			            case 'p':
+			            {
+			                /* Recenter around player */
+			                Xtra2.verify_panel();
 
-			//                /* Handle stuff */
-			//                handle_stuff(p_ptr);
+			                /* Handle stuff */
+			                Misc.p_ptr.handle_stuff();
 
-			//                y = p_ptr.py;
-			//                x = p_ptr.px;
-			//            }
+			                y = Misc.p_ptr.py;
+			                x = Misc.p_ptr.px;
+							break;
+			            }
 
-			//            case 'o':
-			//            {
-			//                break;
-			//            }
+			            case 'o':
+			            {
+			                break;
+			            }
 
-			//            case 'm':
-			//            {
-			//                flag = true;
+			            case 'm':
+			            {
+			                flag = true;
 
-			//                m = 0;
-			//                bd = 999;
+			                m = 0;
+			                bd = 999;
 
-			//                /* Pick a nearby monster */
-			//                for (i = 0; i < point_set_size(targets); i++)
-			//                {
-			//                    t = distance(y, x, targets.pts[i].y, targets.pts[i].x);
+			                /* Pick a nearby monster */
+			                for (i = 0; i < targets.Count(); i++)
+			                {
+			                    t = Cave.distance(y, x, targets[i].y, targets[i].x);
 
-			//                    /* Pick closest */
-			//                    if (t < bd)
-			//                    {
-			//                        m = i;
-			//                        bd = t;
-			//                    }
-			//                }
+			                    /* Pick closest */
+			                    if (t < bd)
+			                    {
+			                        m = i;
+			                        bd = t;
+			                    }
+			                }
 
-			//                /* Nothing interesting */
-			//                if (bd == 999) flag = false;
+			                /* Nothing interesting */
+			                if (bd == 999) flag = false;
 
-			//                break;
-			//            }
+			                break;
+			            }
 
-			//            case 't':
-			//            case '5':
-			//            case '0':
-			//            case '.':
-			//            {
-			//                target_set_location(y, x);
-			//                done = true;
-			//                break;
-			//            }
+			            case 't':
+			            case '5':
+			            case '0':
+			            case '.':
+			            {
+							Target.set_location(y, x);
+			                done = true;
+			                break;
+			            }
 
-			//            case 'g':
-			//            {
-			//                cmd_insert(CMD_PATHFIND);
-			//                cmd_set_arg_point(cmd_get_top(), 0, y, x);
-			//                done = true;
-			//                break;
-			//            }
+			            case 'g':
+			            {
+							Game_Command.insert(Command_Code.PATHFIND);
+							Game_Command.get_top().set_arg_point(0, y, x);
+			                done = true;
+			                break;
+			            }
 
-			//            case '?':
-			//            {
-			//                help = !help;
+			            case '?':
+			            {
+			                help = !help;
 					
-			//                /* Redraw main window */
-			//                p_ptr.redraw |= (PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIP);
-			//                Term_clear();
-			//                handle_stuff(p_ptr);
-			//                if (!help)
-			//                    prt("Press '?' for help.", help_prompt_loc, 0);
+			                /* Redraw main window */
+			                Misc.p_ptr.redraw |= (uint)(Misc.PR_BASIC | Misc.PR_EXTRA | Misc.PR_MAP | Misc.PR_EQUIP);
+			                Term.clear();
+			                Misc.p_ptr.handle_stuff();
+			                if (!help)
+			                    Utilities.prt("Press '?' for help.", help_prompt_loc, 0);
 					
-			//                break;
-			//            }
+			                break;
+			            }
 
-			//            default:
-			//            {
-			//                /* Extract a direction */
-			//                d = target_dir(query);
+			            default:
+			            {
+			                /* Extract a direction */
+			                d = Utilities.target_dir(query);
 
-			//                /* Oops */
-			//                if (!d) bell("Illegal command for target mode!");
+			                /* Oops */
+			                if (d == 0) Utilities.bell("Illegal command for target mode!");
 
-			//                break;
-			//            }
-			//        }
+			                break;
+			            }
+			        }
 
-			//        /* Handle "direction" */
-			//        if (d)
-			//        {
-			//            int dungeon_hgt = (p_ptr.depth == 0) ? TOWN_HGT : DUNGEON_HGT;
-			//            int dungeon_wid = (p_ptr.depth == 0) ? TOWN_WID : DUNGEON_WID;
+			        /* Handle "direction" */
+			        if (d != 0)
+			        {
+			            int dungeon_hgt = (Misc.p_ptr.depth == 0) ? Cave.TOWN_HGT : Cave.DUNGEON_HGT;
+			            int dungeon_wid = (Misc.p_ptr.depth == 0) ? Cave.TOWN_WID : Cave.DUNGEON_WID;
 
-			//            /* Move */
-			//            x += ddx[d];
-			//            y += ddy[d];
+			            /* Move */
+			            x += Misc.ddx[d];
+			            y += Misc.ddy[d];
 
-			//            /* Slide into legality */
-			//            if (x >= dungeon_wid - 1) x--;
-			//            else if (x <= 0) x++;
+			            /* Slide into legality */
+			            if (x >= dungeon_wid - 1) x--;
+			            else if (x <= 0) x++;
 
-			//            /* Slide into legality */
-			//            if (y >= dungeon_hgt - 1) y--;
-			//            else if (y <= 0) y++;
+			            /* Slide into legality */
+			            if (y >= dungeon_hgt - 1) y--;
+			            else if (y <= 0) y++;
 
-			//            /* Adjust panel if needed */
-			//            if (adjust_panel_help(y, x, help))
-			//            {
-			//                /* Handle stuff */
-			//                handle_stuff(p_ptr);
+			            /* Adjust panel if needed */
+			            if (adjust_panel_help(y, x, help))
+			            {
+			                /* Handle stuff */
+			                Misc.p_ptr.handle_stuff();
 
-			//                /* Recalculate interesting grids */
-			//                point_set_dispose(targets);
-			//                targets = target_set_interactive_prepare(mode);
-			//            }
-			//        }
-			//    }
-			//}
+			                /* Recalculate interesting grids */
+			                //point_set_dispose(targets);
+			                targets = Target.set_interactive_prepare(mode);
+			            }
+			        }
+			    }
+			}
 
-			///* Forget */
+			/* Forget */
 			//point_set_dispose(targets);
 
-			///* Redraw as necessary */
-			//if (help)
-			//{
-			//    p_ptr.redraw |= (PR_BASIC | PR_EXTRA | PR_MAP | PR_EQUIP);
-			//    Term_clear();
-			//}
-			//else
-			//{
-			//    prt("", 0, 0);
-			//    prt("", help_prompt_loc, 0);
-			//    p_ptr.redraw |= (PR_DEPTH | PR_STATUS);
-			//}
+			/* Redraw as necessary */
+			if (help)
+			{
+			    Misc.p_ptr.redraw |= (uint)(Misc.PR_BASIC | Misc.PR_EXTRA | Misc.PR_MAP | Misc.PR_EQUIP);
+			    Term.clear();
+			}
+			else
+			{
+			    Utilities.prt("", 0, 0);
+			    Utilities.prt("", help_prompt_loc, 0);
+			    Misc.p_ptr.redraw |= (Misc.PR_DEPTH | Misc.PR_STATUS);
+			}
 
-			///* Recenter around player */
-			//verify_panel();
+			/* Recenter around player */
+			Xtra2.verify_panel();
 
-			///* Handle stuff */
-			//handle_stuff(p_ptr);
+			/* Handle stuff */
+			Misc.p_ptr.handle_stuff();
 
-			///* Failure to set target */
-			//if (!target_set) return (false);
+			/* Failure to set target */
+			if (!target_set) return (false);
 
-			///* Success */
-			//return (true);
+			/* Success */
+			return (true);
 		}
+
+		/*
+		 * Hack -- help "select" a location (see below)
+		 */
+		static short pick(int y1, int x1, int dy, int dx, List<Loc> targets)
+		{
+			int i, v;
+
+			int x2, y2, x3, y3, x4, y4;
+
+			int b_i = -1, b_v = 9999;
+
+
+			/* Scan the locations */
+			for (i = 0; i < targets.Count(); i++)
+			{
+				/* Point 2 */
+				x2 = targets[i].x;
+				y2 = targets[i].y;
+
+				/* Directed distance */
+				x3 = (x2 - x1);
+				y3 = (y2 - y1);
+
+				/* Verify quadrant */
+				if (dx != 0 && (x3 * dx <= 0)) continue;
+				if (dy != 0 && (y3 * dy <= 0)) continue;
+
+				/* Absolute distance */
+				x4 = Math.Abs(x3);
+				y4 = Math.Abs(y3);
+
+				/* Verify quadrant */
+				if (dy != 0 && dx == 0 && (x4 > y4)) continue;
+				if (dx != 0 && dy == 0 && (y4 > x4)) continue;
+
+				/* Approximate Double Distance */
+				v = ((x4 > y4) ? (x4 + x4 + y4) : (y4 + y4 + x4));
+
+				/* Penalize location XXX XXX XXX */
+
+				/* Track best */
+				if ((b_i >= 0) && (v >= b_v)) continue;
+
+				/* Track best */
+				b_i = i; b_v = v;
+			}
+
+			/* Result */
+			return (short)(b_i);
+		}
+
+		/*
+		 * Monster health description
+		 */
+		static string look_mon_desc(int m_idx)
+		{
+			string buf;
+			Monster.Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
+			Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			bool living = true;
+
+
+			/* Determine if the monster is "living" (vs "undead") */
+			if (r_ptr.monster_is_unusual()) living = false;
+
+
+			/* Healthy monsters */
+			if (m_ptr.hp >= m_ptr.maxhp)
+			{
+				/* No damage */
+				buf = living ? "unhurt" : "undamaged";
+			}
+			else
+			{
+				/* Calculate a health "percentage" */
+				int perc = (int)(100L * m_ptr.hp / m_ptr.maxhp);
+
+				if(perc >= 60)
+					buf = living ? "somewhat wounded" : "somewhat damaged";
+				else if(perc >= 25)
+					buf = living ? "wounded" : "damaged";
+				else if(perc >= 10)
+					buf = living ? "badly wounded" : "badly damaged";
+				else
+					buf = living ? "almost dead" : "almost destroyed";
+			}
+
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.SLEEP] != 0) buf += ", asleep";
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.CONF] != 0) buf += ", confused";
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.FEAR] != 0) buf += ", afraid";
+			if (m_ptr.m_timed[(int)Misc.MON_TMD.STUN] != 0) buf += ", stunned";
+
+			return buf;
+		}
+
+		/*
+		 * Describe a location relative to the player position.
+		 * e.g. "12 S 35 W" or "0 N, 33 E" or "0 N, 0 E"
+		 */
+		static string coords_desc(int y, int x)
+		{
+			string east_or_west;
+			string north_or_south;
+
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
+
+			if (y > py)
+				north_or_south = "S";
+			else
+				north_or_south = "N";
+
+			if (x < px)
+				east_or_west = "W";
+			else
+				east_or_west = "E";
+
+			string buf = String.Format("{0} {1}, {2} {3}", Math.Abs(y-py), north_or_south, 
+				Math.Abs(x-px), east_or_west);
+
+			return buf;
+		}
+
+
+		/*
+		 * Examine a grid, return a keypress.
+		 *
+		 * The "mode" argument contains the "TARGET_LOOK" bit flag, which
+		 * indicates that the "space" key should scan through the contents
+		 * of the grid, instead of simply returning immediately.  This lets
+		 * the "look" command get complete information, without making the
+		 * "target" command annoying.
+		 *
+		 * The "info" argument contains the "commands" which should be shown
+		 * inside the "[xxx]" text.  This string must never be empty, or grids
+		 * containing monsters will be displayed with an extra comma.
+		 *
+		 * Note that if a monster is in the grid, we update both the monster
+		 * recall info and the health bar info to track that monster.
+		 *
+		 * This function correctly handles multiple objects per grid, and objects
+		 * and terrain features in the same grid, though the latter never happens.
+		 *
+		 * This function must handle blindness/hallucination.
+		 */
+		static keypress set_interactive_aux(int y, int x, int mode)
+		{
+			short this_o_idx = 0, next_o_idx = 0;
+
+			string s1, s2, s3;
+
+			bool boring;
+
+			int feat;
+
+			int[] floor_list = new int[Misc.MAX_FLOOR_STACK];
+			int floor_num;
+
+			keypress query = new keypress();
+
+			string out_val = "";//new char[256];
+
+			string coords;//new char[20];
+
+			/* Describe the square location */
+			coords = coords_desc(y, x);
+
+			/* Repeat forever */
+			while (true)
+			{
+			    /* Paranoia */
+			    query.code = (keycode_t)' ';
+
+			    /* Assume boring */
+			    boring = true;
+
+			    /* Default */
+			    s1 = "You see ";
+			    s2 = "";
+			    s3 = "";
+
+
+			    /* The player */
+			    if (Cave.cave.m_idx[y][x] < 0)
+			    {
+			        /* Description */
+			        s1 = "You are ";
+
+			        /* Preposition */
+			        s2 = "on ";
+			    }
+
+			    /* Hallucination messes things up */
+			    if (Misc.p_ptr.timed[(int)Timed_Effect.IMAGE] != 0)
+			    {
+					throw new NotImplementedException();
+					//const char *name = "something strange";
+
+					///* Display a message */
+					//if (p_ptr.wizard)
+					//    strnfmt(out_val, sizeof(out_val), "%s%s%s%s, %s (%d:%d).",
+					//            s1, s2, s3, name, coords, y, x);
+					//else
+					//    strnfmt(out_val, sizeof(out_val), "%s%s%s%s, %s.",
+					//            s1, s2, s3, name, coords);
+
+					//prt(out_val, 0, 0);
+					//move_cursor_relative(y, x);
+					//query = inkey();
+
+					///* Stop on everything but "return" */
+					//if (query.code == '\n' || query.code == '\r')
+					//    continue;
+
+					//return query;
+			    }
+
+			    /* Actual monsters */
+			    if (Cave.cave.m_idx[y][x] > 0)
+			    {
+			        Monster.Monster m_ptr = Cave.cave_monster(Cave.cave, Cave.cave.m_idx[y][x]);
+			        Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			        /* Visible */
+			        if (m_ptr.ml && !m_ptr.unaware)
+			        {
+			            bool recall = false;
+
+			            //char m_name[80];
+						string m_name;
+
+			            /* Not boring */
+			            boring = false;
+
+			            /* Get the monster name ("a kobold") */
+			            m_name = m_ptr.monster_desc(Monster.Monster.Desc.IND2);
+
+			            /* Hack -- track this monster race */
+			            Cave.monster_race_track(m_ptr.r_idx);
+
+			            /* Hack -- health bar for this monster */
+			            Cave.health_track(Misc.p_ptr, Cave.cave.m_idx[y][x]);
+
+			            /* Hack -- handle stuff */
+			            Misc.p_ptr.handle_stuff();
+
+			            /* Interact */
+			            while (true)
+			            {
+			                /* Recall */
+			                if (recall)
+			                {
+			                    /* Save screen */
+			                    Utilities.screen_save();
+
+			                    /* Recall on screen */
+			                    Monster_Lore.screen_roff(m_ptr.r_idx);
+
+			                    /* Command */
+			                    query = Utilities.inkey();
+
+			                    /* Load screen */
+			                    Utilities.screen_load();
+			                }
+
+			                /* Normal */
+			                else
+			                {
+			                    //char buf[80];
+								string buf;
+
+			                    /* Describe the monster */
+			                    buf = look_mon_desc(Cave.cave.m_idx[y][x]);
+
+			                    /* Describe, and prompt for recall */
+			                    if (Misc.p_ptr.wizard)
+			                    {
+									out_val = String.Format("{0}{1}{2}{3} ({4}), {5} ({6}:{7}).",
+			                                s1, s2, s3, m_name, buf, coords, y, x);
+			                    }
+			                    else
+			                    {
+									out_val = String.Format("{0}{1}{2}{3} ({4}), {5}.",
+			                                s1, s2, s3, m_name, buf, coords);
+			                    }
+
+			                    Utilities.prt(out_val, 0, 0);
+
+			                    /* Place cursor */
+			                    Cave.move_cursor_relative(y, x);
+
+			                    /* Command */
+			                    query = Utilities.inkey();
+			                }
+
+			                /* Normal commands */
+			                if (query.code == (keycode_t)'r')
+			                    recall = !recall;
+			                else
+			                    break;
+			            }
+
+			            /* Stop on everything but "return"/"space" */
+			            if ((char)query.code != '\n' && (char)query.code != '\r' && (char)query.code != ' ')
+			                break;
+
+			            /* Sometimes stop at "space" key */
+			            if (((char)query.code == ' ') && (mode & (LOOK)) == 0) break;
+
+			            /* Take account of gender */
+			            if (r_ptr.flags.has(Monster_Flag.FEMALE.value)) s1 = "She is ";
+			            else if (r_ptr.flags.has(Monster_Flag.MALE.value)) s1 = "He is ";
+			            else s1 = "It is ";
+
+			            /* Use a verb */
+			            s2 = "carrying ";
+
+			            /* Scan all objects being carried */
+			            for (this_o_idx = m_ptr.hold_o_idx; this_o_idx != 0; this_o_idx = next_o_idx)
+			            {
+							string o_name;
+							//char o_name[80];
+
+			                Object.Object o_ptr;
+
+			                /* Get the object */
+			                o_ptr = Object.Object.byid(this_o_idx);
+
+			                /* Get the next object */
+			                next_o_idx = o_ptr.next_o_idx;
+
+			                /* Obtain an object description */
+			                o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
+
+			                /* Describe the object */
+			                if (Misc.p_ptr.wizard)
+			                {
+			                    out_val = String.Format("{0}{1}{2}{3}, {4} ({5}:{6}).",
+			                            s1, s2, s3, o_name, coords, y, x);
+			                }
+			                /* Disabled since monsters now carry their drops
+			                else
+			                {
+			                    strnfmt(out_val, sizeof(out_val),
+			                            "%s%s%s%s, %s.", s1, s2, s3, o_name, coords);
+			                } */
+
+			                Utilities.prt(out_val, 0, 0);
+			                Cave.move_cursor_relative(y, x);
+			                query = Utilities.inkey();
+
+			                /* Stop on everything but "return"/"space" */
+			                if (((char)query.code != '\n') && ((char)query.code != '\r') && ((char)query.code != ' ')) break;
+
+			                /* Sometimes stop at "space" key */
+			                if (((char)query.code == ' ') && (mode & (LOOK)) == 0) break;
+
+			                /* Change the intro */
+			                s2 = "also carrying ";
+			            }
+
+			            /* Double break */
+			            if (this_o_idx != 0) break;
+
+			            /* Use a preposition */
+			            s2 = "on ";
+			        }
+			    }
+
+			    /* Assume not floored */
+			    floor_num = Object.Object.scan_floor(floor_list, floor_list.Length, y, x, 0x02);
+
+			    /* Scan all marked objects in the grid */
+			    if ((floor_num > 0) && ((Misc.p_ptr.timed[(int)Timed_Effect.BLIND] == 0) || (y == Misc.p_ptr.py && x == Misc.p_ptr.px)))
+			    {
+			        /* Not boring */
+			        boring = false;
+
+			        Cave.track_object(-floor_list[0]);
+			        Misc.p_ptr.handle_stuff();
+
+			        /* If there is more than one item... */
+			        if (floor_num > 1) while (true)
+			        {
+			            /* Describe the pile */
+			            if (Misc.p_ptr.wizard)
+			            {
+							out_val = String.Format("{0}{1}{2}a pile of {3} objects, {4} ({5}:{6}).",
+			                        s1, s2, s3, floor_num, coords, y, x);
+			            }
+			            else
+			            {
+							out_val = String.Format("{0}{1}{2}a pile of {3} objects, {4}.",
+			                        s1, s2, s3, floor_num, coords);
+			            }
+
+			            Utilities.prt(out_val, 0, 0);
+			            Cave.move_cursor_relative(y, x);
+			            query = Utilities.inkey();
+
+			            /* Display objects */
+			            if ((char)query.code == 'r')
+			            {
+			                int rdone = 0;
+			                int pos;
+			                while (rdone == 0)
+			                {
+			                    /* Save screen */
+			                    Utilities.screen_save();
+
+			                    /* Display */
+			                    Object.Object.show_floor(floor_list, floor_num, 
+									Object.Object.olist_detail_t.OLIST_WEIGHT | Object.Object.olist_detail_t.OLIST_GOLD);
+
+			                    /* Describe the pile */
+			                    Utilities.prt(out_val, 0, 0);
+			                    query = Utilities.inkey();
+
+			                    /* Load screen */
+			                    Utilities.screen_load();
+
+			                    pos = (char)query.code - 'a';
+			                    if (0 <= pos && pos < floor_num)
+			                    {
+			                        Cave.track_object(-floor_list[pos]);
+			                        Misc.p_ptr.handle_stuff();
+			                        continue;
+			                    }
+			                    rdone = 1;
+			                }
+
+			                /* Now that the user's done with the display loop, let's */
+			                /* the outer loop over again */
+			                continue;
+			            }
+
+			            /* Done */
+			            break;
+			        }
+			        /* Only one object to display */
+			        else
+			        {
+
+			            //char o_name[80];
+						string o_name;
+
+			            /* Get the single object in the list */
+			            Object.Object o_ptr = Object.Object.byid((short)floor_list[0]);
+
+			            /* Not boring */
+			            boring = false;
+
+			            /* Obtain an object description */
+						o_name = o_ptr.object_desc(Object.Object.Detail.PREFIX | Object.Object.Detail.FULL);
+
+			            /* Describe the object */
+			            if (Misc.p_ptr.wizard)
+			            {
+							out_val = String.Format("{0}{1}{2}{3}, {4} ({5}:{6}).",
+			                        s1, s2, s3, o_name, coords, y, x);
+			            }
+			            else
+			            {
+							out_val = String.Format("{0}{1}{2}{3}, {4}.", s1, s2, s3, o_name, coords);
+			            }
+
+			            Utilities.prt(out_val, 0, 0);
+			            Cave.move_cursor_relative(y, x);
+			            query = Utilities.inkey();
+
+			            /* Stop on everything but "return"/"space" */
+			            if (((char)query.code != '\n') && ((char)query.code != '\r') && ((char)query.code != ' ')) break;
+
+			            /* Sometimes stop at "space" key */
+			            if (((char)query.code == ' ') && (mode & (LOOK)) == 0) break;
+
+			            /* Change the intro */
+			            s1 = "It is ";
+
+			            /* Plurals */
+			            if (o_ptr.number != 1) s1 = "They are ";
+
+			            /* Preposition */
+			            s2 = "on ";
+			        }
+
+			    }
+
+			    /* Double break */
+			    if (this_o_idx != 0) break;
+
+
+			    /* Feature (apply "mimic") */
+			    feat = Misc.f_info[Cave.cave.feat[y][x]].mimic;
+
+			    /* Require knowledge about grid, or ability to see grid */
+			    if ((Cave.cave.info[y][x] & (Cave.CAVE_MARK)) == 0 && !Cave.player_can_see_bold(y,x))
+			    {
+			        /* Forget feature */
+			        feat = Cave.FEAT_NONE;
+			    }
+
+			    /* Terrain feature if needed */
+			    if (boring || (feat > Cave.FEAT_INVIS))
+			    {
+			        string name = Misc.f_info[feat].name;
+
+			        /* Hack -- handle unknown grids */
+			        if (feat == Cave.FEAT_NONE) name = "unknown grid";
+
+			        /* Pick a prefix */
+			        if (s2 != null && (feat >= Cave.FEAT_DOOR_HEAD)) s2 = "in ";
+
+			        /* Pick proper indefinite article */
+			        s3 = ("aeiouAEIOU".Contains(name[0])) ? "an " : "a ";
+
+			        /* Hack -- special introduction for store doors */
+			        if ((feat >= Cave.FEAT_SHOP_HEAD) && (feat <= Cave.FEAT_SHOP_TAIL))
+			        {
+			            s3 = "the entrance to the ";
+			        }
+
+			        /* Display a message */
+			        if (Misc.p_ptr.wizard)
+			        {
+			            out_val = String.Format("{0}{1}{2}{3}, {4} ({5}:{6}).", s1, s2, s3, name, coords, y, x);
+			        }
+			        else
+			        {
+						out_val = String.Format("{0}{1}{2}{3}, {4}.", s1, s2, s3, name, coords);
+			        }
+
+			        Utilities.prt(out_val, 0, 0);
+			        Cave.move_cursor_relative(y, x);
+			        query = Utilities.inkey();
+
+			        /* Stop on everything but "return"/"space" */
+			        if (((char)query.code != '\n') && ((char)query.code != '\r') && ((char)query.code != ' ')) break;
+			    }
+
+			    /* Stop on everything but "return" */
+			    if (((char)query.code != '\n') && ((char)query.code != '\r')) break;
+			}
+
+			/* Keep going */
+			return (query);
+		}
+
+
+		/**
+		 * Load the attr/char at each point along "path" which is on screen from
+		 * "a" and "c". This was saved in draw_path().
+		 */
+		static void load_path(List<ushort> path_g, char[] c, ConsoleColor[] a) {
+			int i;
+			for (i = 0; i < path_g.Count(); i++) {
+				int y = Cave.GRID_Y(path_g[i]);
+				int x = Cave.GRID_X(path_g[i]);
+
+				if (!Term.panel_contains((uint)y, (uint)x)) continue;
+				Cave.move_cursor_relative(y, x);
+				Term.addch(a[i], c[i]);
+			}
+
+			Term.fresh();
+		}
+
+
+		/**
+		 * Draw a visible path over the squares between (x1,y1) and (x2,y2).
+		 *
+		 * The path consists of "*", which are white except where there is a
+		 * monster, object or feature in the grid.
+		 *
+		 * This routine has (at least) three weaknesses:
+		 * - remembered objects/walls which are no longer present are not shown,
+		 * - squares which (e.g.) the player has walked through in the dark are
+		 *   treated as unknown space.
+		 * - walls which appear strange due to hallucination aren't treated correctly.
+		 *
+		 * The first two result from information being lost from the dungeon arrays,
+		 * which requires changes elsewhere
+		 */
+		static int draw_path(List<ushort> path_g, char[] c, ConsoleColor[] a, int y1, int x1)
+		{
+			int i;
+			bool on_screen;
+
+			/* No path, so do nothing. */
+			if (path_g.Count() < 1) return 0;
+
+			/* The starting square is never drawn, but notice if it is being
+			 * displayed. In theory, it could be the last such square.
+			 */
+			on_screen = Term.panel_contains((uint)y1, (uint)x1);
+
+			/* Draw the path. */
+			for (i = 0; i < path_g.Count(); i++) {
+			    ConsoleColor colour;
+
+			    /* Find the co-ordinates on the level. */
+			    int y = Cave.GRID_Y(path_g[i]);
+			    int x = Cave.GRID_X(path_g[i]);
+
+			    /*
+			     * As path[] is a straight line and the screen is oblong,
+			     * there is only section of path[] on-screen.
+			     * If the square being drawn is visible, this is part of it.
+			     * If none of it has been drawn, continue until some of it
+			     * is found or the last square is reached.
+			     * If some of it has been drawn, finish now as there are no
+			     * more visible squares to draw.
+			     */
+			     if (Term.panel_contains((uint)y,(uint)x)) on_screen = true;
+			     else if (on_screen) break;
+			     else continue;
+
+			    /* Find the position on-screen */
+			    Cave.move_cursor_relative(y,x);
+
+			    /* This square is being overwritten, so save the original. */
+			    Term.what(Term.instance.scr.cx, Term.instance.scr.cy, ref a[i], ref c[i]);
+
+			    /* Choose a colour. */
+			    if (Cave.cave.m_idx[y][x] != 0 && Cave.cave_monster(Cave.cave, Cave.cave.m_idx[y][x]).ml) {
+			        /* Visible monsters are red. */
+			        Monster.Monster m_ptr = Cave.cave_monster(Cave.cave, Cave.cave.m_idx[y][x]);
+			        Monster_Race r_ptr = Misc.r_info[m_ptr.r_idx];
+
+			        /*mimics act as objects*/
+			        if (r_ptr.flags.has(Monster_Flag.UNAWARE.value)) 
+			            colour = ConsoleColor.Yellow;
+			        else
+			            colour = ConsoleColor.Red;
+			    }
+
+			    else if (Cave.cave.o_idx[y][x] != 0 && Object.Object.byid(Cave.cave.o_idx[y][x]).marked != 0)
+			        /* Known objects are yellow. */
+			        colour = ConsoleColor.Yellow;
+
+			    else if (!Cave.cave_floor_bold(y,x) &&
+			             ((Cave.cave.info[y][x] & (Cave.CAVE_MARK)) != 0 || Cave.player_can_see_bold(y,x)))
+			        /* Known walls are blue. */
+			        colour = ConsoleColor.Blue;
+
+			    else if ((Cave.cave.info[y][x] & (Cave.CAVE_MARK)) == 0 && !Cave.player_can_see_bold(y,x))
+			        /* Unknown squares are grey. */
+			        colour = ConsoleColor.Gray;
+
+			    else
+			        /* Unoccupied squares are white. */
+			        colour = ConsoleColor.White;
+
+			    /* Draw the path segment */
+			    Term.addch(colour, '*');
+			}
+			return i;
+		}
+
+		/*
+		 * Display targeting help at the bottom of the screen.
+		 */
+		static void display_help(bool monster, bool free)
+		{
+			/* Determine help location */
+			int wid, hgt, help_loc;
+			Term.get_size(out wid, out hgt);
+			help_loc = hgt - HELP_HEIGHT;
+	
+			/* Clear */
+			Utilities.clear_from(help_loc);
+
+			/* Prepare help hooks */
+			Misc.text_out_hook = Utilities.text_out_to_screen;
+			Misc.text_out_indent = 1;
+			Term.gotoxy(1, help_loc);
+
+			/* Display help */
+			Utilities.text_out_c(ConsoleColor.Green, "<dir>");
+			Utilities.text_out(" and ");
+			Utilities.text_out_c(ConsoleColor.Green, "<click>");
+			Utilities.text_out(" look around. '");
+			Utilities.text_out_c(ConsoleColor.Green, "g");
+			Utilities.text_out(" moves to the selection. '");
+			Utilities.text_out_c(ConsoleColor.Green, "p");
+			Utilities.text_out("' selects the player. '");
+			Utilities.text_out_c(ConsoleColor.Green, "q");
+			Utilities.text_out("' exits. '");
+			Utilities.text_out_c(ConsoleColor.Green, "r");
+			Utilities.text_out("' displays details. '");
+
+			if (free)
+			{
+				Utilities.text_out_c(ConsoleColor.Green, "m");
+				Utilities.text_out("' restricts to interesting places. ");
+			}
+			else
+			{
+				Utilities.text_out_c(ConsoleColor.Green, "+");
+				Utilities.text_out("' and '");
+				Utilities.text_out_c(ConsoleColor.Green, "-");
+				Utilities.text_out("' cycle through interesting places. '");
+				Utilities.text_out_c(ConsoleColor.Green, "o");
+				Utilities.text_out("' allows free selection. ");
+			}
+	
+			if (monster || free)
+			{
+				Utilities.text_out("'");
+				Utilities.text_out_c(ConsoleColor.Green, "t");
+				Utilities.text_out("' targets the current selection.");
+			}
+
+			/* Reset */
+			Misc.text_out_indent = 0;
+		}
+
+		/*
+		 * Set the target to a location
+		 */
+		public static void set_location(int y, int x)
+		{
+			/* Legal target */
+			if (Cave.cave.in_bounds_fully(y, x))
+			{
+				/* Save target info */
+				target_set = true;
+				target_who = 0;
+				target_y = (short)y;
+				target_x = (short)x;
+			}
+
+			/* Clear target */
+			else
+			{
+				/* Reset target info */
+				target_set = false;
+				target_who = 0;
+				target_y = 0;
+				target_x = 0;
+			}
+		}
+
+
+		/*
+		 * Perform the minimum "whole panel" adjustment to ensure that the given
+		 * location is contained inside the current panel, and return true if any
+		 * such adjustment was performed. Optionally accounts for the targeting
+		 * help window.
+		 */
+		static bool adjust_panel_help(int y, int x, bool help)
+		{
+			bool changed = false;
+
+			int j;
+
+			int screen_hgt_main = help ? (Term.instance.hgt - Misc.ROW_MAP - 3) 
+									   : (Term.instance.hgt - Misc.ROW_MAP - 1);
+
+			/* Scan windows */
+			for (j = 0; j < Misc.ANGBAND_TERM_MAX; j++)
+			{
+				int wx, wy;
+				int screen_hgt, screen_wid;
+
+				Term t = Misc.angband_term[j];
+
+				/* No window */
+				if (t == null) continue;
+
+				/* No relevant flags */
+				if ((j > 0) && (Player.Player_Other.instance.window_flag[j] & Misc.PW_MAP) == 0) continue;
+
+				wy = t.offset_y;
+				wx = t.offset_x;
+
+				screen_hgt = (j == 0) ? screen_hgt_main : t.hgt;
+				screen_wid = (j == 0) ? (Term.instance.wid - Misc.COL_MAP - 1) : t.wid;
+
+				/* Bigtile panels need adjustment */
+				screen_wid = screen_wid / Term.tile_width;
+				screen_hgt = screen_hgt / Term.tile_height;
+
+				/* Adjust as needed */
+				while (y >= wy + screen_hgt) wy += screen_hgt / 2;
+				while (y < wy) wy -= screen_hgt / 2;
+
+				/* Adjust as needed */
+				while (x >= wx + screen_wid) wx += screen_wid / 2;
+				while (x < wx) wx -= screen_wid / 2;
+
+				/* Use "modify_panel" */
+				if (Xtra2.modify_panel(t, wy, wx)) changed = true;
+			}
+
+			return (changed);
+		}
+
 
 		/*
 		 * Update (if necessary) and verify (if possible) the target.

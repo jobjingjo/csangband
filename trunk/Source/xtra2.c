@@ -77,45 +77,6 @@ bool adjust_panel(int y, int x)
 
 
 /*
- * Change the current panel to the panel lying in the given direction.
- *
- * Return true if the panel was changed.
- */
-bool change_panel(int dir)
-{
-	bool changed = false;
-	int j;
-
-	/* Scan windows */
-	for (j = 0; j < ANGBAND_TERM_MAX; j++)
-	{
-		int screen_hgt, screen_wid;
-		int wx, wy;
-
-		term *t = angband_term[j];
-
-		/* No window */
-		if (!t) continue;
-
-		/* No relevant flags */
-		if ((j > 0) && !(op_ptr.window_flag[j] & PW_MAP)) continue;
-
-		screen_hgt = (j == 0) ? SCREEN_HGT : t.hgt;
-		screen_wid = (j == 0) ? SCREEN_WID : t.wid;
-
-		/* Shift by half a panel */
-		wy = t.offset_y + ddy[dir] * screen_hgt / 2;
-		wx = t.offset_x + ddx[dir] * screen_wid / 2;
-
-		/* Use "modify_panel" */
-		if (modify_panel(t, wy, wx)) changed = true;
-	}
-
-	return (changed);
-}
-
-
-/*
  * Given a "source" and "target" location, extract a "direction",
  * which will move one step from the "source" towards the "target".
  *
