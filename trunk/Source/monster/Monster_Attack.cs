@@ -181,19 +181,18 @@ namespace CSAngband.Monster {
 						Spell.take_hit(p, damage, ddesc);
 			        } else if ( effect.value == RBE.POISON.value)
 			        {
-						throw new NotImplementedException();
-						//damage = adjust_dam(p, GF_POIS, damage, RANDOMISE,
-						//    check_for_resist(p, GF_POIS, p.state.flags, true));
+						damage = Spell.adjust_dam(p, GF.POIS, damage, aspect.RANDOMISE,
+						    Spell.check_for_resist(p, GF.POIS, p.state.flags, true));
 
-						//// Take damage
-						//take_hit(p, damage, ddesc);
+						// Take damage
+						Spell.take_hit(p, damage, ddesc);
 
-						//// Take "poison" effect
-						//if (player_inc_timed(p, TMD_POISONED, randint1(rlev) + 5, true, true))
-						//    obvious = true;
+						// Take "poison" effect
+						if (p.inc_timed(Timed_Effect.POISONED, Random.randint1(rlev) + 5, true, true))
+						    obvious = true;
 
-						//// Learn about the player
-						//monster_learn_resists(m_ptr, p, GF_POIS);
+						// Learn about the player
+						monster_learn_resists(p, GF.POIS);
 			        } else if (effect.value == RBE.UN_BONUS.value)
 			        {
 						throw new NotImplementedException();
@@ -589,7 +588,7 @@ namespace CSAngband.Monster {
 						    obvious = true;
 
 						// Learn about the player
-						update_smart_learn(p, Object.Object_Flag.RES_CONFU.value);
+						update_smart_learn(p, Object.Object_Flag.RES_CONFU);
 			        } else if (effect.value == RBE.TERRIFY.value)
 			        {
 						throw new NotImplementedException();

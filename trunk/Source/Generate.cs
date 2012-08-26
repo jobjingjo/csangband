@@ -1108,10 +1108,10 @@ namespace CSAngband {
 		static bool build_circular(Cave c, int y0, int x0) {
 			throw new NotImplementedException();
 			///* Pick a room size */
-			//int radius = 2 + randint1(2) + randint1(3);
+			//int radius = 2 + Random.randint1(2) + Random.randint1(3);
 
 			///* Occasional light */
-			//bool light = c.depth <= randint1(25) ? true : false;
+			//bool light = c.depth <= Random.randint1(25) ? true : false;
 
 			///* Mark interior squares as being in a room (optionally lit) */
 			//int info = CAVE_ROOM | (light ? CAVE_GLOW : 0);
@@ -1121,20 +1121,20 @@ namespace CSAngband {
 			//fill_circle(c, y0, x0, radius, 0, FEAT_FLOOR, info);
 
 			///* Especially large circular rooms will have a middle chamber */
-			//if (radius - 4 > 0 && randint0(4) < radius - 4) {
+			//if (radius - 4 > 0 && Random.randint0(4) < radius - 4) {
 			//    /* choose a random direction */
 			//    int cd, rd;
-			//    rand_dir(&rd, &cd);
+			//    Random.rand_dir(&rd, &cd);
 
 			//    /* draw a room with a secret door on a random side */
 			//    draw_rectangle(c, y0 - 2, x0 - 2, y0 + 2, x0 + 2, FEAT_WALL_INNER);
 			//    cave_set_feat(c, y0 + cd * 2, x0 + rd * 2, FEAT_SECRET);
 
 			//    /* Place a treasure in the vault */
-			//    vault_objects(c, y0, x0, c.depth, randint0(2));
+			//    vault_objects(c, y0, x0, c.depth, Random.randint0(2));
 
 			//    /* create some monsterss */
-			//    vault_monsters(c, y0, x0, c.depth + 1, randint0(3));
+			//    vault_monsters(c, y0, x0, c.depth + 1, Random.randint0(3));
 			//}
 
 			//return true;

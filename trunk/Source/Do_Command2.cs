@@ -264,20 +264,19 @@ namespace CSAngband {
 		 * Determine if a given grid may be "opened"
 		 */
 		static bool open_test(int y, int x) {
-			throw new NotImplementedException();
-			///* Must have knowledge */
-			//if (!(cave.info[y][x] & (CAVE_MARK))) {
-			//    msg("You see nothing there.");
-			//    return false;
-			//}
+			/* Must have knowledge */
+			if ((Cave.cave.info[y][x] & (Cave.CAVE_MARK)) == 0) {
+			    Utilities.msg("You see nothing there.");
+			    return false;
+			}
 
-			//if (!cave_iscloseddoor(cave, y, x)) {
-			//    msgt(MSG_NOTHING_TO_OPEN, "You see nothing there to open.");
-			//    return false;
-			//}
+			if (!Cave.cave_iscloseddoor(Cave.cave, y, x)) {
+			    Utilities.msgt(Message_Type.MSG_NOTHING_TO_OPEN, "You see nothing there to open.");
+			    return false;
+			}
 
-			///* Okay */
-			//return (true);
+			/* Okay */
+			return (true);
 		}
 
 
@@ -289,86 +288,85 @@ namespace CSAngband {
 		 * Returns true if repeated commands may continue
 		 */
 		static bool open_aux(int y, int x) {
-			throw new NotImplementedException();
-			//int i, j;
+			int i, j;
 
-			//bool more = false;
-
-
-			///* Verify legality */
-			//if (!do_cmd_open_test(y, x)) return (false);
+			bool more = false;
 
 
-			///* Jammed door */
-			//if (cave_isjammeddoor(cave, y, x))
-			//{
-			//    msg("The door appears to be stuck.");
-			//}
+			/* Verify legality */
+			if (!Do_Command.open_test(y, x)) return (false);
 
-			///* Locked door */
-			//else if (cave_islockeddoor(cave, y, x))
-			//{
-			//    /* Disarm factor */
-			//    i = p_ptr.state.skills[SKILL_DISARM];
 
-			//    /* Penalize some conditions */
-			//    if (p_ptr.timed[TMD_BLIND] || no_light()) i = i / 10;
-			//    if (p_ptr.timed[TMD_CONFUSED] || p_ptr.timed[TMD_IMAGE]) i = i / 10;
+			/* Jammed door */
+			if (Cave.cave_isjammeddoor(Cave.cave, y, x))
+			{
+			    Utilities.msg("The door appears to be stuck.");
+			}
 
-			//    /* Extract the lock power */
-			//    j = cave.feat[y][x] - FEAT_DOOR_HEAD;
+			/* Locked door */
+			else if (Cave.cave_islockeddoor(Cave.cave, y, x))
+			{
+			    /* Disarm factor */
+			    i = Misc.p_ptr.state.skills[(int)Skill.DISARM];
 
-			//    /* Extract the difficulty XXX XXX XXX */
-			//    j = i - (j * 4);
+			    /* Penalize some conditions */
+			    if (Misc.p_ptr.timed[(int)Timed_Effect.BLIND] != 0 || Cave.no_light()) i = i / 10;
+			    if (Misc.p_ptr.timed[(int)Timed_Effect.CONFUSED] != 0 || Misc.p_ptr.timed[(int)Timed_Effect.IMAGE] != 0) i = i / 10;
 
-			//    /* Always have a small chance of success */
-			//    if (j < 2) j = 2;
+			    /* Extract the lock power */
+			    j = Cave.cave.feat[y][x] - Cave.FEAT_DOOR_HEAD;
 
-			//    /* Success */
-			//    if (randint0(100) < j)
-			//    {
-			//        /* Message */
-			//        msgt(MSG_LOCKPICK, "You have picked the lock.");
+			    /* Extract the difficulty XXX XXX XXX */
+			    j = i - (j * 4);
 
-			//        /* Open the door */
-			//        cave_set_feat(cave, y, x, FEAT_OPEN);
+			    /* Always have a small chance of success */
+			    if (j < 2) j = 2;
 
-			//        /* Update the visuals */
-			//        p_ptr.update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+			    /* Success */
+			    if (Random.randint0(100) < j)
+			    {
+			        /* Message */
+			        Utilities.msgt(Message_Type.MSG_LOCKPICK, "You have picked the lock.");
 
-			//        /* Experience */
-			//        /* Removed to avoid exploit by repeatedly locking and unlocking door */
-			//        /* player_exp_gain(p_ptr, 1); */
-			//    }
+			        /* Open the door */
+			        Cave.cave_set_feat(Cave.cave, y, x, Cave.FEAT_OPEN);
 
-			//    /* Failure */
-			//    else
-			//    {
-			//        flush();
+			        /* Update the visuals */
+			        Misc.p_ptr.update |= (Misc.PU_UPDATE_VIEW | Misc.PU_MONSTERS);
 
-			//        /* Message */
-			//        msgt(MSG_LOCKPICK_FAIL, "You failed to pick the lock.");
+			        /* Experience */
+			        /* Removed to avoid exploit by repeatedly locking and unlocking door */
+			        /* player_exp_gain(p_ptr, 1); */
+			    }
 
-			//        /* We may keep trying */
-			//        more = true;
-			//    }
-			//}
+			    /* Failure */
+			    else
+			    {
+			        Utilities.flush();
 
-			///* Closed door */
-			//else
-			//{
-			//    /* Open the door */
-			//    cave_set_feat(cave, y, x, FEAT_OPEN);
+			        /* Message */
+			        Utilities.msgt(Message_Type.MSG_LOCKPICK_FAIL, "You failed to pick the lock.");
 
-			//    /* Update the visuals */
-			//    p_ptr.update |= (PU_UPDATE_VIEW | PU_MONSTERS);
+			        /* We may keep trying */
+			        more = true;
+			    }
+			}
 
-			//    /* Sound */
-			//    sound(MSG_OPENDOOR);
-			//}
+			/* Closed door */
+			else
+			{
+			    /* Open the door */
+			    Cave.cave_set_feat(Cave.cave, y, x, Cave.FEAT_OPEN);
 
-			///* Result */
-			//return (more);
+			    /* Update the visuals */
+			    Misc.p_ptr.update |= (Misc.PU_UPDATE_VIEW | Misc.PU_MONSTERS);
+
+			    /* Sound */
+			    //sound(MSG_OPENDOOR); //Nick: Todo: Enable in the distant future
+			}
+
+			/* Result */
+			return (more);
 		}
 
 
@@ -1543,23 +1541,22 @@ namespace CSAngband {
 		 * Note that running while confused is not allowed.
 		 */
 		public static void run(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			//int x, y;
-			//int dir = args[0].direction;
+			int x, y;
+			int dir = args[0].value;
 
-			//if (player_confuse_dir(p_ptr, &dir, true))
-			//{
-			//    return;
-			//}
+			if (Misc.p_ptr.confuse_dir(ref dir, true))
+			{
+			    return;
+			}
 
-			///* Get location */
-			//y = p_ptr.py + ddy[dir];
-			//x = p_ptr.px + ddx[dir];
-			//if (!do_cmd_walk_test(y, x))
-			//    return;
+			/* Get location */
+			y = Misc.p_ptr.py + Misc.ddy[dir];
+			x = Misc.p_ptr.px + Misc.ddx[dir];
+			if (!Do_Command.walk_test(y, x))
+			    return;
 
-			///* Start run */
-			//run_step(dir);
+			/* Start run */
+			Pathfind.run_step(dir);
 		}
 
 

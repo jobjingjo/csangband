@@ -1983,5 +1983,23 @@ namespace CSAngband.Monster {
 			return (true);
 		}
 
+		/**
+		 * Update monster knowledge of player resists.
+		 *
+		 * \param m_idx is the monster who is learning
+		 * \param type is the GF_ type to which it's learning about the player's
+		 *    resistance (or lack of)
+		 */
+		void monster_learn_resists(Player.Player p, GF type)
+		{
+			//GF gf_ptr = &gf_table[type];
+
+			update_smart_learn(p, type.resist);
+			update_smart_learn(p, type.immunity);
+			update_smart_learn(p, type.vuln);
+
+			return;
+		}
+
 	}
 }

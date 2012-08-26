@@ -608,7 +608,7 @@ namespace CSAngband.Monster {
 		 * Learn about an "observed" resistance or other player state property, or
 		 * lack of it.
 		 */
-		public void update_smart_learn(Player.Player p, int what)
+		public void update_smart_learn(Player.Player p, Object_Flag what)
 		{
 			throw new NotImplementedException();
 			//monster_race *r_ptr = &r_info[m.r_idx];

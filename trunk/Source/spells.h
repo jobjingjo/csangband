@@ -80,7 +80,6 @@ bool project(int who, int rad, int y, int x, int dam, int typ, int flg);
 int check_for_resist(struct player *p, int type, bitflag *flags, bool real);
 bool check_side_immune(int type);
 int inven_damage(struct player *p, int type, int cperc);
-void monster_learn_resists(struct monster *m, struct player *p, int type);
 
 /* spells2.c */
 extern bool hp_player(int num);

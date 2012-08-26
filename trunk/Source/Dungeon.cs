@@ -716,18 +716,17 @@ namespace CSAngband {
 			{
 			    ui_event e;
 
-				throw new NotImplementedException();
-				///* Do not wait */
-				//inkey_scan = SCAN_INSTANT;
+				/* Do not wait */
+				Utilities.inkey_scan = Misc.SCAN_INSTANT;
 
-				///* Check for a key */
-				//e = inkey_ex();
-				//if (e.type != EVT_NONE) {
-				//    /* Flush and disturb */
-				//    flush();
-				//    disturb(Misc.p_ptr, 0, 0);
-				//    msg("Cancelled.");
-				//}
+				/* Check for a key */
+				e = Utilities.inkey_ex();
+				if (e.type != ui_event_type.EVT_NONE) {
+				    /* Flush and disturb */
+				    Utilities.flush();
+				    Cave.disturb(Misc.p_ptr, 0, 0);
+				    Utilities.msg("Cancelled.");
+				}
 			}
 
 
