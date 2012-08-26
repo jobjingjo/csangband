@@ -682,11 +682,10 @@ namespace CSAngband.Monster {
 
 			/* Friends for certain monsters */
 			if (r_ptr.flags.has(Monster_Flag.FRIEND.value)) {
-				throw new NotImplementedException();
-				//int total = group_size_2(r_idx);
+				int total = group_size_2(r_idx);
 		
-				///* Attempt to place a group */
-				//(void)place_new_monster_group(c, y, x, r_idx, slp, total, origin);
+				/* Attempt to place a group */
+				place_new_monster_group(c, y, x, r_idx, slp, total, (byte)origin);
 			}
 
 			/* Friends for certain monsters */
@@ -755,6 +754,35 @@ namespace CSAngband.Monster {
 
 			/* Success */
 			return (true);
+		}
+
+		/*
+		 * Pick a monster group size. Used for monsters with the FRIEND
+		 * flag.
+		 */
+		static int group_size_2(int r_idx)
+		{
+			Monster_Race r_ptr = Misc.r_info[r_idx];
+
+			int total, extra = 0;
+
+			/* Start small */
+			total = 1;
+
+			/* Easy monsters, large groups */
+			if (r_ptr.level < Misc.p_ptr.depth)
+			{
+				extra = 2 * (Misc.p_ptr.depth - r_ptr.level);
+				extra = Random.randint1(extra);
+			}
+
+			/* Modify the group size */
+			total += extra;
+
+			/* Maximum size */
+			if (total > GROUP_MAX) total = GROUP_MAX;
+
+			return total;
 		}
 
 		/*
