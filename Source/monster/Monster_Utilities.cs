@@ -536,34 +536,33 @@ namespace CSAngband.Monster {
 		 */
 		public static bool multiply_monster(int m_idx)
 		{
-			throw new NotImplementedException();
-			//monster_type *m_ptr = cave_monster(cave, m_idx);
+			Monster m_ptr = Cave.cave_monster(Cave.cave, m_idx);
 
-			//int i, y, x;
+			int i, y, x;
 
-			//bool result = false;
+			bool result = false;
 
-			///* Try up to 18 times */
-			//for (i = 0; i < 18; i++)
-			//{
-			//    int d = 1;
+			/* Try up to 18 times */
+			for (i = 0; i < 18; i++)
+			{
+			    int d = 1;
 
-			//    /* Pick a location */
-			//    scatter(&y, &x, m_ptr.fy, m_ptr.fx, d, 0);
+			    /* Pick a location */
+			    Cave.scatter(out y, out x, m_ptr.fy, m_ptr.fx, d, 0);
 
-			//    /* Require an "empty" floor grid */
-			//    if (!cave_empty_bold(y, x)) continue;
+			    /* Require an "empty" floor grid */
+			    if (!Cave.cave_empty_bold(y, x)) continue;
 
-			//    /* Create a new monster (awake, no groups) */
-			//    result = place_new_monster(cave, y, x, m_ptr.r_idx, false, false,
-			//        ORIGIN_DROP_BREED);
+			    /* Create a new monster (awake, no groups) */
+			    result = Monster_Make.place_new_monster(Cave.cave, y, x, m_ptr.r_idx, false, false,
+			        Origin.DROP_BREED);
 
-			//    /* Done */
-			//    break;
-			//}
+			    /* Done */
+			    break;
+			}
 
-			///* Result */
-			//return (result);
+			/* Result */
+			return (result);
 		}
 
 		/*
@@ -610,29 +609,28 @@ namespace CSAngband.Monster {
 		 */
 		public void update_smart_learn(Player.Player p, Object_Flag what)
 		{
-			throw new NotImplementedException();
-			//monster_race *r_ptr = &r_info[m.r_idx];
+			Monster_Race r_ptr = Misc.r_info[r_idx];
 
-			///* Sanity check */
-			//if (!what) return;
+			/* Sanity check */
+			if (what != null) return;
 
-			///* anything a monster might learn, the player should learn */
-			//wieldeds_notice_flag(p, what);
+			/* anything a monster might learn, the player should learn */
+			Object.Object.wieldeds_notice_flag(p, what.value);
 
-			///* Not allowed to learn */
-			//if (!OPT(birth_ai_learn)) return;
+			/* Not allowed to learn */
+			if (!Option.birth_ai_learn.value) return;
 
-			///* Too stupid to learn anything */
-			//if (rf_has(r_ptr.flags, RF_STUPID)) return;
+			/* Too stupid to learn anything */
+			if (r_ptr.flags.has(Monster_Flag.STUPID.value)) return;
 
-			///* Not intelligent, only learn sometimes */
-			//if (!rf_has(r_ptr.flags, RF_SMART) && one_in_(2)) return;
+			/* Not intelligent, only learn sometimes */
+			if (!r_ptr.flags.has(Monster_Flag.SMART.value) && Random.one_in_(2)) return;
 
-			///* Analyze the knowledge; fail very rarely */
-			//if (check_state(p, what, p.state.flags) && !one_in_(100))
-			//    of_on(m.known_pflags, what);
-			//else
-			//    of_off(m.known_pflags, what);
+			/* Analyze the knowledge; fail very rarely */
+			if (p.check_state(what, p.state.flags) && !Random.one_in_(100))
+			    known_pflags.on(what.value);
+			else
+			    known_pflags.off(what.value);
 		}
 
 		/*

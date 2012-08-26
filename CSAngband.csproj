@@ -104,6 +104,7 @@
     <Compile Include="Source\Message.cs" />
     <Compile Include="Source\Misc.cs" />
     <Compile Include="Source\Monster\Eval.cs" />
+    <Compile Include="Source\Monster\Melee.cs" />
     <Compile Include="Source\Monster\Monster.cs" />
     <Compile Include="Source\Monster\Monster_Attack.cs" />
     <Compile Include="Source\Monster\Monster_Base.cs" />

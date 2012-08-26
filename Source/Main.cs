@@ -853,7 +853,6 @@ namespace CSAngband {
 					i = (i + 1) % 10;
 				}
 
-				//Todo: Make sure this works!
 				ConsoleKeyInfo ck = Console.ReadKey(true);
 				keycode_t to_send = (keycode_t)ck.KeyChar;
 				keycode_t mods = keycode_t.KC_NONE;

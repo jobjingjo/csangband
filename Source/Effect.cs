@@ -20,7 +20,7 @@ namespace CSAngband {
 
 		public string name;
 		public bool aim;
-		public int rating;
+		public int rating; //aka power
 		public string desc;
 		public int value;
 		/*
@@ -2460,10 +2460,9 @@ namespace CSAngband {
 
 			else if (this == TRAP_GAS_CONFUSE)
 			{
-				throw new NotImplementedException();
-				//msg("You are surrounded by a gas of scintillating colors!");
-				//(void)player_inc_timed(p_ptr, TMD_CONFUSED, randint0(20) + 10, true, true);
-				//return true;
+				Utilities.msg("You are surrounded by a gas of scintillating colors!");
+				Misc.p_ptr.inc_timed(Timed_Effect.CONFUSED, Random.randint0(20) + 10, true, true);
+				return true;
 			}
 
 			else if (this == TRAP_GAS_POISON)

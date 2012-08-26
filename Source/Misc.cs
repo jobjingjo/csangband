@@ -866,5 +866,11 @@ namespace CSAngband {
 		public static string PLURAL(bool n){
 			return (n ? "" : "s");
 		}
+
+		/*
+		 * XXX Hack: player immunity to mana draining cannot be represented by 
+		 * m_ptr.known_pflags, so we need this.
+		 */
+		public const int SM_IMM_MANA = 0x00000800;
 	}
 }

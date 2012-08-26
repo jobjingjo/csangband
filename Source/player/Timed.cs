@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CSAngband.Object;
 
 namespace CSAngband.Player {
 	partial class Player {
@@ -269,107 +270,118 @@ namespace CSAngband.Player {
 			return set_timed(idx, v, notify);
 		}
 
-		//typedef struct
-		//{
-		//  const char *on_begin;
-		//  const char *on_end;
-		//  const char *on_increase;
-		//  const char *on_decrease;
-		//  u32b flag_redraw, flag_update;
-		//  int msg;
-		//  int resist;
-		//} timed_effect;
+		public class timed_effect
+		{
+			public timed_effect(string a, string b, string c, string d, uint e, uint f, Message_Type g, Object_Flag h){
+				on_begin = a;
+				on_end = b;
+				on_increase = c;
+				on_decrease = d;
+				flag_redraw = e;
+				flag_update = f;
+				msg = g;
+				resist = h;
+			}
+			public string on_begin;
+			public string on_end;
+			public string on_increase;
+			public string on_decrease;
+			public uint flag_redraw;
+			public uint flag_update;
+			public Message_Type msg;
+			public Object_Flag resist;
+		}
 
-		//static timed_effect effects[] =
-		//{
-		//    { "You feel yourself moving faster!", "You feel yourself slow down.",
-		//            null, null,
-		//            0, PU_BONUS, MSG_SPEED, 0 },
-		//    { "You feel yourself moving slower!", "You feel yourself speed up.",
-		//            null, null,
-		//            0, PU_BONUS, MSG_SLOW, OF_FREE_ACT },
-		//    { "You are blind.", "You blink and your eyes clear.",
-		//            null, null,
-		//            PR_MAP, PU_FORGET_VIEW | PU_UPDATE_VIEW | PU_MONSTERS, MSG_BLIND,
-		//            OF_RES_BLIND },
-		//    { "You are paralysed!", "You can move again.",
-		//            null, null,
-		//            0, 0, MSG_PARALYZED, OF_FREE_ACT },
-		//    { "You are confused!", "You are no longer confused.",
-		//            "You are more confused!", "You feel a little less confused.",
-		//            0, 0, MSG_CONFUSED, OF_RES_CONFU },
-		//    { "You are terrified!", "You feel bolder now.",
-		//            "You are more scared!", "You feel a little less scared.",
-		//            0, PU_BONUS, MSG_AFRAID, OF_RES_FEAR },
-		//    { "You feel drugged!", "You can see clearly again.",
-		//            "You feel more drugged!", "You feel less drugged.",
-		//            PR_MAP | PR_MONLIST | PR_ITEMLIST, 0, MSG_DRUGGED, OF_RES_CHAOS },
-		//    { "You are poisoned!", "You are no longer poisoned.",
-		//            "You are more poisoned!", "You are less poisoned.",
-		//            0, 0, MSG_POISONED, OF_RES_POIS },
-		//    { null, null, null, null, 0, 0, 0, 0 },  /* TMD_CUT -- handled seperately */
-		//    { null, null, null, null, 0, 0, 0, OF_RES_STUN },  /* TMD_STUN -- handled seperately */
-		//    { "You feel safe from evil!", "You no longer feel safe from evil.",
-		//            "You feel even safer from evil!", "You feel less safe from evil.",
-		//            0, 0, MSG_PROT_EVIL, 0 },
-		//    { "You feel invulnerable!", "You feel vulnerable once more.",
-		//            null, null,
-		//            0, PU_BONUS, MSG_INVULN, 0 },
-		//    { "You feel like a hero!", "You no longer feel heroic.",
-		//            "You feel more like a hero!", "You feel less heroic.",
-		//            0, PU_BONUS, MSG_HERO, 0 },
-		//    { "You feel like a killing machine!", "You no longer feel berserk.",
-		//            "You feel even more berserk!", "You feel less berserk.",
-		//            0, PU_BONUS, MSG_BERSERK, 0 },
-		//    { "A mystic shield forms around your body!", "Your mystic shield crumbles away.",
-		//            "The mystic shield strengthens.", "The mystic shield weakens.",
-		//            0, PU_BONUS, MSG_SHIELD, 0 },
-		//    { "You feel righteous!", "The prayer has expired.",
-		//            "You feel more righteous!", "You feel less righteous.",
-		//            0, PU_BONUS, MSG_BLESSED, 0 },
-		//    { "Your eyes feel very sensitive!", "Your eyes no longer feel so sensitive.",
-		//            "Your eyes feel more sensitive!", "Your eyes feel less sensitive.",
-		//            0, (PU_BONUS | PU_MONSTERS), MSG_SEE_INVIS, 0 },
-		//    { "Your eyes begin to tingle!", "Your eyes stop tingling.",
-		//            "Your eyes' tingling intensifies.", "Your eyes tingle less.",
-		//            0, (PU_BONUS | PU_MONSTERS), MSG_INFRARED, 0 },
-		//    { "You feel resistant to acid!", "You are no longer resistant to acid.",
-		//            "You feel more resistant to acid!", "You feel less resistant to acid.",
-		//            PR_STATUS, 0, MSG_RES_ACID, OF_VULN_ACID },
-		//    { "You feel resistant to electricity!", "You are no longer resistant to electricity.",
-		//            "You feel more resistant to electricity!", "You feel less resistant to electricity.",
-		//            PR_STATUS, 0, MSG_RES_ELEC, OF_VULN_ELEC },
-		//    { "You feel resistant to fire!", "You are no longer resistant to fire.",
-		//            "You feel more resistant to fire!", "You feel less resistant to fire.",
-		//            PR_STATUS, 0, MSG_RES_FIRE, OF_VULN_FIRE },
-		//    { "You feel resistant to cold!", "You are no longer resistant to cold.",
-		//            "You feel more resistant to cold!", "You feel less resistant to cold.",
-		//            PR_STATUS, 0, MSG_RES_COLD, OF_VULN_COLD },
-		//    { "You feel resistant to poison!", "You are no longer resistant to poison.",
-		//            "You feel more resistant to poison!", "You feel less resistant to poison.",
-		//            0, 0, MSG_RES_POIS, 0 },
-		//    { "You feel resistant to confusion!", "You are no longer resistant to confusion.",
-		//            "You feel more resistant to confusion!", "You feel less resistant to confusion.",
-		//            PR_STATUS, PU_BONUS, 0, 0 },
-		//    { "You feel your memories fade.", "Your memories come flooding back.",
-		//            null, null,
-		//            0, 0, MSG_GENERIC, 0 },
-		//    { "Your mind expands.", "Your horizons are once more limited.",
-		//            "Your mind expands further.", null,
-		//            0, PU_BONUS, MSG_GENERIC, 0 },
-		//    { "Your skin turns to stone.", "A fleshy shade returns to your skin.",
-		//            null, null,
-		//            0, PU_BONUS, MSG_GENERIC, 0 },
-		//    { "You feel the need to run away, and fast!", "The urge to run dissipates.",
-		//            null, null,
-		//            0, PU_BONUS, MSG_AFRAID, 0 },
-		//    { "You start sprinting.", "You suddenly stop sprinting.",
-		//            null, null,
-		//            0, PU_BONUS, MSG_SPEED, 0 },
-		//    { "You feel bold.", "You no longer feel bold.",
-		//            "You feel even bolder!", "You feel less bold.",
-		//            0, PU_BONUS, MSG_BOLD, 0 },
-		//};
+		public static timed_effect[] effects =
+		{
+		    new timed_effect( "You feel yourself moving faster!", "You feel yourself slow down.",
+		            null, null,
+		            0, Misc.PU_BONUS, Message_Type.MSG_SPEED, null ),
+		    new timed_effect( "You feel yourself moving slower!", "You feel yourself speed up.",
+		            null, null,
+		            0, Misc.PU_BONUS, Message_Type.MSG_SLOW, Object_Flag.FREE_ACT ),
+		    new timed_effect( "You are blind.", "You blink and your eyes clear.",
+		            null, null,
+		            Misc.PR_MAP, Misc.PU_FORGET_VIEW | Misc.PU_UPDATE_VIEW | Misc.PU_MONSTERS, Message_Type.MSG_BLIND,
+		            Object_Flag.RES_BLIND ),
+		    new timed_effect( "You are paralysed!", "You can move again.",
+		            null, null,
+		            0, 0, Message_Type.MSG_PARALYZED, Object_Flag.FREE_ACT ),
+		    new timed_effect( "You are confused!", "You are no longer confused.",
+		            "You are more confused!", "You feel a little less confused.",
+		            0, 0, Message_Type.MSG_CONFUSED, Object_Flag.RES_CONFU ),
+		    new timed_effect( "You are terrified!", "You feel bolder now.",
+		            "You are more scared!", "You feel a little less scared.",
+		            0, Misc.PU_BONUS, Message_Type.MSG_AFRAID, Object_Flag.RES_FEAR ),
+		    new timed_effect( "You feel drugged!", "You can see clearly again.",
+		            "You feel more drugged!", "You feel less drugged.",
+		            Misc.PR_MAP | Misc.PR_MONLIST | Misc.PR_ITEMLIST, 0, Message_Type.MSG_DRUGGED, Object_Flag.RES_CHAOS ),
+		    new timed_effect( "You are poisoned!", "You are no longer poisoned.",
+		            "You are more poisoned!", "You are less poisoned.",
+		            0, 0, Message_Type.MSG_POISONED, Object_Flag.RES_POIS ),
+		    new timed_effect( null, null, null, null, 0, 0, 0, null ),  /* TMD_CUT -- handled seperately */
+		    new timed_effect( null, null, null, null, 0, 0, 0, Object_Flag.RES_STUN ),  /* TMD_STUN -- handled seperately */
+		    new timed_effect( "You feel safe from evil!", "You no longer feel safe from evil.",
+		            "You feel even safer from evil!", "You feel less safe from evil.",
+		            0, 0, Message_Type.MSG_PROT_EVIL, null ),
+		    new timed_effect( "You feel invulnerable!", "You feel vulnerable once more.",
+		            null, null,
+		            0, Misc.PU_BONUS, Message_Type.MSG_INVULN, null ),
+		    new timed_effect( "You feel like a hero!", "You no longer feel heroic.",
+		            "You feel more like a hero!", "You feel less heroic.",
+		            0, Misc.PU_BONUS, Message_Type.MSG_HERO, null ),
+		    new timed_effect( "You feel like a killing machine!", "You no longer feel berserk.",
+		            "You feel even more berserk!", "You feel less berserk.",
+		            0, Misc.PU_BONUS, Message_Type.MSG_BERSERK, null ),
+		    new timed_effect( "A mystic shield forms around your body!", "Your mystic shield crumbles away.",
+		            "The mystic shield strengthens.", "The mystic shield weakens.",
+		            0, Misc.PU_BONUS, Message_Type.MSG_SHIELD, null ),
+		    new timed_effect( "You feel righteous!", "The prayer has expired.",
+		            "You feel more righteous!", "You feel less righteous.",
+		            0, Misc.PU_BONUS, Message_Type.MSG_BLESSED, null ),
+		    new timed_effect( "Your eyes feel very sensitive!", "Your eyes no longer feel so sensitive.",
+		            "Your eyes feel more sensitive!", "Your eyes feel less sensitive.",
+		            0, (Misc.PU_BONUS | Misc.PU_MONSTERS), Message_Type.MSG_SEE_INVIS, null ),
+		    new timed_effect( "Your eyes begin to tingle!", "Your eyes stop tingling.",
+		            "Your eyes' tingling intensifies.", "Your eyes tingle less.",
+		            0, (Misc.PU_BONUS | Misc.PU_MONSTERS), Message_Type.MSG_INFRARED, null ),
+		    new timed_effect( "You feel resistant to acid!", "You are no longer resistant to acid.",
+		            "You feel more resistant to acid!", "You feel less resistant to acid.",
+		            Misc.PR_STATUS, 0, Message_Type.MSG_RES_ACID, Object_Flag.VULN_ACID ),
+		    new timed_effect( "You feel resistant to electricity!", "You are no longer resistant to electricity.",
+		            "You feel more resistant to electricity!", "You feel less resistant to electricity.",
+		            Misc.PR_STATUS, 0, Message_Type.MSG_RES_ELEC, Object_Flag.VULN_ELEC ),
+		    new timed_effect( "You feel resistant to fire!", "You are no longer resistant to fire.",
+		            "You feel more resistant to fire!", "You feel less resistant to fire.",
+		            Misc.PR_STATUS, 0, Message_Type.MSG_RES_FIRE, Object_Flag.VULN_FIRE ),
+		    new timed_effect( "You feel resistant to cold!", "You are no longer resistant to cold.",
+		            "You feel more resistant to cold!", "You feel less resistant to cold.",
+		            Misc.PR_STATUS, 0, Message_Type.MSG_RES_COLD, Object_Flag.VULN_COLD ),
+		    new timed_effect( "You feel resistant to poison!", "You are no longer resistant to poison.",
+		            "You feel more resistant to poison!", "You feel less resistant to poison.",
+		            0, 0, Message_Type.MSG_RES_POIS, null ),
+		    new timed_effect( "You feel resistant to confusion!", "You are no longer resistant to confusion.",
+		            "You feel more resistant to confusion!", "You feel less resistant to confusion.",
+		            Misc.PR_STATUS, Misc.PU_BONUS, 0, null ),
+		    new timed_effect( "You feel your memories fade.", "Your memories come flooding back.",
+		            null, null,
+		            0, 0, Message_Type.MSG_GENERIC, null ),
+		    new timed_effect( "Your mind expands.", "Your horizons are once more limited.",
+		            "Your mind expands further.", null,
+		            0, Misc.PU_BONUS, Message_Type.MSG_GENERIC, null ),
+		    new timed_effect( "Your skin turns to stone.", "A fleshy shade returns to your skin.",
+		            null, null,
+		            0, Misc.PU_BONUS, Message_Type.MSG_GENERIC, null ),
+		    new timed_effect( "You feel the need to run away, and fast!", "The urge to run dissipates.",
+		            null, null,
+		            0, Misc.PU_BONUS, Message_Type.MSG_AFRAID, null ),
+		    new timed_effect( "You start sprinting.", "You suddenly stop sprinting.",
+		            null, null,
+		            0, Misc.PU_BONUS, Message_Type.MSG_SPEED, null ),
+		    new timed_effect( "You feel bold.", "You no longer feel bold.",
+		            "You feel even bolder!", "You feel less bold.",
+		            0, Misc.PU_BONUS, Message_Type.MSG_BOLD, null ),
+		};
 
 		/*
 		 * The "stun" and "cut" statuses need to be handled by special functions of
