@@ -419,11 +419,11 @@ namespace CSAngband {
 
 					throw new NotImplementedException();
 
-					///* Pick a trap */
-					//pick_trap(y, x);
+					/* Pick a trap */
+					Trap.pick_trap(y, x);
 
-					///* Hit the trap */
-					//hit_trap(y, x);
+					/* Hit the trap */
+					Trap.hit_trap(y, x);
 				}
 
 				/* Set off an visible trap */
