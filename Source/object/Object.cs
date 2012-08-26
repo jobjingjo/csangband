@@ -511,7 +511,7 @@ namespace CSAngband.Object
 		 */
 		public bool flavor_is_aware()
 		{
-			Misc.assert(kind != null);
+			//Misc.assert(kind != null);
 			return kind.aware;
 		}
 

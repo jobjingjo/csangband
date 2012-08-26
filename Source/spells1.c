@@ -45,46 +45,6 @@ const struct gf_type gf_table[] =
 };
 
 
-/**
- * Check for resistance to a GF_ attack type. Return codes:
- * -1 = vulnerability
- * 0 = no resistance (or resistance plus vulnerability)
- * 1 = single resistance or opposition (or double resist plus vulnerability)
- * 2 = double resistance (including opposition)
- * 3 = total immunity
- *
- * \param type is the attack type we are trying to resist
- * \param flags is the set of flags we're checking
- * \param real is whether this is a real attack
- */
-int check_for_resist(struct player *p, int type, bitflag *flags, bool real)
-{
-	const struct gf_type *gf_ptr = &gf_table[type];
-	int result = 0;
-
-	if (gf_ptr.vuln && of_has(flags, gf_ptr.vuln))
-		result--;
-
-	/* If it's not a real attack, we don't check timed status explicitly */
-	if (real && gf_ptr.opp && p.timed[gf_ptr.opp])
-		result++;
-
-	if (gf_ptr.resist && of_has(flags, gf_ptr.resist))
-		result++;
-
-	if (gf_ptr.immunity && of_has(flags, gf_ptr.immunity))
-		result = 3;
-
-	/* Notice flags, if it's a real attack */
-	if (real && gf_ptr.immunity)
-		wieldeds_notice_flag(p, gf_ptr.immunity);
-	if (real && gf_ptr.resist)
-		wieldeds_notice_flag(p, gf_ptr.resist);
-	if (real && gf_ptr.vuln)
-		wieldeds_notice_flag(p, gf_ptr.vuln);
-
-	return result;
-}
 
 
 /**
@@ -105,24 +65,6 @@ bool check_side_immune(int type)
 		return true;
 
 	return false;
-}
-
-/**
- * Update monster knowledge of player resists.
- *
- * \param m_idx is the monster who is learning
- * \param type is the GF_ type to which it's learning about the player's
- *    resistance (or lack of)
- */
-void monster_learn_resists(struct monster *m, struct player *p, int type)
-{
-	const struct gf_type *gf_ptr = &gf_table[type];
-
-	update_smart_learn(m, p, gf_ptr.resist);
-	update_smart_learn(m, p, gf_ptr.immunity);
-	update_smart_learn(m, p, gf_ptr.vuln);
-
-	return;
 }
 
 /*

@@ -376,6 +376,7 @@ namespace CSAngband {
 
 		public static void assert(bool value){
 			if (value == false){
+				
 				throw new Exception("Assert failed");
 			}
 		}

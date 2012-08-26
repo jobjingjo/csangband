@@ -2691,6 +2691,10 @@ namespace CSAngband {
 		    /* Objects */
 		    for (o_ptr = Object.Object.get_first_object(y, x); o_ptr != null; o_ptr = Object.Object.get_next_object(o_ptr))
 		    {
+				if(o_ptr.kind == null) {
+					continue;
+				}
+
 		        /* Memorized objects */
 		        if (o_ptr.marked != 0 && !Squelch.item_ok(o_ptr))
 		        {

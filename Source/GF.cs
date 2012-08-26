@@ -8,7 +8,7 @@ namespace CSAngband {
 	class GF {
 		public static List<GF> list = new List<GF>();
 
-		int value;
+		public int value;
 		private static int counter = 0;
 		public GF(string name, string desc, Object_Flag resist, int num, random_value denom, Timed_Effect opp,
 				Object_Flag immunity, bool side_immune, Object_Flag vuln, Monster_Flag mon_res, Monster_Flag mon_vuln,

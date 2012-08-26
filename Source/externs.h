@@ -84,7 +84,7 @@ extern bool make_attack_spell(int m_idx);
 
 /* pathfind.c */
 extern bool findpath(int y, int x);
-extern void run_step(int dir);
+
 
 /* score.c */
 extern void enter_score(time_t *death_time);
