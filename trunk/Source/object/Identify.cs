@@ -597,5 +597,161 @@ namespace CSAngband.Object {
 			if (add_ident_flags(IDENT_FIRED))
 				check_for_ident();
 		}
+
+		/*
+		 * Determine whether a weapon or missile weapon is obviously {excellent} when
+		 * worn.
+		 *
+		 * XXX Eddie should messages be adhoc all over the place?  perhaps the main
+		 * loop should check for change in inventory/wieldeds and all messages be
+		 * printed from one place
+		 */
+		public void notice_on_wield()
+		{
+			Bitflag f = new Bitflag(Object_Flag.SIZE);
+			Bitflag f2 = new Bitflag(Object_Flag.SIZE);
+			Bitflag obvious_mask = new Bitflag(Object_Flag.SIZE);
+			bool obvious = false;
+
+			Object_Flag.create_mask(obvious_mask, true, Object_Flag.object_flag_id.WIELD);
+
+			/* Save time of wield for later */
+			object_last_wield = Misc.turn;
+
+			/* Only deal with un-ID'd items */
+			if (is_known()) return;
+
+			/* Wear it */
+			flavor_tried();
+			if (add_ident_flags(IDENT_WORN))
+			    check_for_ident();
+
+			/* CC: may wish to be more subtle about this once we have ego lights
+			 * with multiple pvals */
+			if (is_light() && ego != null)
+			    notice_ego();
+
+			if (flavor_is_aware() && easy_know())
+			{
+			    notice_everything();
+			    return;
+			}
+
+			/* Automatically sense artifacts upon wield */
+			sense_artifact();
+
+			/* Note artifacts when found */
+			if (artifact != null)
+			    History.add_artifact(artifact, is_known(), true);
+
+			/* special case FA, needed at least for mages wielding gloves */
+			if (FA_would_be_obvious())
+			    obvious_mask.on(Object_Flag.FREE_ACT.value);
+
+			/* Extract the flags */
+			object_flags(ref f);
+
+			/* Find obvious things (disregarding curses) - why do we remove the curses?? */
+			Object_Flag.create_mask(f2, false, Object_Flag.object_flag_type.CURSE);
+			obvious_mask.diff(f2);
+			if (f.is_inter(obvious_mask)) obvious = true;
+			Object_Flag.create_mask(obvious_mask, true, Object_Flag.object_flag_id.WIELD);
+
+			/* Notice any obvious brands or slays */
+			Slay.object_notice_slays(this, obvious_mask);
+
+			/* Learn about obvious flags */
+			known_flags.union(obvious_mask);
+
+			/* XXX Eddie should these next NOT call object_check_for_ident due to worries about repairing? */
+
+			/* XXX Eddie this is a small hack, but jewelry with anything noticeable really is obvious */
+			/* XXX Eddie learn =soulkeeping vs =bodykeeping when notice sustain_str */
+			if (is_jewelry())
+			{
+			    /* Learn the flavor of jewelry with obvious flags */
+			    if (EASY_LEARN && obvious)
+			        flavor_aware();
+
+			    /* Learn all flags on any aware non-artifact jewelry */
+			    if (flavor_is_aware() && artifact == null)
+			        know_all_flags();
+			}
+
+			check_for_ident();
+
+			if (!obvious) return;
+
+			/* XXX Eddie need to add stealth here, also need to assert/double-check everything is covered */
+			/* CC: also need to add FA! */
+			if (f.has(Object_Flag.STR.value))
+			    Utilities.msg("You feel %s!", pval[which_pval(
+			        Object_Flag.STR.value)] > 0 ? "stronger" : "weaker");
+			if (f.has(Object_Flag.INT.value))
+			    Utilities.msg("You feel %s!", pval[which_pval(
+			        Object_Flag.INT.value)] > 0 ? "smarter" : "more stupid");
+			if (f.has(Object_Flag.WIS.value))
+			    Utilities.msg("You feel %s!", pval[which_pval(
+			        Object_Flag.WIS.value)] > 0 ? "wiser" : "more naive");
+			if (f.has(Object_Flag.DEX.value))
+			    Utilities.msg("You feel %s!", pval[which_pval(
+			        Object_Flag.DEX.value)] > 0 ? "more dextrous" : "clumsier");
+			if (f.has(Object_Flag.CON.value))
+			    Utilities.msg("You feel %s!", pval[which_pval(
+			        Object_Flag.CON.value)] > 0 ? "healthier" : "sicklier");
+			if (f.has(Object_Flag.CHR.value))
+			    Utilities.msg("You feel %s!", pval[which_pval(
+			        Object_Flag.CHR.value)] > 0 ? "cuter" : "uglier");
+			if (f.has(Object_Flag.SPEED.value))
+			    Utilities.msg("You feel strangely %s.", pval[which_pval(
+			        Object_Flag.SPEED.value)] > 0 ? "quick" : "sluggish");
+			if (f.has(Object_Flag.BLOWS.value))
+			    Utilities.msg("Your weapon %s in your hands.",
+			        pval[which_pval(Object_Flag.BLOWS.value)] > 0 ?
+			            "tingles" : "aches");
+			if (f.has(Object_Flag.SHOTS.value))
+			    Utilities.msg("Your bow %s in your hands.",
+			        pval[which_pval(Object_Flag.SHOTS.value)] > 0 ?
+			            "tingles" : "aches");
+			if (f.has(Object_Flag.INFRA.value))
+			    Utilities.msg("Your eyes tingle.");
+			if (f.has(Object_Flag.LIGHT.value))
+			    Utilities.msg("It glows!");
+			if (f.has(Object_Flag.TELEPATHY.value))
+			    Utilities.msg("Your mind feels strangely sharper!");
+
+			/* WARNING -- masking f by obvious mask -- this should be at the end of this function */
+			/* CC: I think this can safely go, but just in case ... */
+			/*flags_mask(f, OF_SIZE, OF_OBVIOUS_MASK, FLAG_END); */
+
+			/* Remember the flags */
+			notice_sensing();
+
+			/* XXX Eddie should we check_for_ident here? */
+		}
+
+		/**
+		 * Mark an object's flavour as tried.
+		 *
+		 * \param o_ptr is the object whose flavour should be marked
+		 */
+		void flavor_tried()
+		{
+			Misc.assert(kind != null);
+
+			kind.tried = true;
+		}
+
+		/*
+		 * Sense artifacts
+		 */
+		void sense_artifact()
+		{
+			if (artifact != null)
+				notice_sensing();
+			else
+				ident |= IDENT_NOTART;
+		}
+
 	}
 }

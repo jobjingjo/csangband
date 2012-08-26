@@ -305,8 +305,6 @@
     <Content Include="Source\stats\db.h" />
     <Content Include="Source\store.c" />
     <Content Include="Source\tables.c" />
-    <Content Include="Source\target.c" />
-    <Content Include="Source\target.h" />
     <Content Include="Source\textui.h" />
     <Content Include="Source\trap.c" />
     <Content Include="Source\trap.h" />

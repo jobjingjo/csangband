@@ -231,29 +231,28 @@ namespace CSAngband.Player {
 		//formerly player_inc_timed
 		public bool inc_timed(Timed_Effect idx, int v, bool notify, bool check)
 		{
-			throw new NotImplementedException();
-			//timed_effect *effect;
+			GF effect;
 
-			///* Find the effect */
-			//effect = &effects[idx];
+			/* Check we have a valid effect */
+			if ((idx < 0) || (idx > Timed_Effect.MAX)) return false;
 
-			///* Check we have a valid effect */
-			//if ((idx < 0) || (idx > TMD_MAX)) return false;
+			/* Find the effect */
+			effect = GF.list[(int)idx];
 
-			///* Check that @ can be affected by this effect */
-			//if (check) {
-			//    wieldeds_notice_flag(p, effect.resist);
-			//    if (check_state(p, effect.resist, p.state.flags)) return false;
-			//}
+			/* Check that @ can be affected by this effect */
+			if (check) {
+			    Object.Object.wieldeds_notice_flag(Misc.p_ptr, effect.resist.value);
+			    if (check_state(effect.resist, state.flags)) return false;
+			}
 
-			///* Paralysis should be non-cumulative */
-			//if (idx == TMD_PARALYZED && p.timed[TMD_PARALYZED] > 0)
-			//    return false;
+			/* Paralysis should be non-cumulative */
+			if (idx == Timed_Effect.PARALYZED && timed[(int)Timed_Effect.PARALYZED] > 0)
+			    return false;
 
-			///* Set v */
-			//v = v + p.timed[idx];
+			/* Set v */
+			v = v + timed[(int)idx];
 
-			//return player_set_timed(p, idx, v, notify);
+			return set_timed(idx, v, notify);
 		}
 
 		/**
