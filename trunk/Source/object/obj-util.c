@@ -486,24 +486,6 @@ void floor_item_charges(int item)
 }
 
 
-
-/*
- * Describe an item in the inventory.
- */
-void floor_item_describe(int item)
-{
-	object_type *o_ptr = object_byid(item);
-
-	char o_name[80];
-
-	/* Get a description */
-	object_desc(o_name, sizeof(o_name), o_ptr, ODESC_PREFIX | ODESC_FULL);
-
-	/* Print a message */
-	msg("You see %s.", o_name);
-}
-
-
 /*
  *Returns the number of times in 1000 that @ will FAIL
  * - thanks to Ed Graham for the formula

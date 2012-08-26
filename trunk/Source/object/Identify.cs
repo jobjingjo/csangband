@@ -735,7 +735,7 @@ namespace CSAngband.Object {
 		 *
 		 * \param o_ptr is the object whose flavour should be marked
 		 */
-		void flavor_tried()
+		public void flavor_tried()
 		{
 			Misc.assert(kind != null);
 
@@ -745,12 +745,27 @@ namespace CSAngband.Object {
 		/*
 		 * Sense artifacts
 		 */
-		void sense_artifact()
+		public void sense_artifact()
 		{
 			if (artifact != null)
 				notice_sensing();
 			else
 				ident |= IDENT_NOTART;
+		}
+
+		/**
+		 * Notice the "effect" from activating an object.
+		 *
+		 * \param o_ptr is the object to become aware of
+		 */
+		public void notice_effect()
+		{
+			if (add_ident_flags(IDENT_EFFECT))
+				check_for_ident();
+
+			/* noticing an effect gains awareness */
+			if (!flavor_is_aware())
+				flavor_aware();
 		}
 
 	}

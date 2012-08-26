@@ -35,14 +35,6 @@ extern void display_feeling(bool obj_only);
 extern void do_cmd_fire(cmd_code code, cmd_arg args[]);
 extern void do_cmd_throw(cmd_code code, cmd_arg args[]);
 
-/* Types of item use */
-typedef enum
-{
-	USE_TIMEOUT,
-	USE_CHARGE,
-	USE_SINGLE
-} use_type;
-
 /* XXX */
 extern int cmp_monsters(const void *a, const void *b);
 

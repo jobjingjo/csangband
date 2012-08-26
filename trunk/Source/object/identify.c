@@ -104,21 +104,6 @@ void object_notice_indestructible(object_type *o_ptr)
 		object_check_for_ident(o_ptr);
 }
 
-/**
- * Notice the "effect" from activating an object.
- *
- * \param o_ptr is the object to become aware of
- */
-void object_notice_effect(object_type *o_ptr)
-{
-	if (object_add_ident_flags(o_ptr, IDENT_EFFECT))
-		object_check_for_ident(o_ptr);
-
-	/* noticing an effect gains awareness */
-	if (!object_flavor_is_aware(o_ptr))
-		object_flavor_aware(o_ptr);
-}
-
 
 
 

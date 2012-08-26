@@ -69,6 +69,7 @@
     <Compile Include="Source\Cave.cs" />
     <Compile Include="Source\Command.cs" />
     <Compile Include="Source\Command_List.cs" />
+    <Compile Include="Source\Command_Object.cs" />
     <Compile Include="Source\Config.cs" />
     <Compile Include="Source\Data_Panel.cs" />
     <Compile Include="Source\Do_Command2.cs" />

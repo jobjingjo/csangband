@@ -1912,6 +1912,14 @@ namespace CSAngband {
 			//p_ptr.redraw |= (PR_INVEN | PR_EQUIP);
 		}
 
+		/* Types of item use */
+		enum use_type
+		{
+			USE_TIMEOUT,
+			USE_CHARGE,
+			USE_SINGLE
+		}
+
 		/*
 		 * Use an object the right way.
 		 *
@@ -1929,203 +1937,210 @@ namespace CSAngband {
 		 * no longer point at the correct item, with horrifying results.
 		 */
 		public static void use(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			//int item = args[0].item;
-			//object_type* o_ptr = object_from_item_idx(item);
-			//int effect;
-			//bool ident = false, used = false;
-			//bool was_aware = object_flavor_is_aware(o_ptr);
-			//int dir = 5;
-			//int px = p_ptr.px, py = p_ptr.py;
-			//int snd, boost, level;
-			//use_type use;
-			//int items_allowed = 0;
+			int item = args[0].value;
+			Object.Object o_ptr = Object.Object.object_from_item_idx(item);
+			Effect effect;
+			bool ident = false, used = false;
+			bool was_aware = o_ptr.flavor_is_aware();
+			int dir = 5;
+			int px = Misc.p_ptr.px, py = Misc.p_ptr.py;
+			Message_Type snd = (Message_Type)0;
+			int boost, level;
+			use_type use = (use_type)(-1);
+			int items_allowed = 0;
 
-			///* Determine how this item is used. */
-			//if(obj_is_rod(o_ptr)) {
-			//    if(!obj_can_zap(o_ptr)) {
-			//        msg("That rod is still charging.");
-			//        return;
-			//    }
+			/* Determine how this item is used. */
+			if(o_ptr.is_rod()) {
+			    if(!o_ptr.can_zap()) {
+			        Utilities.msg("That rod is still charging.");
+			        return;
+			    }
 
-			//    use = USE_TIMEOUT;
-			//    snd = MSG_ZAP_ROD;
-			//    items_allowed = USE_INVEN | USE_FLOOR;
-			//} else if(obj_is_wand(o_ptr)) {
-			//    if(!obj_has_charges(o_ptr)) {
-			//        msg("That wand has no charges.");
-			//        return;
-			//    }
+			    use = use_type.USE_TIMEOUT;
+			    snd = Message_Type.MSG_ZAP_ROD;
+			    items_allowed = Misc.USE_INVEN | Misc.USE_FLOOR;
+			} else if(o_ptr.is_wand()) {
+				throw new NotImplementedException();
+				//if(!obj_has_charges(o_ptr)) {
+				//    msg("That wand has no charges.");
+				//    return;
+				//}
 
-			//    use = USE_CHARGE;
-			//    snd = MSG_ZAP_ROD;
-			//    items_allowed = USE_INVEN | USE_FLOOR;
-			//} else if(obj_is_staff(o_ptr)) {
-			//    if(!obj_has_charges(o_ptr)) {
-			//        msg("That staff has no charges.");
-			//        return;
-			//    }
+				//use = USE_CHARGE;
+				//snd = MSG_ZAP_ROD;
+				//items_allowed = USE_INVEN | USE_FLOOR;
+			} else if(o_ptr.is_staff()) {
+				throw new NotImplementedException();
+				//if(!obj_has_charges(o_ptr)) {
+				//    msg("That staff has no charges.");
+				//    return;
+				//}
 
-			//    use = USE_CHARGE;
-			//    snd = MSG_USE_STAFF;
-			//    items_allowed = USE_INVEN | USE_FLOOR;
-			//} else if(obj_is_food(o_ptr)) {
-			//    use = USE_SINGLE;
-			//    snd = MSG_EAT;
-			//    items_allowed = USE_INVEN | USE_FLOOR;
-			//} else if(obj_is_potion(o_ptr)) {
-			//    use = USE_SINGLE;
-			//    snd = MSG_QUAFF;
-			//    items_allowed = USE_INVEN | USE_FLOOR;
-			//} else if(obj_is_scroll(o_ptr)) {
-			//    /* Check player can use scroll */
-			//    if(!player_can_read())
-			//        return;
+				//use = USE_CHARGE;
+				//snd = MSG_USE_STAFF;
+				//items_allowed = USE_INVEN | USE_FLOOR;
+			} else if(o_ptr.is_food()) {
+			    use = use_type.USE_SINGLE;
+			    snd = Message_Type.MSG_EAT;
+			    items_allowed = Misc.USE_INVEN | Misc.USE_FLOOR;
+			} else if(o_ptr.is_potion()) {
+			    use = use_type.USE_SINGLE;
+			    snd = Message_Type.MSG_QUAFF;
+			    items_allowed = Misc.USE_INVEN | Misc.USE_FLOOR;
+			} else if(o_ptr.is_scroll()) {
+			    /* Check player can use scroll */
+			    if(!Player.Player.can_read())
+			        return;
 
-			//    use = USE_SINGLE;
-			//    snd = MSG_GENERIC;
-			//    items_allowed = USE_INVEN | USE_FLOOR;
-			//} else if(obj_is_activatable(o_ptr)) {
-			//    if(!obj_can_activate(o_ptr)) {
-			//        msg("That item is still charging.");
-			//        return;
-			//    }
+			    use = use_type.USE_SINGLE;
+			    snd = Message_Type.MSG_GENERIC;
+			    items_allowed = Misc.USE_INVEN | Misc.USE_FLOOR;
+			} else if(o_ptr.is_activatable()) {
+				throw new NotImplementedException();
+				//if(!obj_can_activate(o_ptr)) {
+				//    msg("That item is still charging.");
+				//    return;
+				//}
 
-			//    use = USE_TIMEOUT;
-			//    snd = MSG_ACT_ARTIFACT;
-			//    items_allowed = USE_EQUIP;
-			//} else {
-			//    msg("The item cannot be used at the moment");
-			//}
+				//use = USE_TIMEOUT;
+				//snd = MSG_ACT_ARTIFACT;
+				//items_allowed = USE_EQUIP;
+			} else {
+			    Utilities.msg("The item cannot be used at the moment");
+			}
 
-			///* Check if item is within player's reach. */
-			//if(items_allowed == 0 || !item_is_available(item, null, items_allowed)) {
-			//    msg("You cannot use that item from its current location.");
-			//    return;
-			//}
+			/* Check if item is within player's reach. */
+			if(items_allowed == 0 || !Object.Object.item_is_available(item, null, items_allowed)) {
+			    Utilities.msg("You cannot use that item from its current location.");
+			    return;
+			}
 
-			///* track the object used */
-			//track_object(item);
+			/* track the object used */
+			Cave.track_object(item);
 
-			///* Figure out effect to use */
-			//effect = object_effect(o_ptr);
+			/* Figure out effect to use */
+			effect = o_ptr.effect();
 
-			///* If the item requires a direction, get one (allow cancelling) */
-			//if(obj_needs_aim(o_ptr))
-			//    dir = args[1].direction;
+			/* If the item requires a direction, get one (allow cancelling) */
+			if(o_ptr.needs_aim())
+			    dir = args[1].value;
 
-			///* Check for use if necessary, and execute the effect */
-			//if((use != USE_CHARGE && use != USE_TIMEOUT) || check_devices(o_ptr)) {
-			//    int beam = beam_chance(o_ptr.tval);
+			/* Check for use if necessary, and execute the effect */
+			if((use != use_type.USE_CHARGE && use != use_type.USE_TIMEOUT) || check_devices(o_ptr) != 0) {
+				int beam = beam_chance(o_ptr.tval);
 
-			//    /* Special message for artifacts */
-			//    if(o_ptr.artifact) {
-			//        msgt(snd, "You activate it.");
-			//        if(o_ptr.artifact.effect_msg)
-			//            activation_message(o_ptr, o_ptr.artifact.effect_msg);
-			//        level = o_ptr.artifact.level;
-			//    } else {
-			//        /* Make a noise! */
-			//        sound(snd);
-			//        level = o_ptr.kind.level;
-			//    }
+				/* Special message for artifacts */
+				if(o_ptr.artifact != null) {
+				    Utilities.msgt(snd, "You activate it.");
+					if(o_ptr.artifact.effect_msg != null) {
+						throw new NotImplementedException();
+						//activation_message(o_ptr, o_ptr.artifact.effect_msg);
+					}
+				    level = o_ptr.artifact.level;
+				} else {
+				    /* Make a noise! */
+				    //sound(snd); //Nick: todo: implement sound
+				    level = o_ptr.kind.level;
+				}
 
-			//    /* A bit of a hack to make ID work better.
-			//        -- Check for "obvious" effects beforehand. */
-			//    if(effect_obvious(effect))
-			//        object_flavor_aware(o_ptr);
+				/* A bit of a hack to make ID work better.
+				    -- Check for "obvious" effects beforehand. */
+				if(effect.obvious())
+				    o_ptr.flavor_aware();
 
-			//    /* Boost damage effects if skill > difficulty */
-			//    boost = MAX(p_ptr.state.skills[SKILL_DEVICE] - level, 0);
+				/* Boost damage effects if skill > difficulty */
+				boost = Math.Max(Misc.p_ptr.state.skills[(int)Skill.DEVICE] - level, 0);
 
-			//    /* Do effect */
-			//    used = effect_do(effect, &ident, was_aware, dir, beam, boost);
+				/* Do effect */
+				used = effect.effect_do(out ident, was_aware, dir, beam, boost);
 
-			//    /* Quit if the item wasn't used and no knowledge was gained */
-			//    if(!used && (was_aware || !ident))
-			//        return;
-			//}
+				/* Quit if the item wasn't used and no knowledge was gained */
+				if(!used && (was_aware || !ident))
+				    return;
+			}
 
-			///* If the item is a null pointer or has been wiped, be done now */
-			//if(!o_ptr || !o_ptr.kind)
-			//    return;
+			/* If the item is a null pointer or has been wiped, be done now */
+			if(o_ptr == null || o_ptr.kind == null)
+			    return;
 
-			//if(ident)
-			//    object_notice_effect(o_ptr);
+			if(ident)
+			    o_ptr.notice_effect();
 
-			///* Food feeds the player */
-			//if(o_ptr.tval == TV_FOOD || o_ptr.tval == TV_POTION)
-			//    player_set_food(p_ptr, p_ptr.food + o_ptr.pval[DEFAULT_PVAL]);
+			/* Food feeds the player */
+			if(o_ptr.tval == TVal.TV_FOOD || o_ptr.tval == TVal.TV_POTION)
+			    Misc.p_ptr.set_food(Misc.p_ptr.food + o_ptr.pval[Misc.DEFAULT_PVAL]);
 
-			///* Use the turn */
-			//p_ptr.energy_use = 100;
+			/* Use the turn */
+			Misc.p_ptr.energy_use = 100;
 
-			///* Mark as tried and redisplay */
-			//p_ptr.notice |= (PN_COMBINE | PN_REORDER);
-			//p_ptr.redraw |= (PR_INVEN | PR_EQUIP | PR_OBJECT);
+			/* Mark as tried and redisplay */
+			Misc.p_ptr.notice |= (Misc.PN_COMBINE | Misc.PN_REORDER);
+			Misc.p_ptr.redraw |= (Misc.PR_INVEN | Misc.PR_EQUIP | Misc.PR_OBJECT);
 
-			///*
-			// * If the player becomes aware of the item's function, then mark it as
-			// * aware and reward the player with some experience.  Otherwise, mark
-			// * it as "tried".
-			// */
-			//if(ident && !was_aware) {
-			//    /* Object level */
-			//    int lev = o_ptr.kind.level;
+			/*
+			 * If the player becomes aware of the item's function, then mark it as
+			 * aware and reward the player with some experience.  Otherwise, mark
+			 * it as "tried".
+			 */
+			if(ident && !was_aware) {
+				throw new NotImplementedException();
+				///* Object level */
+				//int lev = o_ptr.kind.level;
 
-			//    object_flavor_aware(o_ptr);
-			//    if(o_ptr.tval == TV_ROD)
-			//        object_notice_everything(o_ptr);
-			//    player_exp_gain(p_ptr, (lev + (p_ptr.lev / 2)) / p_ptr.lev);
-			//    p_ptr.notice |= PN_SQUELCH;
-			//} else if(used) {
-			//    object_flavor_tried(o_ptr);
-			//}
+				//object_flavor_aware(o_ptr);
+				//if(o_ptr.tval == TV_ROD)
+				//    object_notice_everything(o_ptr);
+				//player_exp_gain(p_ptr, (lev + (p_ptr.lev / 2)) / p_ptr.lev);
+				//p_ptr.notice |= PN_SQUELCH;
+			} else if(used) {
+				o_ptr.flavor_tried();
+			}
 
-			///* If there are no more of the item left, then we're done. */
-			//if(!o_ptr.number)
-			//    return;
+			/* If there are no more of the item left, then we're done. */
+			if(o_ptr.number == 0)
+			    return;
 
-			///* Chargeables act differently to single-used items when not used up */
-			//if(used && use == USE_CHARGE) {
-			//    /* Use a single charge */
-			//    o_ptr.pval[DEFAULT_PVAL]--;
+			/* Chargeables act differently to single-used items when not used up */
+			if(used && use == use_type.USE_CHARGE) {
+				throw new NotImplementedException();
+				///* Use a single charge */
+				//o_ptr.pval[DEFAULT_PVAL]--;
 
-			//    /* Describe charges */
-			//    if(item >= 0)
-			//        inven_item_charges(item);
-			//    else
-			//        floor_item_charges(0 - item);
-			//} else if(used && use == USE_TIMEOUT) {
-			//    /* Artifacts use their own special field */
-			//    if(o_ptr.artifact)
-			//        o_ptr.timeout = randcalc(o_ptr.artifact.time, 0, RANDOMISE);
-			//    else
-			//        o_ptr.timeout += randcalc(o_ptr.kind.time, 0, RANDOMISE);
-			//} else if(used && use == USE_SINGLE) {
-			//    /* Destroy a potion in the pack */
-			//    if(item >= 0) {
-			//        inven_item_increase(item, -1);
-			//        inven_item_describe(item);
-			//        inven_item_optimize(item);
-			//    }
+				///* Describe charges */
+				//if(item >= 0)
+				//    inven_item_charges(item);
+				//else
+				//    floor_item_charges(0 - item);
+			} else if(used && use == use_type.USE_TIMEOUT) {
+				throw new NotImplementedException();
+				///* Artifacts use their own special field */
+				//if(o_ptr.artifact)
+				//    o_ptr.timeout = randcalc(o_ptr.artifact.time, 0, RANDOMISE);
+				//else
+				//    o_ptr.timeout += randcalc(o_ptr.kind.time, 0, RANDOMISE);
+			} else if(used && use == use_type.USE_SINGLE) {
+				/* Destroy a potion in the pack */
+				if(item >= 0) {
+				    Object.Object.inven_item_increase(item, -1);
+				    Object.Object.inven_item_describe(item);
+				    Object.Object.inven_item_optimize(item);
+				}
 
-			//    /* Destroy a potion on the floor */
-			//    else {
-			//        floor_item_increase(0 - item, -1);
-			//        floor_item_describe(0 - item);
-			//        floor_item_optimize(0 - item);
-			//    }
-			//}
+				/* Destroy a potion on the floor */
+				else {
+				    Object.Object.floor_item_increase(0 - item, -1);
+				    Object.Object.floor_item_describe(0 - item);
+				    Object.Object.floor_item_optimize(0 - item);
+				}
+			}
 
-			///* Hack to make Glyph of Warding work properly */
-			//if(cave.feat[py][px] == FEAT_GLYPH) {
-			//    /* Push objects off the grid */
-			//    if(cave.o_idx[py][px])
-			//        push_object(py, px);
-			//}
-
-
+			/* Hack to make Glyph of Warding work properly */
+			if(Cave.cave.feat[py][px] == Cave.FEAT_GLYPH) {
+				throw new NotImplementedException();
+				///* Push objects off the grid */
+				//if(cave.o_idx[py][px])
+				//    push_object(py, px);
+			}
 		}
 
 

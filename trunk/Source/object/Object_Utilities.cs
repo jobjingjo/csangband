@@ -518,10 +518,14 @@ namespace CSAngband.Object {
 		public static bool obj_is_light(Object o_ptr)   { return o_ptr.tval == TVal.TV_LIGHT; }
 		public static bool obj_is_ring(Object o_ptr)   { return o_ptr.tval == TVal.TV_RING; }
 
-
-		public bool is_light() {
-			return tval == TVal.TV_LIGHT;
-		}
+		public bool is_staff()  { return tval == TVal.TV_STAFF; }
+		public bool is_wand()   { return tval == TVal.TV_WAND; }
+		public bool is_rod()    { return tval == TVal.TV_ROD; }
+		public bool is_potion() { return tval == TVal.TV_POTION; }
+		public bool is_scroll() { return tval == TVal.TV_SCROLL; }
+		public bool is_food()   { return tval == TVal.TV_FOOD; }
+		public bool is_light()	{ return tval == TVal.TV_LIGHT; }
+		public bool is_ring()   { return tval == TVal.TV_RING; }
 
 
 		/* Determine if an object has charges */
@@ -544,6 +548,7 @@ namespace CSAngband.Object {
 
 			//return false;
 		}
+		public bool can_zap() { return obj_can_zap(this);}
 
 		/* Determine if an object is activatable */
 		public static bool obj_is_activatable(Object o_ptr)
@@ -551,6 +556,7 @@ namespace CSAngband.Object {
 			throw new NotImplementedException();
 			//return object_effect(o_ptr) ? true : false;
 		}
+		public bool is_activatable() { return obj_is_activatable(this); }
 
 		/* Determine if an object can be activated now */
 		public static bool obj_can_activate(Object o_ptr)
@@ -1580,6 +1586,22 @@ namespace CSAngband.Object {
 
 			///* Change the number */
 			//o_ptr.number += num;
+		}
+
+		/*
+		 * Describe an item in the inventory.
+		 */
+		public static void floor_item_describe(int item)
+		{
+			//object_type *o_ptr = object_byid(item);
+
+			//char o_name[80];
+
+			///* Get a description */
+			//object_desc(o_name, sizeof(o_name), o_ptr, ODESC_PREFIX | ODESC_FULL);
+
+			///* Print a message */
+			//msg("You see %s.", o_name);
 		}
 
 		
