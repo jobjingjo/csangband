@@ -663,33 +663,32 @@ namespace CSAngband.Player {
 		 */
 		public bool set_timed(Timed_Effect idx, int v, bool notify)
 		{
+			/* Hack -- Force good values */
+			v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
+			if ((idx < 0) || (idx > Timed_Effect.MAX)) return false;
+
+			/* No change */
+			if (timed[(int)idx] == v) return false;
+
+			/* Hack -- call other functions */
+			if (idx == Timed_Effect.STUN) return set_stun(this, v);
+			else if (idx == Timed_Effect.CUT) return set_cut(this, v);
+
+			/* Don't mention effects which already match the player state. */
+			if (idx == Timed_Effect.OPP_ACID && check_state(Object_Flag.IM_ACID, state.flags))
+			    notify = false;
+			else if (idx == Timed_Effect.OPP_ELEC && check_state(Object_Flag.IM_ELEC, state.flags))
+			    notify = false;
+			else if (idx == Timed_Effect.OPP_FIRE && check_state(Object_Flag.IM_FIRE, state.flags))
+			    notify = false;
+			else if (idx == Timed_Effect.OPP_COLD && check_state(Object_Flag.IM_COLD, state.flags))
+			    notify = false;
+			else if (idx == Timed_Effect.OPP_CONF && state.flags.has(Object_Flag.RES_CONFU.value))
+			    notify = false;
+
 			throw new NotImplementedException();
-			//Timed_Effect effect;
-			///* Hack -- Force good values */
-			//v = (v > 10000) ? 10000 : (v < 0) ? 0 : v;
-			//if ((idx < 0) || (idx > TMD_MAX)) return false;
-
-			///* No change */
-			//if (p.timed[idx] == v) return false;
-
-			///* Hack -- call other functions */
-			//if (idx == TMD_STUN) return set_stun(p, v);
-			//else if (idx == TMD_CUT) return set_cut(p, v);
-
-			///* Don't mention effects which already match the player state. */
-			//if (idx == TMD_OPP_ACID && check_state(p_ptr, OF_IM_ACID, p.state.flags))
-			//    notify = false;
-			//else if (idx == TMD_OPP_ELEC && check_state(p_ptr, OF_IM_ELEC, p.state.flags))
-			//    notify = false;
-			//else if (idx == TMD_OPP_FIRE && check_state(p_ptr, OF_IM_FIRE, p.state.flags))
-			//    notify = false;
-			//else if (idx == TMD_OPP_COLD && check_state(p_ptr, OF_IM_COLD, p.state.flags))
-			//    notify = false;
-			//else if (idx == TMD_OPP_CONF && of_has(p.state.flags, OF_RES_CONFU))
-			//    notify = false;
-
 			///* Find the effect */
-			//effect = &effects[idx];
+			//Effect effect = &effects[idx];
 
 			///* Turning off, always mention */
 			//if (v == 0)
@@ -739,6 +738,7 @@ namespace CSAngband.Player {
 			///* Result */
 			//return true;
 		}
+
 
 		/*
 		 * Obtain the "flags" for the player as if he was an item

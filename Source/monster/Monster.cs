@@ -1516,9 +1516,8 @@ namespace CSAngband.Monster {
 			    if (m_ptr.cdis > Misc.MAX_RANGE) return false;
 
 			    /* Check path */
-				throw new NotImplementedException();
-				//if (!projectable(m_ptr.fy, m_ptr.fx, py, px, PROJECT_NONE))
-				//    return false;
+				if (!Cave.projectable(m_ptr.fy, m_ptr.fx, py, px, Spell.PROJECT_NONE))
+				    return false;
 			}
 
 			/* Extract the monster level */
