@@ -70,39 +70,6 @@ void get_mon_num_prep(void)
 	/* Success */
 	return;
 }
-		
-/*
- * Pick a monster group size. Used for monsters with the FRIEND
- * flag.
- */
-static int group_size_2(int r_idx)
-{
-	monster_race *r_ptr = &r_info[r_idx];
-
-	int total, extra = 0;
-
-	/* Start small */
-	total = 1;
-
-	/* Easy monsters, large groups */
-	if (r_ptr.level < p_ptr.depth)
-	{
-		extra = 2 * (p_ptr.depth - r_ptr.level);
-		extra = randint1(extra);
-	}
-
-	/* Modify the group size */
-	total += extra;
-
-	/* Maximum size */
-	if (total > GROUP_MAX) total = GROUP_MAX;
-
-	return total;
-}
-
-		
-
-
 
 /*
  * Hack -- help pick an escort type
