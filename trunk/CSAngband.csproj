@@ -290,7 +290,6 @@
     <Content Include="Source\pathfind.h" />
     <Content Include="Source\Player\player.h" />
     <Content Include="Source\Player\spell.c" />
-    <Content Include="Source\Player\timed.c" />
     <Content Include="Source\prefs.c" />
     <Content Include="Source\prefs.h" />
     <Content Include="Source\save.c" />
