@@ -642,12 +642,13 @@ namespace CSAngband {
 					case Command_Code.OPEN:
 					{
 						throw new NotImplementedException();
-						//if (OPT(easy_open) && (!cmd.arg_present[0] ||
-						//        cmd.arg[0].direction == DIR_UNKNOWN))
+						//if (Option.easy_open.value && (!cmd.arg_present[0] ||
+						//        cmd.arg[0].value == (int)Direction.UNKNOWN))
 						//{
 						//    int y, x;
 						//    int n_closed_doors, n_locked_chests;
-			
+
+						//    throw new NotImplementedException();
 						//    n_closed_doors = count_feats(&y, &x, cave_iscloseddoor, false);
 						//    n_locked_chests = count_chests(&y, &x, false);
 			
