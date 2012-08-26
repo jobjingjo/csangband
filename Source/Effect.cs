@@ -2358,10 +2358,9 @@ namespace CSAngband {
 
 			else if (this == TRAP_RUNE_TELEPORT)
 			{
-				throw new NotImplementedException();
-				//msg("You hit a teleport trap!");
-				//teleport_player(100);
-				//return true;
+				Utilities.msg("You hit a teleport trap!");
+				Spell.teleport_player(100);
+				return true;
 			}
 
 			else if (this == TRAP_SPOT_FIRE)

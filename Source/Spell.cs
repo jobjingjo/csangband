@@ -383,5 +383,80 @@ namespace CSAngband {
 			return (false);
 		}
 
+
+		/*
+		 * Teleport the player to a location up to "dis" grids away.
+		 *
+		 * If no such spaces are readily available, the distance may increase.
+		 * Try very hard to move the player at least a quarter that distance.
+		 */
+		public static void teleport_player(int dis)
+		{
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
+
+			int d, i, min, y, x;
+
+			bool look = true;
+
+
+			/* Initialize */
+			y = py;
+			x = px;
+
+			/* Minimum distance */
+			min = dis / 2;
+
+			/* Look until done */
+			while (look)
+			{
+				/* Verify max distance */
+				if (dis > 200) dis = 200;
+
+				/* Try several locations */
+				for (i = 0; i < 500; i++)
+				{
+					/* Pick a (possibly illegal) location */
+					while (true)
+					{
+						y = Random.rand_spread(py, dis);
+						x = Random.rand_spread(px, dis);
+						d = Cave.distance(py, px, y, x);
+						if ((d >= min) && (d <= dis)) break;
+					}
+
+					/* Ignore illegal locations */
+					if (!Cave.cave.in_bounds_fully(y, x)) continue;
+
+					/* Require "naked" floor space */
+					if (!Cave.cave_naked_bold(y, x)) continue;
+
+					/* No teleporting into vaults and such */
+					if ((Cave.cave.info[y][x] & (Cave.CAVE_ICKY)) != 0) continue;
+
+					/* This grid looks good */
+					look = false;
+
+					/* Stop looking */
+					break;
+				}
+
+				/* Increase the maximum distance */
+				dis = dis * 2;
+
+				/* Decrease the minimum distance */
+				min = min / 2;
+			}
+
+			/* Sound */
+			//sound(MSG_TELEPORT); //Nick: Todo: Enable sound
+
+			/* Move player */
+			Monster.Monster.monster_swap(py, px, y, x);
+
+			/* Handle stuff XXX XXX XXX */
+			Misc.p_ptr.handle_stuff();
+		}
+
 	}
 }
