@@ -894,7 +894,9 @@ namespace CSAngband {
 		 */
 		public static void text_out_c(ConsoleColor a, string fmt, params object[] args)
 		{
-			throw new NotImplementedException();
+			string buf = String.Format(fmt, args);
+			Misc.text_out_hook(a, buf);
+
 			//char buf[1024];
 			//va_list vp;
 

@@ -365,5 +365,43 @@ namespace CSAngband {
 			return (true);
 		}
 
+
+		/*
+		 * Change the current panel to the panel lying in the given direction.
+		 *
+		 * Return true if the panel was changed.
+		 */
+		public static bool change_panel(int dir)
+		{
+			bool changed = false;
+			int j;
+
+			/* Scan windows */
+			for (j = 0; j < Misc.ANGBAND_TERM_MAX; j++)
+			{
+			    int screen_hgt, screen_wid;
+			    int wx, wy;
+
+			    Term t = Misc.angband_term[j];
+
+			    /* No window */
+			    if (t == null) continue;
+
+			    /* No relevant flags */
+			    if ((j > 0) && (Player.Player_Other.instance.window_flag[j] & Misc.PW_MAP) == 0) continue;
+
+			    screen_hgt = (j == 0) ? Misc.SCREEN_HGT : t.hgt;
+			    screen_wid = (j == 0) ? Misc.SCREEN_WID : t.wid;
+
+			    /* Shift by half a panel */
+			    wy = t.offset_y + Misc.ddy[dir] * screen_hgt / 2;
+			    wx = t.offset_x + Misc.ddx[dir] * screen_wid / 2;
+
+			    /* Use "modify_panel" */
+			    if (modify_panel(t, wy, wx)) changed = true;
+			}
+
+			return (changed);
+		}
 	}
 }

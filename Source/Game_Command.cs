@@ -505,6 +505,22 @@ namespace CSAngband {
 			arg_present[n] = true;
 		}
 
+		public void set_arg_point(int n, int x, int y)
+		{
+			int idx = cmd_idx(command);
+
+			Misc.assert(n <= CMD_MAX_ARGS);
+			Misc.assert((game_cmds[idx].arg_type[n] & cmd_arg_type.arg_POINT) != 0);
+
+			arg[n] = new cmd_arg();
+			arg[n].point = new Loc();
+			arg[n].point.x = x;
+			arg[n].point.y = y;
+			arg_type[n] = cmd_arg_type.arg_POINT;
+			arg_present[n] = true;
+		}
+
+
 		public static Game_Command get_top()
 		{
 			return cmd_queue[prev_cmd_idx(cmd_head)];

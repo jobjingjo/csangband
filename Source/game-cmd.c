@@ -50,18 +50,6 @@ void cmd_set_arg_target(game_command *cmd, int n, int target)
 	cmd.arg_present[n] = true;
 }
 
-void cmd_set_arg_point(game_command *cmd, int n, int x, int y)
-{
-	int idx = cmd_idx(cmd.command);
-
-	assert(n <= CMD_MAX_ARGS);
-	assert(game_cmds[idx].arg_type[n] & arg_POINT);
-
-	cmd.arg[n].point.x = x;
-	cmd.arg[n].point.y = y;
-	cmd.arg_type[n] = arg_POINT;
-	cmd.arg_present[n] = true;
-}
 
 
 

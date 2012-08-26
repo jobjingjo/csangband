@@ -68,5 +68,28 @@ namespace CSAngband.Monster {
 			    Misc.p_ptr.redraw |= (Misc.PR_MONSTER);
 			}
 		}
+
+		
+		/*
+		 * Hack -- describe the given monster race at the top of the screen
+		 */
+		public static void screen_roff(int r_idx)
+		{
+			throw new NotImplementedException();
+			///* Flush messages */
+			//message_flush();
+
+			///* Begin recall */
+			//Term_erase(0, 1, 255);
+
+			///* Output to the screen */
+			//text_out_hook = text_out_to_screen;
+
+			///* Recall monster */
+			//describe_monster(r_idx, false);
+
+			///* Describe monster */
+			//roff_top(r_idx);
+		}
 	}
 }

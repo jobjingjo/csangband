@@ -113,7 +113,6 @@ extern void c_put_str(byte attr, const char *str, int row, int col);
 extern void put_str(const char *str, int row, int col);
 extern void c_prt(byte attr, const char *str, int row, int col);
 extern void text_out_to_file(byte attr, const char *str);
-extern void clear_from(int row);
 extern bool askfor_aux_keypress(char *buf, size_t buflen, size_t *curs, size_t *len, struct keypress keypress, bool firsttime);
 extern bool askfor_aux(char *buf, size_t len, bool keypress_h(char *, size_t, size_t *, size_t *, struct keypress, bool));
 extern bool get_string(const char *prompt, char *buf, size_t len);
@@ -139,7 +138,6 @@ extern char xchar_trans(byte c);
 
 /* xtra2.c */
 bool adjust_panel(int y, int x);
-bool change_panel(int dir);
 void center_panel(void);
 int motion_dir(int y1, int x1, int y2, int x2);
 
