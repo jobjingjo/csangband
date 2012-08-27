@@ -865,24 +865,23 @@ namespace CSAngband {
 		 * Determine if a given grid may be "disarmed"
 		 */
 		static bool disarm_test(int y, int x) {
-			throw new NotImplementedException();
-			///* Must have knowledge */
-			//if (!(cave.info[y][x] & (CAVE_MARK))) {
-			//    msg("You see nothing there.");
-			//    return false;
-			//}
+			/* Must have knowledge */
+			if ((Cave.cave.info[y][x] & (Cave.CAVE_MARK)) == 0) {
+			    Utilities.msg("You see nothing there.");
+			    return false;
+			}
 
-			///* Look for a closed, unlocked door to lock */
-			//if (cave.feat[y][x] == FEAT_DOOR_HEAD)	return true;
+			/* Look for a closed, unlocked door to lock */
+			if (Cave.cave.feat[y][x] == Cave.FEAT_DOOR_HEAD)	return true;
 
-			///* Look for a trap */
-			//if (!cave_isknowntrap(cave, y, x)) {
-			//    msg("You see nothing there to disarm.");
-			//    return false;
-			//}
+			/* Look for a trap */
+			if (!Cave.cave_isknowntrap(Cave.cave, y, x)) {
+			    Utilities.msg("You see nothing there to disarm.");
+			    return false;
+			}
 
-			///* Okay */
-			//return true;
+			/* Okay */
+			return true;
 		}
 
 
@@ -950,79 +949,78 @@ namespace CSAngband {
 		 * Returns true if repeated commands may continue
 		 */
 		static bool disarm_aux(int y, int x) {
-			throw new NotImplementedException();
-			//int i, j, power;
+			int i, j, power;
 
-			//const char *name;
+			string name;
 
-			//bool more = false;
-
-
-			///* Verify legality */
-			//if (!do_cmd_disarm_test(y, x)) return (false);
+			bool more = false;
 
 
-			///* Get the trap name */
-			//name = f_info[cave.feat[y][x]].name;
+			/* Verify legality */
+			if (!Do_Command.disarm_test(y, x)) return (false);
 
-			///* Get the "disarm" factor */
-			//i = p_ptr.state.skills[SKILL_DISARM];
 
-			///* Penalize some conditions */
-			//if (p_ptr.timed[TMD_BLIND] || no_light()) i = i / 10;
-			//if (p_ptr.timed[TMD_CONFUSED] || p_ptr.timed[TMD_IMAGE]) i = i / 10;
+			/* Get the trap name */
+			name = Misc.f_info[Cave.cave.feat[y][x]].name;
 
-			///* XXX XXX XXX Variable power? */
+			/* Get the "disarm" factor */
+			i = Misc.p_ptr.state.skills[(int)Skill.DISARM];
 
-			///* Extract trap "power" */
-			//power = 5;
+			/* Penalize some conditions */
+			if (Misc.p_ptr.timed[(int)Timed_Effect.BLIND] != 0 || Cave.no_light()) i = i / 10;
+			if (Misc.p_ptr.timed[(int)Timed_Effect.CONFUSED] != 0 || Misc.p_ptr.timed[(int)Timed_Effect.IMAGE] != 0) i = i / 10;
 
-			///* Extract the difficulty */
-			//j = i - power;
+			/* XXX XXX XXX Variable power? */
 
-			///* Always have a small chance of success */
-			//if (j < 2) j = 2;
+			/* Extract trap "power" */
+			power = 5;
 
-			///* Success */
-			//if (randint0(100) < j)
-			//{
-			//    /* Message */
-			//    msgt(MSG_DISARM, "You have disarmed the %s.", name);
+			/* Extract the difficulty */
+			j = i - power;
 
-			//    /* Reward */
-			//    player_exp_gain(p_ptr, power);
+			/* Always have a small chance of success */
+			if (j < 2) j = 2;
 
-			//    /* Forget the trap */
-			//    cave.info[y][x] &= ~(CAVE_MARK);
+			/* Success */
+			if (Random.randint0(100) < j)
+			{
+			    /* Message */
+			    Utilities.msgt(Message_Type.MSG_DISARM, "You have disarmed the {0}.", name);
 
-			//    /* Remove the trap */
-			//    cave_set_feat(cave, y, x, FEAT_FLOOR);
-			//}
+			    /* Reward */
+			    Misc.p_ptr.exp_gain(power);
 
-			///* Failure -- Keep trying */
-			//else if ((i > 5) && (randint1(i) > 5))
-			//{
-			//    flush();
+			    /* Forget the trap */
+			    Cave.cave.info[y][x] &= ~(Cave.CAVE_MARK);
 
-			//    /* Message */
-			//    msg("You failed to disarm the %s.", name);
+			    /* Remove the trap */
+			    Cave.cave_set_feat(Cave.cave, y, x, Cave.FEAT_FLOOR);
+			}
 
-			//    /* We may keep trying */
-			//    more = true;
-			//}
+			/* Failure -- Keep trying */
+			else if ((i > 5) && (Random.randint1(i) > 5))
+			{
+			    Utilities.flush();
 
-			///* Failure -- Set off the trap */
-			//else
-			//{
-			//    /* Message */
-			//    msg("You set off the %s!", name);
+			    /* Message */
+			    Utilities.msg("You failed to disarm the {0}.", name);
 
-			//    /* Hit the trap */
-			//    hit_trap(y, x);
-			//}
+			    /* We may keep trying */
+			    more = true;
+			}
 
-			///* Result */
-			//return (more);
+			/* Failure -- Set off the trap */
+			else
+			{
+			    /* Message */
+			    Utilities.msg("You set off the {0}!", name);
+
+			    /* Hit the trap */
+			    Trap.hit_trap(y, x);
+			}
+
+			/* Result */
+			return (more);
 		}
 
 
