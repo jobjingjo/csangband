@@ -278,71 +278,70 @@ namespace CSAngband.Monster {
 						//}
 			        } else if (effect.value == RBE.EAT_GOLD.value)
 			        {
-						throw new NotImplementedException();
-						//// Take damage
-						//take_hit(p, damage, ddesc);
+						// Take damage
+						Spell.take_hit(p, damage, ddesc);
 
-						//// Obvious
-						//obvious = true;
+						// Obvious
+						obvious = true;
 
-						//// Saving throw (unless paralyzed) based on dex and level
-						//if (!p.timed[TMD_PARALYZED] &&
-						//    (randint0(100) < (adj_dex_safe[p.state.stat_ind[A_DEX]] +
-						//                        p.lev)))
-						//{
-						//    // Saving throw message
-						//    msg("You quickly protect your money pouch!");
+						// Saving throw (unless paralyzed) based on dex and level
+						if (p.timed[(int)Timed_Effect.PARALYZED] == 0 &&
+						    (Random.randint0(100) < (Player.Player.adj_dex_safe[p.state.stat_ind[(int)Stat.Dex]] + p.lev)))
+						{
+							// Saving throw message
+							Utilities.msg("You quickly protect your money pouch!");
 
-						//    // Occasional blink anyway
-						//    if (randint0(3)) blinked = true;
-						//}
+							// Occasional blink anyway
+							if (Random.randint0(3) != 0) blinked = true;
+						}
 
-						//// Eat gold
-						//else {
-						//    gold = (p.au / 10) + randint1(25);
-						//    if (gold < 2) gold = 2;
-						//    if (gold > 5000) gold = (p.au / 20) + randint1(3000);
-						//    if (gold > p.au) gold = p.au;
-						//    p.au -= gold;
-						//    if (gold <= 0) {
-						//        msg("Nothing was stolen.");
-						//        break;
-						//    }
-						//    // Let the player know they were robbed
-						//    msg("Your purse feels lighter.");
-						//    if (p.au)
-						//        msg("%ld coins were stolen!", (long)gold);
-						//    else
-						//        msg("All of your coins were stolen!");
+						// Eat gold
+						else {
+							gold = (short)((p.au / 10) + Random.randint1(25));
+							if (gold < 2) gold = 2;
+							if (gold > 5000) gold = (short)((p.au / 20) + Random.randint1(3000));
+							if (gold > p.au) gold = (short)p.au;
+							p.au -= gold;
+							if (gold <= 0) {
+							    Utilities.msg("Nothing was stolen.");
+							    break;
+							}
+							// Let the player know they were robbed
+							Utilities.msg("Your purse feels lighter.");
+							if (p.au != 0)
+							    Utilities.msg("{0} coins were stolen!", (long)gold);
+							else
+							    Utilities.msg("All of your coins were stolen!");
 
-						//    // While we have gold, put it in objects
-						//    while (gold > 0) {
-						//        int amt;
+							// While we have gold, put it in objects
+							while (gold > 0) {
+							    int amt;
 
-						//        // Create a new temporary object
-						//        object_type o;
-						//        object_wipe(&o);
-						//        object_prep(&o, objkind_get(TV_GOLD, SV_GOLD), 0, MINIMISE);
+							    // Create a new temporary object
+								//object_type o;
+								//object_wipe(&o);
+								Object.Object o = new Object.Object();
+								o.prep(Object.Object_Kind.objkind_get(TVal.TV_GOLD, (int)SVal.sval_gold.SV_GOLD), 0, aspect.MINIMISE);
 
-						//        // Amount of gold to put in this object
-						//        amt = gold > MAX_PVAL ? MAX_PVAL : gold;
-						//        o.pval[DEFAULT_PVAL] = amt;
-						//        gold -= amt;
+							    // Amount of gold to put in this object
+							    amt = gold > Misc.MAX_PVAL ? Misc.MAX_PVAL : gold;
+							    o.pval[Misc.DEFAULT_PVAL] = (short)amt;
+							    gold -= (short)amt;
 
-						//        // Set origin to stolen, so it is not confused with
-						//        // dropped treasure in monster_death
-						//        o.origin = ORIGIN_STOLEN;
+							    // Set origin to stolen, so it is not confused with
+							    // dropped treasure in monster_death
+							    o.origin = Origin.STOLEN;
 
-						//        // Give the gold to the monster
-						//        monster_carry(m_ptr, &o);
-						//    }
+							    // Give the gold to the monster
+								carry(o);
+							}
 
-						//    // Redraw gold
-						//    p.redraw |= (PR_GOLD);
+							// Redraw gold
+							p.redraw |= (Misc.PR_GOLD);
 
-						//    // Blink away
-						//    blinked = true;
-						//}
+							// Blink away
+							blinked = true;
+						}
 			        } else if (effect.value == RBE.EAT_ITEM.value)
 			        {
 						// Take damage
