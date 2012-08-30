@@ -218,7 +218,7 @@ namespace CSAngband {
 		/*
 		 * Ignore SIGTSTP signals (keyboard suspend)
 		 */
-		public static void signals_ignore_tstp()
+		public static void ignore_tstp()
 		{
 
 			//#ifdef SIGTSTP
@@ -230,7 +230,7 @@ namespace CSAngband {
 		/*
 		 * Handle SIGTSTP signals (keyboard suspend)
 		 */
-		public static void signals_handle_tstp()
+		public static void handle_tstp()
 		{
 
 			//#ifdef SIGTSTP

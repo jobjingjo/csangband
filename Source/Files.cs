@@ -1014,5 +1014,107 @@ namespace CSAngband {
 			/* Equippy */
 			display_player_equippy(row++, col+6);
 		}
+
+		/*
+		 * Close up the current game (player may or may not be dead)
+		 *
+		 * Note that the savefile is not saved until the tombstone is
+		 * actually displayed and the player has a chance to examine
+		 * the inventory and such.  This allows cheating if the game
+		 * is equipped with a "quit without save" method.  XXX XXX XXX
+		 */
+		public static void close_game()
+		{
+			/* Handle stuff */
+			Misc.p_ptr.handle_stuff();
+
+			/* Flush the messages */
+			Utilities.message_flush();
+
+			/* Flush the input */
+			Utilities.flush();
+
+
+			/* No suspending now */
+			Signals.ignore_tstp();
+
+
+			/* Hack -- Increase "icky" depth */
+			Misc.character_icky++;
+
+
+			/* Handle death */
+			if (Misc.p_ptr.is_dead)
+			{
+				Death.screen();
+			}
+
+			/* Still alive */
+			else
+			{
+				/* Save the game */
+				save_game();
+
+				if (Term.instance.mapped_flag)
+				{
+					keypress ch;
+
+					Utilities.prt("Press Return (or Escape).", 0, 40);
+					ch = Utilities.inkey();
+					if (ch.code != keycode_t.ESCAPE)
+						Score.predict_score();
+				}
+			}
+
+
+			/* Hack -- Decrease "icky" depth */
+			Misc.character_icky--;
+
+
+			/* Allow suspending now */
+			Signals.handle_tstp();
+		}
+
+		/*
+		 * Save the game
+		 */
+		public static void save_game()
+		{
+			/* Disturb the player */
+			Cave.disturb(Misc.p_ptr, 1, 0);
+
+			/* Clear messages */
+			Utilities.message_flush();
+
+			/* Handle stuff */
+			Misc.p_ptr.handle_stuff();
+
+			/* Message */
+			Utilities.prt("Saving game...", 0, 0);
+
+			/* Refresh */
+			Term.fresh();
+
+			/* The player is not dead */
+			Misc.p_ptr.died_from = "(saved)";
+
+			/* Forbid suspend */
+			Signals.ignore_tstp();
+
+			/* Save the player */
+			if (Savefile.savefile_save(savefile))
+			    Utilities.prt("Saving game... done.", 0, 0);
+			else
+			    Utilities.prt("Saving game... failed!", 0, 0);
+
+			/* Allow suspend again */
+			Signals.handle_tstp();
+
+			/* Refresh */
+			Term.fresh();
+
+			/* Note that the player is not dead */
+			Misc.p_ptr.died_from = "(alive and well)";
+		}
 	}
 }

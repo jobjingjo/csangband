@@ -35,7 +35,6 @@ extern const char *copyright;
 extern int arg_graphics;
 extern bool arg_graphics_nice;
 extern bool character_existed;
-extern bool character_saved;
 extern s16b character_xtra;
 extern bool use_graphics_nice;
 extern char savefile[1024];
@@ -89,11 +88,9 @@ extern bool findpath(int y, int x);
 /* score.c */
 extern void enter_score(time_t *death_time);
 extern void show_scores(void);
-extern void predict_score(void);
 
 
 /* signals.c */
-extern void signals_ignore_tstp(void);
 extern void signals_handle_tstp(void);
 extern void signals_init(void);
 

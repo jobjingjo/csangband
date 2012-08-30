@@ -268,67 +268,68 @@ namespace CSAngband {
 
 				/* Accidental Death */
 				if (Player.Player.instance.playing && Player.Player.instance.is_dead) {
-					throw new NotImplementedException();
-					///* XXX-elly: this does not belong here. Refactor or
-					// * remove. Very similar to do_cmd_wiz_cure_all(). */
-					//if ((Player.Player.instance.wizard || OPT(cheat_live)) && !get_check("Die? ")) {
-					//    /* Mark social class, reset age, if needed */
-					//    if (Player.Player.instance.sc) Player.Player.instance.sc = Player.Player.instance.age = 0;
+					/* XXX-elly: this does not belong here. Refactor or
+					 * remove. Very similar to do_cmd_wiz_cure_all(). */
+					if ((Player.Player.instance.wizard || Option.cheat_live.value) && !Utilities.get_check("Die? ")) {
+						throw new NotImplementedException();
 
-					//    /* Increase age */
-					//    Player.Player.instance.age++;
+						///* Mark social class, reset age, if needed */
+						//if (Player.Player.instance.sc != 0) Player.Player.instance.sc = Player.Player.instance.age = 0;
 
-					//    /* Mark savefile */
-					//    Player.Player.instance.noscore |= NOSCORE_WIZARD;
+						///* Increase age */
+						//Player.Player.instance.age++;
 
-					//    /* Message */
-					//    msg("You invoke wizard mode and cheat death.");
-					//    message_flush();
+						///* Mark savefile */
+						//Player.Player.instance.noscore |= NOSCORE_WIZARD;
 
-					//    /* Cheat death */
-					//    Player.Player.instance.is_dead = false;
+						///* Message */
+						//msg("You invoke wizard mode and cheat death.");
+						//message_flush();
 
-					//    /* Restore hit points */
-					//    Player.Player.instance.chp = Player.Player.instance.mhp;
-					//    Player.Player.instance.chp_frac = 0;
+						///* Cheat death */
+						//Player.Player.instance.is_dead = false;
 
-					//    /* Restore spell points */
-					//    Player.Player.instance.csp = Player.Player.instance.msp;
-					//    Player.Player.instance.csp_frac = 0;
+						///* Restore hit points */
+						//Player.Player.instance.chp = Player.Player.instance.mhp;
+						//Player.Player.instance.chp_frac = 0;
 
-					//    /* Hack -- Healing */
-					//    Player.Player.instance.clear_timed(Timed_Effect.BLIND, true);
-					//    Player.Player.instance.clear_timed(Timed_Effect.CONFUSED, true);
-					//    Player.Player.instance.clear_timed(Timed_Effect.POISONED, true);
-					//    Player.Player.instance.clear_timed(Timed_Effect.AFRAID, true);
-					//    Player.Player.instance.clear_timed(Timed_Effect.PARALYZED, true);
-					//    Player.Player.instance.clear_timed(Timed_Effect.IMAGE, true);
-					//    Player.Player.instance.clear_timed(Timed_Effect.STUN, true);
-					//    Player.Player.instance.clear_timed(Timed_Effect.CUT, true);
+						///* Restore spell points */
+						//Player.Player.instance.csp = Player.Player.instance.msp;
+						//Player.Player.instance.csp_frac = 0;
 
-					//    /* Hack -- Prevent starvation */
-					//    Player.Player.instance.set_food(Player.Player.instance, PY_FOOD_MAX - 1);
+						///* Hack -- Healing */
+						//Player.Player.instance.clear_timed(Timed_Effect.BLIND, true);
+						//Player.Player.instance.clear_timed(Timed_Effect.CONFUSED, true);
+						//Player.Player.instance.clear_timed(Timed_Effect.POISONED, true);
+						//Player.Player.instance.clear_timed(Timed_Effect.AFRAID, true);
+						//Player.Player.instance.clear_timed(Timed_Effect.PARALYZED, true);
+						//Player.Player.instance.clear_timed(Timed_Effect.IMAGE, true);
+						//Player.Player.instance.clear_timed(Timed_Effect.STUN, true);
+						//Player.Player.instance.clear_timed(Timed_Effect.CUT, true);
 
-					//    /* Hack -- cancel recall */
-					//    if (Player.Player.instance.word_recall)
-					//    {
-					//        /* Message */
-					//        msg("A tension leaves the air around you...");
-					//        message_flush();
+						///* Hack -- Prevent starvation */
+						//Player.Player.instance.set_food(Player.Player.instance, PY_FOOD_MAX - 1);
 
-					//        /* Hack -- Prevent recall */
-					//        Player.Player.instance.word_recall = 0;
-					//    }
+						///* Hack -- cancel recall */
+						//if (Player.Player.instance.word_recall)
+						//{
+						//    /* Message */
+						//    msg("A tension leaves the air around you...");
+						//    message_flush();
 
-					//    /* Note cause of death XXX XXX XXX */
-					//    my_strcpy(Player.Player.instance.died_from, "Cheating death", sizeof(Player.Player.instance.died_from));
+						//    /* Hack -- Prevent recall */
+						//    Player.Player.instance.word_recall = 0;
+						//}
 
-					//    /* New depth */
-					//    Player.Player.instance.depth = 0;
+						///* Note cause of death XXX XXX XXX */
+						//my_strcpy(Player.Player.instance.died_from, "Cheating death", sizeof(Player.Player.instance.died_from));
 
-					//    /* Leaving */
-					//    Player.Player.instance.leaving = true;
-					//}
+						///* New depth */
+						//Player.Player.instance.depth = 0;
+
+						///* Leaving */
+						//Player.Player.instance.leaving = true;
+					}
 				}
 
 				/* Handle "death" */
@@ -338,16 +339,14 @@ namespace CSAngband {
 				Cave.cave_generate(Cave.cave, Player.Player.instance);
 			}
 
-			throw new NotImplementedException();
+			/* Disallow big cursor */
+			Term.smlcurs = true;
 
-			///* Disallow big cursor */
-			//smlcurs = true;
+			/* Tell the UI we're done with the game state */
+			Game_Event.signal(Game_Event.Event_Type.LEAVE_GAME);
 
-			///* Tell the UI we're done with the game state */
-			//event_signal(EVENT_LEAVE_GAME);
-
-			///* Close stuff */
-			//close_game();
+			/* Close stuff */
+			Files.close_game();
 		}
 
 		/*
@@ -422,7 +421,7 @@ namespace CSAngband {
 			{
 				///* The borg runs so quickly that this is a bad idea. */
 				//#ifndef ALLOW_BORG 
-				//        save_game();
+				Files.save_game();
 				//#endif
 				Misc.p_ptr.autosave = false;
 			}
