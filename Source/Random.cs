@@ -163,9 +163,9 @@ namespace CSAngband {
 		 * gameplay.  This is intended for use by external program parts like the
 		 * main-*.c files.
 		 */
-		public static UInt32 Rand_simple(UInt32 m) {
-			throw new NotImplementedException();
-			//return 0;
+		public static int Rand_simple(int m) {
+			System.Random temp = new System.Random();
+			return temp.Next(m);
 		}
 
 		/**
