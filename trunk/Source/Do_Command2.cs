@@ -1711,8 +1711,7 @@ namespace CSAngband {
 		}
 
 		public static void save_game(Command_Code code, cmd_arg[] args) {
-			throw new NotImplementedException();
-			//save_game();
+			Files.save_game();
 		}
 
 		/**

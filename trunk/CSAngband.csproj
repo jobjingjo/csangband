@@ -72,6 +72,7 @@
     <Compile Include="Source\Command_Object.cs" />
     <Compile Include="Source\Config.cs" />
     <Compile Include="Source\Data_Panel.cs" />
+    <Compile Include="Source\Death.cs" />
     <Compile Include="Source\Do_Command2.cs" />
     <Compile Include="Source\Do_Command_Knowledge.cs" />
     <Compile Include="Source\Do_Command3.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Source\Init.cs" />
     <Compile Include="Source\Init2.cs" />
     <Compile Include="Source\Keymap.cs" />
+    <Compile Include="Source\Load.cs" />
     <Compile Include="Source\Loc.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\Map.cs" />
@@ -158,7 +160,9 @@
     <Compile Include="Source\Quark.cs" />
     <Compile Include="Source\Quest.cs" />
     <Compile Include="Source\Region.cs" />
+    <Compile Include="Source\Save.cs" />
     <Compile Include="Source\Savefile.cs" />
+    <Compile Include="Source\Score.cs" />
     <Compile Include="Source\Sidebar.cs" />
     <Compile Include="Source\Signals.cs" />
     <Compile Include="Source\Skill_Enum.cs" />
@@ -242,7 +246,6 @@
     <Content Include="Source\cmd1.c" />
     <Content Include="Source\cmd2.c" />
     <Content Include="Source\cmds.h" />
-    <Content Include="Source\death.c" />
     <Content Include="Source\debug.c" />
     <Content Include="Source\debug.h" />
     <Content Include="Source\defines.h" />
@@ -259,7 +262,6 @@
     <Content Include="Source\history.c" />
     <Content Include="Source\init.h" />
     <Content Include="Source\init2.c" />
-    <Content Include="Source\load.c" />
     <Content Include="Source\main-crb.c" />
     <Content Include="Source\main-gcu.c" />
     <Content Include="Source\main-nds.c" />
@@ -294,10 +296,8 @@
     <Content Include="Source\Player\spell.c" />
     <Content Include="Source\prefs.c" />
     <Content Include="Source\prefs.h" />
-    <Content Include="Source\save.c" />
     <Content Include="Source\savefile.c" />
     <Content Include="Source\savefile.h" />
-    <Content Include="Source\score.c" />
     <Content Include="Source\snd-sdl.c" />
     <Content Include="Source\spells.h" />
     <Content Include="Source\spells1.c" />
