@@ -133,7 +133,7 @@ namespace CSAngband {
 		 */
 		public static int my_strcpy(ref string buf, string src, int bufsize){
 			buf = src.Substring(0, bufsize);
-			return buf.Length;
+			return src.Length;
 		}
 
 		/**
