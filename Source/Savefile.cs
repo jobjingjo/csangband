@@ -200,50 +200,63 @@ namespace CSAngband {
 		static bool try_save(StreamWriter file)
 		{
 		    byte[] savefile_head = new byte[SAVEFILE_HEAD_SIZE];
-		    int i, pos;
+		    int i, pos = 0;
 
 		    /* Start off the buffer */
 		    buffer = new byte[BUFFER_INITIAL_SIZE];
 		    buffer_size = BUFFER_INITIAL_SIZE;
 
-			throw new NotImplementedException();
-		//    for (i = 0; i < savers.Length; i++)
-		//    {
-		//        buffer_pos = 0;
-		//        buffer_check = 0;
+		    for (i = 0; i < savers.Length; i++)
+		    {
+		        buffer_pos = 0;
+		        buffer_check = 0;
 
-		//        savers[i].save();
+		        savers[i].save();
 
-		//        /* 16-byte block name */
-		//        pos = my_strcpy((char *)savefile_head,
-		//                savers[i].name,
-		//                sizeof savefile_head);
-		//        while (pos < 16)
-		//            savefile_head[pos++] = 0;
+		        /* 16-byte block name */
+				//pos = my_strcpy((char *)savefile_head, savers[i].name,sizeof savefile_head);
+				pos = savers[i].name.Length; //my_strcpy returns length of source.
+				for (int n = 0; n < savers[i].name.Length; n++){
+					savefile_head[n] = (byte)savers[i].name[n];
+				}
+				
 
-		//#define SAVE_U32B(v)	\
-		//        savefile_head[pos++] = (v & 0xFF); \
-		//        savefile_head[pos++] = ((v >> 8) & 0xFF); \
-		//        savefile_head[pos++] = ((v >> 16) & 0xFF); \
-		//        savefile_head[pos++] = ((v >> 24) & 0xFF);
+		        while (pos < 16)
+		            savefile_head[pos++] = 0;
 
-		//        SAVE_U32B(savers[i].version);
-		//        SAVE_U32B(buffer_pos);
-		//        SAVE_U32B(buffer_check);
+				uint[] temp_vals = new uint[]{
+					savers[i].version,
+					buffer_pos,
+					buffer_check
+				};
 
-		//        assert(pos == SAVEFILE_HEAD_SIZE);
+				foreach (uint v in temp_vals){
+					savefile_head[pos++] = (byte)(v & 0xFF);
+					savefile_head[pos++] = (byte)((v >> 8) & 0xFF);
+					savefile_head[pos++] = (byte)((v >> 16) & 0xFF);
+					savefile_head[pos++] = (byte)((v >> 24) & 0xFF);
+				}
 
-		//        file_write(file, (char *)savefile_head, SAVEFILE_HEAD_SIZE);
-		//        file_write(file, (char *)buffer, buffer_pos);
+				Misc.assert(pos == SAVEFILE_HEAD_SIZE);
 
-		//        /* pad to 4 byte multiples */
-		//        if (buffer_pos % 4)
-		//            file_write(file, "xxx", 4 - (buffer_pos % 4));
-		//    }
+				file.Write(savefile_head);
+				file.Write(buffer);
 
-		//    mem_free(buffer);
+				//file_write(file, (char *)savefile_head, SAVEFILE_HEAD_SIZE);
+				//file_write(file, (char *)buffer, buffer_pos);
 
-		//    return true;
+				/* pad to 4 byte multiples */
+				if((buffer_pos % 4) != 0) {
+					for(uint x = buffer_pos % 4; x != 0; x--) {
+						file.Write((byte)'x');
+					}
+				}
+		    }
+
+			buffer = null;
+		    //mem_free(buffer);
+
+		    return true;
 		}
 
 
