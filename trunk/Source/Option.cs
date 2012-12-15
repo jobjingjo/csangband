@@ -6,7 +6,7 @@ using System.Text;
 namespace CSAngband {
 	class Option {
 		static int Counter = 0;
-		static Option[] options = new Option[MAX];
+		public static Option[] options = new Option[MAX];
 
 		public Option(string name, string description, bool normal){
 			this.name = name;

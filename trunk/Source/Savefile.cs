@@ -59,10 +59,10 @@ namespace CSAngband {
 		static string savefile_name = "VNLA";
 
 		/* Buffer bits */
-		static byte[] buffer;
-		static uint buffer_size;
-		static uint buffer_pos;
-		static uint buffer_check;
+		public static byte[] buffer;
+        public static uint buffer_size;
+        public static uint buffer_pos;
+        public static uint buffer_check;
 
 		const int BUFFER_INITIAL_SIZE	 =	1024;
 		const int BUFFER_BLOCK_INCREMENT =	1024;
