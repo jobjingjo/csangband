@@ -5,6 +5,42 @@ using System.Text;
 
 namespace CSAngband {
 	class Save {
+        private static void wr_string(string val)
+        {
+            foreach (char c in val.ToCharArray())
+            {
+                wr_byte((byte)c);
+            }
+        }
+
+        private static void wr_u16b(UInt16 val)
+        {
+            BitConverter.GetBytes(val).CopyTo(Savefile.buffer, Savefile.buffer_pos);
+            Savefile.buffer_pos += 2;
+            Savefile.buffer_size += 2;
+        }
+
+        private static void wr_s16b(Int16 val)
+        {
+            BitConverter.GetBytes(val).CopyTo(Savefile.buffer, Savefile.buffer_pos);
+            Savefile.buffer_pos += 2;
+            Savefile.buffer_size += 2;
+        }
+
+        private static void wr_u32b(UInt32 val)
+        {
+            BitConverter.GetBytes(val).CopyTo(Savefile.buffer, Savefile.buffer_pos);
+            Savefile.buffer_pos += 4; //4 bytes in a u32b
+            Savefile.buffer_size += 4;
+        }
+
+        private static void wr_byte(byte val)
+        {
+            Savefile.buffer[Savefile.buffer_pos] = val;
+            Savefile.buffer_pos += 1;
+            Savefile.buffer_size += 1;
+        }
+
 		/*
 		 * Write an "item" record
 		 */
@@ -98,27 +134,26 @@ namespace CSAngband {
 		 */
 		public static void wr_randomizer()
 		{
-			throw new NotImplementedException();
-			//int i;
+			int i;
 
-			///* current value for the simple RNG */
-			//wr_u32b(Rand_value);
+			/* current value for the simple RNG */
+			wr_u32b(Random.Rand_value);
 
-			///* state index */
-			//wr_u32b(state_i);
+			/* state index */
+			wr_u32b(Random.state_i);
 
-			///* RNG variables */
-			//wr_u32b(z0);
-			//wr_u32b(z1);
-			//wr_u32b(z2);
+            /* RNG variables */
+            wr_u32b(Random.z0);
+            wr_u32b(Random.z1);
+            wr_u32b(Random.z2);
 
-			///* RNG state */
-			//for (i = 0; i < RAND_DEG; i++)
-			//    wr_u32b(STATE[i]);
+            /* RNG state */
+            for (i = 0; i < Random.RAND_DEG; i++)
+                wr_u32b(Random.STATE[i]);
 
-			///* null padding */
-			//for (i = 0; i < 59 - RAND_DEG; i++)
-			//    wr_u32b(0);
+            /* null padding */
+            for (i = 0; i < 59 - Random.RAND_DEG; i++)
+                wr_u32b(0);
 		}
 
 
@@ -127,58 +162,60 @@ namespace CSAngband {
 		 */
 		public static void wr_options()
 		{
-			throw new NotImplementedException();
-		   // int i, k;
+		    int i, k;
 
-		   // u32b window_flag[ANGBAND_TERM_MAX];
-		   // u32b window_mask[ANGBAND_TERM_MAX];
+		    uint[] window_flag = new uint[Misc.ANGBAND_TERM_MAX];
+            uint[] window_mask = new uint[Misc.ANGBAND_TERM_MAX];
 
 
-		   // /* Special Options */
-		   // wr_byte(op_ptr.delay_factor);
-		   // wr_byte(op_ptr.hitpoint_warn);
-		   // wr_u16b(lazymove_delay);
+		    /* Special Options */
+            wr_byte(Player.Player_Other.instance.delay_factor);
+		    wr_byte(Player.Player_Other.instance.hitpoint_warn);
+		    wr_u16b(Misc.lazymove_delay);
 
-		   // /* Normal options */
-		   // for (i = 0; i < OPT_MAX; i++) {
-		   //     const char *name = option_name(i);
-		   //     if (!name)
-		   //         continue;
+		    /* Normal options */
+            for (i = 0; i < Option.MAX; i++)
+            {
+                if (Option.options[i] == null) continue;
 
-		   //     wr_string(name);
-		   //     wr_byte(op_ptr.opt[i]);
-		   //}
+                string name = Option.options[i].name;
+		        
+                if (name == null) continue;
 
-		   // /* Sentinel */
-		   // wr_byte(0);
+		        wr_string(name);
+		        wr_byte((byte)(Option.options[i].value?1:0));
+		   }
 
-		   // /*** Window options ***/
+		    /* Sentinel */
+		    wr_byte(0);
 
-		   // /* Reset */
-		   // for (i = 0; i < ANGBAND_TERM_MAX; i++)
-		   // {
-		   //     /* Flags */
-		   //     window_flag[i] = op_ptr.window_flag[i];
+		    /*** Window options ***/
 
-		   //     /* Mask */
-		   //     window_mask[i] = 0L;
+		    /* Reset */
+		    for (i = 0; i < Misc.ANGBAND_TERM_MAX; i++)
+		    {
+		        /* Flags */
+                window_flag[i] = Player.Player_Other.instance.window_flag[i];
 
-		   //     /* Build the mask */
-		   //     for (k = 0; k < 32; k++)
-		   //     {
-		   //         /* Set mask */
-		   //         if (window_flag_desc[k])
-		   //         {
-		   //             window_mask[i] |= (1L << k);
-		   //         }
-		   //     }
-		   // }
+		        /* Mask */
+		        window_mask[i] = 0;
 
-		   // /* Dump the flags */
-		   // for (i = 0; i < ANGBAND_TERM_MAX; i++) wr_u32b(window_flag[i]);
+		        /* Build the mask */
+		        for (k = 0; k < 32; k++)
+		        {
+		            /* Set mask */
+		            if (window_flag_desc[k])
+		            {
+		                window_mask[i] |= (1 << k);
+		            }
+		        }
+		    }
 
-		   // /* Dump the masks */
-		   // for (i = 0; i < ANGBAND_TERM_MAX; i++) wr_u32b(window_mask[i]);
+		    /* Dump the flags */
+		    for (i = 0; i < ANGBAND_TERM_MAX; i++) wr_u32b(window_flag[i]);
+
+		    /* Dump the masks */
+		    for (i = 0; i < ANGBAND_TERM_MAX; i++) wr_u32b(window_mask[i]);
 		}
 
 

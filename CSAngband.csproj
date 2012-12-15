@@ -170,6 +170,7 @@
     <Compile Include="Source\Squelch.cs" />
     <Compile Include="Source\Statusline.cs" />
     <Compile Include="Source\Store.cs" />
+    <Compile Include="Source\Table.cs" />
     <Compile Include="Source\Target.cs" />
     <Compile Include="Source\Term_Data.cs" />
     <Compile Include="Source\Term_Win.cs" />
