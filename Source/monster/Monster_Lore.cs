@@ -12,6 +12,20 @@ namespace CSAngband.Monster {
 	 * monster recall (no knowledge of spells, etc). XXX XXX XXX
 	 */
 	class Monster_Lore {
+		public Monster_Lore() {
+			sights = 0;
+			deaths = 0;
+			pkills = 0;
+			tkills = 0;
+			wake = 0;
+			ignore = 0;
+			drop_gold = 0;
+			drop_item = 0;
+			cast_innate = 0;
+			cast_spell = 0;
+			Array.Clear(blows, 0, Monster_Blow.MONSTER_BLOW_MAX);
+		}
+
 		public Int16 sights;			/* Count sightings of this monster */
 		public Int16 deaths;			/* Count deaths from this monster */
 
@@ -21,8 +35,8 @@ namespace CSAngband.Monster {
 		public byte wake;				/* Number of times woken up (?) */
 		public byte ignore;			/* Number of times ignored (?) */
 
-		byte drop_gold;			/* Max number of gold dropped at once */
-		byte drop_item;			/* Max number of item dropped at once */
+		public byte drop_gold;			/* Max number of gold dropped at once */
+		public byte drop_item;			/* Max number of item dropped at once */
 
 		public byte cast_innate;		/* Max number of innate spells seen */
 		public byte cast_spell;		/* Max number of other spells seen */

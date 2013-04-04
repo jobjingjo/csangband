@@ -176,10 +176,6 @@ void strip_bytes(int n)
 	while (n--) rd_byte(&tmp8u);
 }
 
-void pad_bytes(int n)
-{
-	while (n--) wr_byte(0);
-}
 
 
 

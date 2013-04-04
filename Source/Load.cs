@@ -2421,8 +2421,8 @@ namespace CSAngband {
 		}
 
 		/**
-			* Read monsters (MON_TMD_MAX = 4)
-			*/
+		* Read monsters (MON_TMD_MAX = 4)
+		*/
 		public static int rd_monsters_2()
 		{
 			throw new NotImplementedException();
