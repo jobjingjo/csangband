@@ -1860,92 +1860,84 @@ namespace CSAngband.Object {
 		 */
 		static void compact_objects_aux(int i1, int i2)
 		{
-			throw new NotImplementedException();
-			//int i;
+			int i;
 
-			//object_type *o_ptr;
-
-
-			///* Do nothing */
-			//if (i1 == i2) return;
+			Object o_ptr;
 
 
-			///* Repair objects */
-			//for (i = 1; i < o_max; i++)
-			//{
-			//    /* Get the object */
-			//    o_ptr = object_byid(i);
-
-			//    /* Skip "dead" objects */
-			//    if (!o_ptr.kind) continue;
-
-			//    /* Repair "next" pointers */
-			//    if (o_ptr.next_o_idx == i1)
-			//    {
-			//        /* Repair */
-			//        o_ptr.next_o_idx = i2;
-			//    }
-			//}
+			/* Do nothing */
+			if (i1 == i2) return;
 
 
-			///* Get the object */
-			//o_ptr = object_byid(i1);
+			/* Repair objects */
+			for (i = 1; i < Misc.o_max; i++) {
+				/* Get the object */
+				o_ptr = Object.byid((short)i);
+
+				/* Skip "dead" objects */
+				if (o_ptr == null || o_ptr.kind == null) continue;
+
+				/* Repair "next" pointers */
+				if (o_ptr.next_o_idx == i1) {
+					/* Repair */
+					o_ptr.next_o_idx = (short)i2;
+				}
+			}
 
 
-			///* Monster */
-			//if (o_ptr.held_m_idx)
-			//{
-			//    monster_type *m_ptr;
-
-			//    /* Get the monster */
-			//    m_ptr = cave_monster(cave, o_ptr.held_m_idx);
-
-			//    /* Repair monster */
-			//    if (m_ptr.hold_o_idx == i1)
-			//    {
-			//        /* Repair */
-			//        m_ptr.hold_o_idx = i2;
-			//    }
-			//}
-
-			///* Dungeon */
-			//else
-			//{
-			//    int y, x;
-
-			//    /* Get location */
-			//    y = o_ptr.iy;
-			//    x = o_ptr.ix;
-
-			//    /* Repair grid */
-			//    if (cave.o_idx[y][x] == i1)
-			//    {
-			//        /* Repair */
-			//        cave.o_idx[y][x] = i2;
-			//    }
-
-			//    /* Mimic */
-			//    if (o_ptr.mimicking_m_idx)
-			//    {
-			//        monster_type *m_ptr;
-
-			//        /* Get the monster */
-			//        m_ptr = cave_monster(cave, o_ptr.mimicking_m_idx);
-
-			//        /* Repair monster */
-			//        if (m_ptr.mimicked_o_idx == i1)
-			//        {
-			//            /* Repair */
-			//            m_ptr.mimicked_o_idx = i2;
-			//        }
-			//    }
-			//}
+			/* Get the object */
+			o_ptr = Object.byid((short)i1);
 
 
-			///* Hack -- move object */
-			//COPY(object_byid(i2), object_byid(i1), object_type);
+			/* Monster */
+			if (o_ptr.held_m_idx != 0) {
+				Monster.Monster m_ptr;
 
-			///* Hack -- wipe hole */
+				/* Get the monster */
+				m_ptr = Cave.cave_monster(Cave.cave, o_ptr.held_m_idx);
+
+				/* Repair monster */
+				if (m_ptr.hold_o_idx == i1) {
+					/* Repair */
+					m_ptr.hold_o_idx = (short)i2;
+				}
+			}
+
+			/* Dungeon */
+			else {
+				int y, x;
+
+				/* Get location */
+				y = o_ptr.iy;
+				x = o_ptr.ix;
+
+				/* Repair grid */
+				if (Cave.cave.o_idx[y][x] == i1) {
+					/* Repair */
+					Cave.cave.o_idx[y][x] = (short)i2;
+				}
+
+				/* Mimic */
+				if (o_ptr.mimicking_m_idx != 0) {
+					Monster.Monster m_ptr;
+
+					/* Get the monster */
+					m_ptr = Cave.cave_monster(Cave.cave, o_ptr.mimicking_m_idx);
+
+					/* Repair monster */
+					if (m_ptr.mimicked_o_idx == i1) {
+						/* Repair */
+						m_ptr.mimicked_o_idx = (short)i2;
+					}
+				}
+			}
+
+
+			/* Hack -- move object */
+			//Object.byid(i2).copy(Object.byid(i1));
+			o_list[i2] = o_list[i1];
+
+			/* Hack -- wipe hole */
 			//object_wipe(o_ptr);
 		}
 
@@ -1967,133 +1959,123 @@ namespace CSAngband.Object {
 		 */
 		public static void compact_objects(int size)
 		{
-			throw new NotImplementedException();
-			//int py = p_ptr.py;
-			//int px = p_ptr.px;
+			int py = Misc.p_ptr.py;
+			int px = Misc.p_ptr.px;
 
-			//int i, y, x, cnt;
+			int i, y, x, cnt;
 
-			//int cur_lev, cur_dis, chance;
-
-
-			///* Reorder objects when not passed a size */
-			//if (!size)
-			//{
-			//    /* Excise dead objects (backwards!) */
-			//    for (i = o_max - 1; i >= 1; i--)
-			//    {
-			//        object_type *o_ptr = object_byid(i);
-			//        if (o_ptr.kind) continue;
-
-			//        /* Move last object into open hole */
-			//        compact_objects_aux(o_max - 1, i);
-
-			//        /* Compress "o_max" */
-			//        o_max--;
-			//    }
-
-			//    return;
-			//}
+			int cur_lev, cur_dis, chance;
 
 
-			///* Message */
-			//msg("Compacting objects...");
+			/* Reorder objects when not passed a size */
+			if (size == 0) {
+				/* Excise dead objects (backwards!) */
+				for (i = Misc.o_max - 1; i >= 1; i--) {
+					Object o_ptr = Object.byid((short)i);
+					if (o_ptr != null && o_ptr.kind != null) continue;
 
-			///*** Try destroying objects ***/
+					/* Move last object into open hole */
+					compact_objects_aux(Misc.o_max - 1, i);
 
-			///* First do gold */
-			//for (i = 1; (i < o_max) && (size); i++)
-			//{
-			//    object_type *o_ptr = object_byid(i);
+					/* Compress "o_max" */
+					Misc.o_max--;
+				}
 
-			//    /* Nuke gold or squelched items */
-			//    if (o_ptr.tval == TV_GOLD || squelch_item_ok(o_ptr))
-			//    {
-			//        delete_object_idx(i);
-			//        size--;
-			//    }
-			//}
-
-
-			///* Compact at least 'size' objects */
-			//for (cnt = 1; size; cnt++)
-			//{
-			//    /* Get more vicious each iteration */
-			//    cur_lev = 5 * cnt;
-
-			//    /* Get closer each iteration */
-			//    cur_dis = 5 * (20 - cnt);
-
-			//    /* Examine the objects */
-			//    for (i = 1; (i < o_max) && (size); i++)
-			//    {
-			//        object_type *o_ptr = object_byid(i);
-			//        if (!o_ptr.kind) continue;
-
-			//        /* Hack -- High level objects start out "immune" */
-			//        if (o_ptr.kind.level > cur_lev && !o_ptr.kind.squelch)
-			//            continue;
-
-			//        /* Monster */
-			//        if (o_ptr.held_m_idx)
-			//        {
-			//            monster_type *m_ptr;
-
-			//            /* Get the monster */
-			//            m_ptr = cave_monster(cave, o_ptr.held_m_idx);
-
-			//            /* Get the location */
-			//            y = m_ptr.fy;
-			//            x = m_ptr.fx;
-
-			//            /* Monsters protect their objects */
-			//            if ((randint0(100) < 90) && !o_ptr.kind.squelch)
-			//                continue;
-			//        }
-
-			//        /* Mimicked items */
-			//        else if (o_ptr.mimicking_m_idx)
-			//        {
-			//            /* Get the location */
-			//            y = o_ptr.iy;
-			//            x = o_ptr.ix;
-
-			//            /* Mimicked items try hard not to be compacted */
-			//            if (randint0(100) < 90)
-			//                continue;
-			//        }
-			
-			//        /* Dungeon */
-			//        else
-			//        {
-			//            /* Get the location */
-			//            y = o_ptr.iy;
-			//            x = o_ptr.ix;
-			//        }
-
-			//        /* Nearby objects start out "immune" */
-			//        if ((cur_dis > 0) && (distance(py, px, y, x) < cur_dis) && !o_ptr.kind.squelch)
-			//            continue;
-
-			//        /* Saving throw */
-			//        chance = 90;
+				return;
+			}
 
 
-			//        /* Hack -- only compact artifacts in emergencies */
-			//        if (o_ptr.artifact && (cnt < 1000)) chance = 100;
+			/* Message */
+			Utilities.msg("Compacting objects...");
 
-			//        /* Apply the saving throw */
-			//        if (randint0(100) < chance) continue;
+			/*** Try destroying objects ***/
 
-			//        /* Delete the object */
-			//        delete_object_idx(i);
-			//        size--;
-			//    }
-			//}
+			/* First do gold */
+			for (i = 1; (i < Misc.o_max) && (size != 0); i++) {
+				Object o_ptr = Object.byid((short)i);
+
+				/* Nuke gold or squelched items */
+				if (o_ptr.tval == TVal.TV_GOLD || Squelch.item_ok(o_ptr)) {
+					delete_object_idx(i);
+					size--;
+				}
+			}
 
 
-			///* Reorder objects */
-			//compact_objects(0);
+			/* Compact at least 'size' objects */
+			for (cnt = 1; size != 0; cnt++) {
+				/* Get more vicious each iteration */
+				cur_lev = 5 * cnt;
+
+				/* Get closer each iteration */
+				cur_dis = 5 * (20 - cnt);
+
+				/* Examine the objects */
+				for (i = 1; (i < Misc.o_max) && (size != 0); i++) {
+					Object o_ptr = Object.byid((short)i);
+					if (o_ptr == null || o_ptr.kind == null) continue;
+
+					/* Hack -- High level objects start out "immune" */
+					if (o_ptr.kind.level > cur_lev && o_ptr.kind.squelch == null)
+						continue;
+
+					/* Monster */
+					if (o_ptr.held_m_idx != 0) {
+						Monster.Monster m_ptr;
+
+						/* Get the monster */
+						m_ptr = Cave.cave_monster(Cave.cave, o_ptr.held_m_idx);
+
+						/* Get the location */
+						y = m_ptr.fy;
+						x = m_ptr.fx;
+
+						/* Monsters protect their objects */
+						if ((Random.randint0(100) < 90) && o_ptr.kind.squelch == null)
+							continue;
+					}
+
+					/* Mimicked items */
+					else if (o_ptr.mimicking_m_idx != 0) {
+						/* Get the location */
+						y = o_ptr.iy;
+						x = o_ptr.ix;
+
+						/* Mimicked items try hard not to be compacted */
+						if (Random.randint0(100) < 90)
+							continue;
+					}
+
+					/* Dungeon */
+					else {
+						/* Get the location */
+						y = o_ptr.iy;
+						x = o_ptr.ix;
+					}
+
+					/* Nearby objects start out "immune" */
+					if ((cur_dis > 0) && (Cave.distance(py, px, y, x) < cur_dis) && o_ptr.kind.squelch == null)
+						continue;
+
+					/* Saving throw */
+					chance = 90;
+
+
+					/* Hack -- only compact artifacts in emergencies */
+					if (o_ptr.artifact != null && (cnt < 1000)) chance = 100;
+
+					/* Apply the saving throw */
+					if (Random.randint0(100) < chance) continue;
+
+					/* Delete the object */
+					delete_object_idx(i);
+					size--;
+				}
+			}
+
+
+			/* Reorder objects */
+			compact_objects(0);
 		}
 
 
