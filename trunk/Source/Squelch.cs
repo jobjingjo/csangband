@@ -168,8 +168,8 @@ namespace CSAngband {
 			new quality_name( quality_squelch.SQUELCH_ALL,				"non-artifact" ),
 		};
 
-		static byte[] squelch_level = new byte[(int)squelch_type_t.TYPE_MAX];
-		const int squelch_size = (int)squelch_type_t.TYPE_MAX;
+		public static byte[] squelch_level = new byte[(int)squelch_type_t.TYPE_MAX];
+		public const int squelch_size = (int)squelch_type_t.TYPE_MAX;
 
 
 		/*** Autoinscription stuff ***/
@@ -480,8 +480,7 @@ namespace CSAngband {
 
 		public static bool kind_is_squelched_unaware(Object_Kind k_ptr)
 		{
-			throw new NotImplementedException();
-			//return (k_ptr.squelch & SQUELCH_IF_UNAWARE) ? true : false;
+			return (k_ptr.squelch & SQUELCH_IF_UNAWARE) != 0 ? true : false;
 		}
 
 		public static void kind_squelch_when_aware(Object_Kind k_ptr)

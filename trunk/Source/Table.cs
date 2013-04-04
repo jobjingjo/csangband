@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CSAngband.Source
+namespace CSAngband
 {
     class Table
     {
@@ -15,7 +15,7 @@ namespace CSAngband.Source
          * main window, including File dump (help), File dump (artifacts, uniques),
          * Character screen, Small scale map, Previous Messages, Store screen, etc.
          */
-        const char *window_flag_desc[32] =
+        public static string[] window_flag_desc = new string[]
         {
 	        "Display inven/equip",
 	        "Display equip/inven",

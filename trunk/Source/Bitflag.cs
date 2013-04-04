@@ -17,6 +17,15 @@ namespace CSAngband {
 			}
 		}
 
+		public byte this[int i]{
+			get {
+				return data[i];
+			}
+			set {
+				data[i] = value;
+			}
+		}
+
 		/* The basic datatype of bitflags */
 		public const int FLAG_WIDTH = (sizeof(byte)*8);//the *8 is to get # of bits
 

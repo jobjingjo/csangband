@@ -234,22 +234,20 @@ namespace CSAngband {
 		 * Return the current number of messages stored.
 		 */
 		public static UInt16 messages_num() {
-			throw new NotImplementedException();
-			//return messages.count;
+			return (ushort)messages.count;
 		}
 
 
 		/** Individual message handling **/
 		//used to return message_t
-		private static Message_Type message_get(UInt16 age)
+		private static Message message_get(UInt16 age)
 		{
-			throw new NotImplementedException();
-			//message_t *m = messages.head;
+			Message m = messages.head;
 
-			//while (m && age--)
-			//    m = m.older;
+			while (m != null && age-- != 0)
+			    m = m.older;
 
-			//return m;
+			return m;
 		}
 
 		/**
@@ -303,9 +301,8 @@ namespace CSAngband {
 		 * available.
 		 */
 		public static string str(UInt16 age) {
-			throw new NotImplementedException();
-			//message_t *m = message_get(age);
-			//return (m ? m.str : "");
+			Message m = message_get(age);
+			return (m != null ? m.text : "");
 		}
 
 		/**
@@ -328,10 +325,9 @@ namespace CSAngband {
 		 *
 		 * The type is one of the MSG_ constants, defined above.
 		 */
-		public static UInt16 type(UInt16 age) {
-			throw new NotImplementedException();
-			//message_t *m = message_get(age);
-			//return (m ? m.type : 0);
+		public static Message_Type type(UInt16 age) {
+			Message m = message_get(age);
+			return (m != null ? m.typ : 0);
 		}
 
 		/**

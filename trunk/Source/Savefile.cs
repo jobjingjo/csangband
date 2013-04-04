@@ -53,6 +53,8 @@ namespace CSAngband {
 		 * - 
 		 */
 
+		public const int ITEM_VERSION = 5;
+
 
 		/** Magic bits at beginning of savefile */
 		static byte[] savefile_magic = { 83, 97, 118, 101 };
@@ -66,6 +68,24 @@ namespace CSAngband {
 
 		const int BUFFER_INITIAL_SIZE	 =	1024;
 		const int BUFFER_BLOCK_INCREMENT =	1024;
+
+
+		public static void BufferAddBytes(byte[] Data) {
+			BufferEnsureFree(Data.Length);
+			Data.CopyTo(Savefile.buffer, Savefile.buffer_pos);
+			Savefile.buffer_pos += (uint)Data.Length;
+			Savefile.buffer_size += (uint)Data.Length;
+		}
+
+		private static void BufferEnsureFree(int size) {
+			if (buffer.Length < buffer_pos + size) {
+				Array.Resize(ref buffer, buffer.Length + BUFFER_BLOCK_INCREMENT);
+			}
+		}
+
+		public static void pad_bytes(int n) {
+			while (n-- != 0) Save.wr_byte(0);
+		}
 
 		/** Savefile saving functions */
 		class Saver {

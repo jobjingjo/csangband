@@ -1,7 +1,7 @@
 #ifndef INCLUDED_SAVEFILE_H
 #define INCLUDED_SAVEFILE_H
 
-#define ITEM_VERSION	5
+
 
 /*** Savefile API ***/
 

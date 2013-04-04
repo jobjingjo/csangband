@@ -260,7 +260,6 @@
     <Content Include="Source\game-cmd.h" />
     <Content Include="Source\generate.h" />
     <Content Include="Source\h-basic.h" />
-    <Content Include="Source\history.c" />
     <Content Include="Source\init.h" />
     <Content Include="Source\init2.c" />
     <Content Include="Source\main-crb.c" />
